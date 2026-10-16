@@ -53,23 +53,47 @@ export function VacancyCard({
     if (salaryType === 'fixed') {
       return (
         <div className="card-salary-box">
-          <span>{Number(salaryMin).toLocaleString()}</span>
+          <span>{Number(salaryMin || 0).toLocaleString()}</span>
           <span className="card-salary-unit">
             {displayCurrency} {t('vacancies.per_month')}
           </span>
         </div>
       );
     }
+    if (!Number(salaryMin) && !Number(salaryMax)) {
+      return (
+        <span className="card-salary-box" style={{ fontSize: '0.95rem' }}>
+          {t('salary_types.negotiable')}
+        </span>
+      );
+    }
     return (
       <div className="card-salary-box">
         <span>
-          {Number(salaryMin).toLocaleString()} - {Number(salaryMax).toLocaleString()}
+          {Number(salaryMin || 0).toLocaleString()} - {Number(salaryMax || 0).toLocaleString()}
         </span>
         <span className="card-salary-unit">
           {displayCurrency} {t('vacancies.per_month')}
         </span>
       </div>
     );
+  };
+
+  const formatDate = (val) => {
+    if (!val) return '';
+    try {
+      const num = Number(val);
+      if (!isNaN(num) && num > 0) {
+        const ms = num < 1e11 ? num * 1000 : num;
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+      }
+      const iso = typeof val === 'string' ? val.replace(' ', 'T') : val;
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+    } catch {
+      return '';
+    }
   };
 
   const getStatusBadgeVariant = (st) => {
@@ -150,7 +174,7 @@ export function VacancyCard({
           <div className="card-footer-item">
             <Icon icon="solar:calendar-bold" width="14" height="14" />
             <span>
-              {createdAt ? new Date(createdAt).toLocaleDateString() : ''}
+              {formatDate(createdAt)}
             </span>
           </div>
         )}

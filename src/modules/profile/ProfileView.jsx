@@ -44,20 +44,52 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
     switchRole(nextRole);
   };
 
+  const tgUser = typeof window !== 'undefined' ? window.Telegram?.WebApp?.initDataUnsafe?.user : null;
+
+  let cachedUser = null;
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem('easyfind_user') : null;
+    if (raw) cachedUser = JSON.parse(raw);
+  } catch {}
+
   const displayName = (() => {
-    if (user) {
-      const full = `${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim();
-      if (full) return full;
-      if (user.username) return `@${user.username}`;
-    }
-    const tg = typeof window !== 'undefined' ? window.Telegram?.WebApp?.initDataUnsafe?.user : null;
-    if (tg) {
-      const tgFull = `${tg.first_name || ''} ${tg.last_name || ''}`.trim();
+    // 1. From context user state
+    const userFull = `${user?.first_name || user?.firstName || ''} ${user?.last_name || user?.lastName || ''}`.trim();
+    if (userFull) return userFull;
+    if (user?.username) return `@${user.username}`;
+
+    // 2. From Telegram WebApp directly
+    if (tgUser) {
+      const tgFull = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim();
       if (tgFull) return tgFull;
-      if (tg.username) return `@${tg.username}`;
+      if (tgUser.username) return `@${tgUser.username}`;
     }
-    return t('profile.role_seeker');
+
+    // 3. From cached user in localStorage
+    if (cachedUser) {
+      const cFull = `${cachedUser.first_name || cachedUser.firstName || ''} ${cachedUser.last_name || cachedUser.lastName || ''}`.trim();
+      if (cFull) return cFull;
+      if (cachedUser.username) return `@${cachedUser.username}`;
+    }
+
+    // 4. From URL search params
+    if (typeof window !== 'undefined') {
+      try {
+        const p = new URLSearchParams(window.location.search);
+        const fn = p.get('first_name');
+        const ln = p.get('last_name');
+        const un = p.get('username');
+        const uFull = `${fn ? decodeURIComponent(fn) : ''} ${ln ? decodeURIComponent(ln) : ''}`.trim();
+        if (uFull) return uFull;
+        if (un) return `@${decodeURIComponent(un)}`;
+      } catch {}
+    }
+
+    return isEmployer ? t('profile.role_employer') : t('profile.role_seeker');
   })();
+
+  const displayUsername = user?.username || tgUser?.username || cachedUser?.username || '';
+  const displayPhoto = user?.photo_url || tgUser?.photo_url || cachedUser?.photo_url || null;
 
   return (
     <div className="page-content">
@@ -89,9 +121,9 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
           </>
         ) : (
           <>
-            {user?.photo_url ? (
+            {displayPhoto ? (
               <img
-                src={user.photo_url}
+                src={displayPhoto}
                 alt={displayName}
                 style={{
                   width: '56px',
@@ -127,9 +159,9 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
               <h3 style={{ fontSize: '1.15rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {displayName}
               </h3>
-              {user?.username && (
+              {displayUsername && (
                 <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                  @{user.username}
+                  @{displayUsername.replace(/^@/, '')}
                 </div>
               )}
               <div style={{ marginTop: '6px' }}>

@@ -90,6 +90,7 @@ function getAppUserInfo() {
         if (!info.firstName && (u.firstName || u.first_name)) info.firstName = u.firstName || u.first_name;
         if (!info.lastName && (u.lastName || u.last_name)) info.lastName = u.lastName || u.last_name;
         if (!info.username && u.username) info.username = u.username;
+        if (!info.photo_url && u.photo_url) info.photo_url = u.photo_url;
       }
     } catch (e) {}
 

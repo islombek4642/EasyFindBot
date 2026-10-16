@@ -78,12 +78,19 @@ export function AuthProvider({ children }) {
       const urlUn = urlParams?.get('username') ? decodeURIComponent(urlParams.get('username')) : '';
 
       setUser((prev) => {
-        const fn = backendUser.first_name || backendUser.firstName || tgUser.first_name || urlFn || prev?.first_name || prev?.firstName || '';
-        const ln = backendUser.last_name || backendUser.lastName || tgUser.last_name || urlLn || prev?.last_name || prev?.lastName || '';
-        const un = backendUser.username || tgUser.username || urlUn || prev?.username || '';
-        const photo = backendUser.photo_url || tgUser.photo_url || prev?.photo_url || null;
+        let cached = null;
+        try {
+          const raw = localStorage.getItem('easyfind_user');
+          if (raw) cached = JSON.parse(raw);
+        } catch (e) {}
+
+        const fn = backendUser.first_name || backendUser.firstName || tgUser.first_name || urlFn || prev?.first_name || prev?.firstName || cached?.first_name || cached?.firstName || '';
+        const ln = backendUser.last_name || backendUser.lastName || tgUser.last_name || urlLn || prev?.last_name || prev?.lastName || cached?.last_name || cached?.lastName || '';
+        const un = backendUser.username || tgUser.username || urlUn || prev?.username || cached?.username || '';
+        const photo = backendUser.photo_url || tgUser.photo_url || prev?.photo_url || cached?.photo_url || null;
 
         const updated = {
+          ...(cached || {}),
           ...(prev || {}),
           ...backendUser,
           first_name: fn,
@@ -92,10 +99,10 @@ export function AuthProvider({ children }) {
           lastName: ln,
           username: un,
           photo_url: photo,
-          role: backendUser.role || prev?.role || 'seeker',
+          role: backendUser.role || prev?.role || cached?.role || 'seeker',
         };
         try {
-          if (updated.first_name || updated.firstName || updated.username) {
+          if (updated.first_name || updated.firstName || updated.username || updated.photo_url) {
             localStorage.setItem('easyfind_user', JSON.stringify(updated));
           }
         } catch (e) {}

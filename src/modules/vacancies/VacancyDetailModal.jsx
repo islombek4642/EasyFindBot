@@ -53,17 +53,24 @@ export function VacancyDetailModal({
     if (salaryType === 'fixed') {
       return (
         <div className="card-salary-box">
-          <span>{Number(salaryMin).toLocaleString()}</span>
+          <span>{Number(salaryMin || 0).toLocaleString()}</span>
           <span className="card-salary-unit">
             {displayCurrency} {t('vacancies.per_month')}
           </span>
         </div>
       );
     }
+    if (!Number(salaryMin) && !Number(salaryMax)) {
+      return (
+        <span className="card-salary-box" style={{ fontSize: '1.1rem' }}>
+          {t('salary_types.negotiable')}
+        </span>
+      );
+    }
     return (
       <div className="card-salary-box">
         <span>
-          {Number(salaryMin).toLocaleString()} - {Number(salaryMax).toLocaleString()}
+          {Number(salaryMin || 0).toLocaleString()} - {Number(salaryMax || 0).toLocaleString()}
         </span>
         <span className="card-salary-unit">
           {displayCurrency} {t('vacancies.per_month')}

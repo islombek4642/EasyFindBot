@@ -22,7 +22,7 @@ export function buildMainReplyKeyboard(isAdmin, lang = 'uz', user = null) {
     if (ln) userParams += `&last_name=${encodeURIComponent(ln)}`;
     if (un) userParams += `&username=${encodeURIComponent(un)}`;
   }
-  const vParam = '&v=1.0.1';
+  const vParam = '&v=1.0.2';
 
   const rows = [
     [
@@ -78,6 +78,8 @@ export default async function (message, ctx) {
   const from = message?.from || {};
 
   if (!chatId || !userId) return;
+
+  const isAdmin = await isUserAdmin(userId);
 
   logger.info('handlers/message.js', `Incoming message from ${userId}: "${text}"`);
 
