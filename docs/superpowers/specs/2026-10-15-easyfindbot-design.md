@@ -330,8 +330,13 @@ export async function getAllAdminTgIds() {
      > *"✅ TASDIQLANDI"*  
      > *"👤 Moderator: @{moderatorUsername} (ID: {moderatorTgId})"*  
      > *"⏰ Vaqt: {timestamp}"*
-   - **In Public Channel (`config.publicChannelId`)**: Publishes a formatted, branded public post with an inline button: `[ 📄 To'liq ko'rish va ariza topshirish ]` with `web_app: { url: 'https://app<id>.tgcloud.ai?startapp=vac_<id>' }`.
-   - Stores `channelMessageId` in the `vacancies` table.
+   - **In Public Channel (`getPublicChannelId()`)**: 
+     > [!IMPORTANT]
+     > **Telegram Bot API Rule:** Telegram explicitly prohibits `web_app` buttons on messages sent to public channels (`BUTTON_TYPE_INVALID`). Channel posts MUST use standard URL buttons:
+     > `url: 'https://t.me/' + config.botUsername + '/app?startapp=vac_' + id`
+     - Publishes a formatted, branded public post with an inline button: `[ 📄 To'liq ko'rish va ariza topshirish ]` with `url: 'https://t.me/' + config.botUsername + '/app?startapp=vac_' + id`.
+     - **Fault Tolerance:** Wrapped in `try...catch`. If bot lacks admin privileges or channel ID is invalid, logs the error, marks an alert on the moderation card, and safely proceeds without failing the database approval.
+     - Stores `channelMessageId` in the `vacancies` table upon successful broadcast.
    - Dispatches matching push notifications to subscribed candidates in the bot.
    - Dispatches confirmation notification to employer via the bot that their vacancy is live.
 5. **On Reject**:
@@ -351,14 +356,21 @@ The Mini App operates within Telegram's WebApp view where Telegram exposes:
 - `Telegram.WebApp.themeParams`:
   - `bg_color`, `secondary_bg_color`, `text_color`, `hint_color`, `link_color`, `button_color`, `button_text_color`
 
-### 5.2. Implementation (`src/context/ThemeContext.jsx` & `src/index.css`)
-1. On initialization, read `Telegram.WebApp.colorScheme`. If undefined (outside Telegram), inspect `window.matchMedia('(prefers-color-scheme: dark)').matches`.
-2. Apply `dark` or `light` class to `document.documentElement` and set CSS variables.
-3. Listen to `Telegram.WebApp.onEvent('themeChanged', applyTheme)`.
-4. Provide a toggle button in `ProfileView` for manual override with `localStorage` persistence.
-5. Design tokens define harmonious color palettes:
-   - **Dark Mode**: Deep slate background (`#0B0F19`), card background (`#151D2F`), border (`rgba(255,255,255,0.08)`), text (`#F8FAFC`), muted (`#94A3B8`), accent (`#38BDF8`).
-   - **Light Mode**: Clean background (`#F8FAFC`), card background (`#FFFFFF`), border (`#E2E8F0`), text (`#0F172A`), muted (`#64748B`), accent (`#0284C7`).
+### 5.3. Viewport Expansion & Mobile Safe Area Handling
+To avoid UI overlap on mobile devices (iOS Home Bar, Android navigation gesture bar, Telegram top header):
+1. **Full Height Expansion**: On mount, call `Telegram.WebApp.ready()` and `Telegram.WebApp.expand()` immediately to ensure the Mini App consumes 100% of the viewport.
+2. **Safe Area Insets**:
+   - Bottom Navigation (`src/components/layout/BottomNav.jsx`) applies padding incorporating device insets:
+     `padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));`
+   - Content wrapper includes bottom padding to prevent content from being obscured behind the fixed `BottomNav`.
+
+### 5.4. Transport Layer & Local Development Mock Adapter (`src/services/api.js`)
+When developers run the app locally outside of Telegram (`npm run dev` in Chrome or Edge):
+- `window.Telegram?.WebApp?.Serverless?.call` is `undefined`.
+- The transport layer (`src/services/api.js`) automatically detects this state:
+  - If inside Telegram Serverless: delegates directly to `Telegram.WebApp.Serverless.call`.
+  - If standalone / local dev: falls back to an in-memory mock adapter (`src/services/mockData.js`) serving realistic sample vacancies, candidate resumes, and demo profile states.
+- This guarantees zero blank screens or runtime crashes during local component styling and testing.
 
 ---
 
@@ -438,7 +450,8 @@ When an authorized administrator triggers `⚙️ Admin panel` or `/admin`, the 
    - `➕ Admin qo'shish`: Prompts for a target user's numeric `tgId` (or username) -> updates `users.role = 'admin'`.
    - `➖ Adminni o'chirish`: Super Admin selects moderator from inline list -> sets `users.role = 'seeker'`.
 4. **📢 Hammaga xabar yuborish (`admin:broadcast`, faqat Super Admin uchun)**:
-   - Prompts for a broadcast message -> queries active `users` table -> safely iterates with rate-limiting and error handling.
+   - Prompts for a broadcast message -> queries active `users` table.
+   - **Rate-limit & Execution Protection**: Processes recipients in chunks of 25 with 1-second delays and per-recipient `try...catch` to prevent Telegram 429 (`Too Many Requests`) and serverless execution timeouts. Large general announcements are recommended via the public channel instead.
 5. **📡 Kanallar boshqaruvi (`admin:channels`, faqat Super Admin uchun)**:
    - `📢 Asosiy kanal (E'lonlar chiqadigan kanal)`: Hozirgi `public_channel_id` qiymatini ko'rsatadi va yangi kanal ID/username (@channel) kiritish imkonini beradi.
    - `🛡 Moderatsiya kanali (E'lonlar tekshiriladigan yopiq guruh/kanal)`: Hozirgi `moderation_channel_id` qiymatini ko'rsatadi va yangi kanal/guruh ID sini kiritish imkonini beradi.
@@ -452,7 +465,7 @@ Bottom Navigation Bar:
 1. **Jobs (Vakansiyalar)**:
    - Keyword search input.
    - Category chips & region dropdown filter.
-   - Salary filter (Range / Negotiable).
+   - Salary filter: supports range and negotiable positions. Query logic uses `WHERE (salary_min >= :min OR salary_type = 'negotiable')` to prevent excluding competitive negotiable offers.
    - Infinite scroll / "Yana yuklash" pagination.
    - Vacancy card & detail modal with "Apply" button.
 2. **Post Job (E'lon berish)**:
