@@ -215,24 +215,61 @@ export const subscriptions = table('subscriptions', {
   userTgIdIdx: index('idx_sub_user_tg_id').on(t.userTgId),
   uniqueSubIdx: uniqueIndex('idx_sub_unique').on(t.userTgId, t.category, t.region),
 }));
+
+export const settings = table('settings', {
+  key:       text('key').primaryKey(),
+  value:     text('value').notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+});
 ```
 
 ---
 
 ## 4. Moderation, Configuration & Channel Broadcasting Workflow
 
-### 4.1. Configuration (`tgcloud/lib/config.js`)
-Since the V8 sandbox has no Node `process.env`, static owner credentials and environment configuration are centralized in `tgcloud/lib/config.js`:
+### 4.1. Dynamic Configuration & Storage (`tgcloud/lib/config.js` & `settings` table)
+Since the V8 sandbox has no Node `process.env`, static owner identity lives in `tgcloud/lib/config.js`, while dynamic channel IDs are stored in the database (`settings` table) and manageable directly via the **Bot Admin Panel**:
 ```javascript
 export const config = {
   superAdminTgId: 0,                           // Primary Owner / Super Admin Telegram ID (immutable root authority)
-  moderationChannelId: '@EasyFindModeration',  // Dedicated private channel/group for moderator review
-  publicChannelId: '@EasyFindJobs',            // Main public channel where approved vacancies are broadcast
+  moderationChannelId: '@EasyFindModeration',  // Default/fallback private moderation channel
+  publicChannelId: '@EasyFindJobs',            // Default/fallback public broadcast channel
   channelUsername: 'EasyFindJobs',
   botUsername: 'EasyFindBot',
   defaultCurrency: 'USD',
   paginationLimit: 15,
 };
+```
+
+**Dynamic Settings Helper (`tgcloud/lib/bot/settings.js`)**:
+```javascript
+import { db } from 'sdk';
+import { eq, sql } from 'sdk/db';
+import { settings } from '../../schema.js';
+import { config } from '../config.js';
+
+export async function getSetting(key, fallback = null) {
+  const row = await db.select().from(settings).where(eq(settings.key, key)).get();
+  return row ? row.value : fallback;
+}
+
+export async function setSetting(key, value) {
+  await db.insert(settings)
+    .values({ key, value: String(value) })
+    .onConflictDoUpdate({
+      target: settings.key,
+      set: { value: String(value), updatedAt: sql`(unixepoch())` },
+    })
+    .run();
+}
+
+export async function getModerationChannelId() {
+  return await getSetting('moderation_channel_id', config.moderationChannelId);
+}
+
+export async function getPublicChannelId() {
+  return await getSetting('public_channel_id', config.publicChannelId);
+}
 ```
 
 ### 4.2. Two-Tier Dynamic Admin Model & Authorization
@@ -402,6 +439,10 @@ When an authorized administrator triggers `⚙️ Admin panel` or `/admin`, the 
    - `➖ Adminni o'chirish`: Super Admin selects moderator from inline list -> sets `users.role = 'seeker'`.
 4. **📢 Hammaga xabar yuborish (`admin:broadcast`, faqat Super Admin uchun)**:
    - Prompts for a broadcast message -> queries active `users` table -> safely iterates with rate-limiting and error handling.
+5. **📡 Kanallar boshqaruvi (`admin:channels`, faqat Super Admin uchun)**:
+   - `📢 Asosiy kanal (E'lonlar chiqadigan kanal)`: Hozirgi `public_channel_id` qiymatini ko'rsatadi va yangi kanal ID/username (@channel) kiritish imkonini beradi.
+   - `🛡 Moderatsiya kanali (E'lonlar tekshiriladigan yopiq guruh/kanal)`: Hozirgi `moderation_channel_id` qiymatini ko'rsatadi va yangi kanal/guruh ID sini kiritish imkonini beradi.
+   - Barcha kiritilgan qiymatlar `settings` jadvalida saqlanadi va kodni o'zgartirmasdan turib darhol kuchga kiradi.
 
 ---
 
