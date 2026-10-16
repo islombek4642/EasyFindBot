@@ -322,29 +322,29 @@
   - `ThemeProvider` synchronizing `data-theme="dark" | "light"` with Telegram client.
   - Design tokens in `src/index.css` with CSS custom properties, glassmorphism card styles, and mobile safe-area paddings.
 
-- [ ] **Step 1: Implement translation dictionaries (`uz.js`, `ru.js`, `en.js`)**
+- [x] **Step 1: Implement translation dictionaries (`uz.js`, `ru.js`, `en.js`)**
   - Complete dictionaries covering navigation, vacancy cards, filters, forms, error alerts, applicant statuses, and empty states.
   - Strictly 0 emojis in strings.
 
-- [ ] **Step 2: Implement `src/locales/index.jsx`**
+- [x] **Step 2: Implement `src/locales/index.jsx`**
   - Provide `TranslationContext` and `useTranslation()` hook with automatic fallback to Uzbek (`uz`).
 
-- [ ] **Step 3: Implement `src/context/ThemeContext.jsx` and `useTheme.js`**
+- [x] **Step 3: Implement `src/context/ThemeContext.jsx` and `useTheme.js`**
   - Detect `Telegram.WebApp.colorScheme` on mount.
   - Listen for `Telegram.WebApp.onEvent('themeChanged', ...)`.
   - Fallback to `window.matchMedia('(prefers-color-scheme: dark)')` when running in browser.
   - Set `document.documentElement.setAttribute('data-theme', theme)`.
 
-- [ ] **Step 4: Implement `src/index.css` design system**
+- [x] **Step 4: Implement `src/index.css` design system**
   - Declare CSS variables: `--bg-primary`, `--bg-surface`, `--bg-card`, `--text-primary`, `--text-secondary`, `--text-muted`, `--border`, `--accent-primary`, `--accent-primary-hover`, `--success`, `--danger`, `--warning`.
   - Include mobile safe-area utility classes: `padding-bottom: max(12px, env(safe-area-inset-bottom, 12px))`.
   - Add smooth transitions, modern typography, and glassmorphic card borders.
 
-- [ ] **Step 5: Implement UI constants**
+- [x] **Step 5: Implement UI constants**
   - `src/constants/routes.js`: `VACANCIES: 'vacancies'`, `POST_JOB: 'post_job'`, `RESUMES: 'resumes'`, `PROFILE: 'profile'`.
   - Categories, regions, and salary type mappings.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
   ```bash
   git add src/locales/ src/context/ThemeContext.jsx src/hooks/useTheme.js src/index.css src/constants/
   git commit -m "feat(frontend): setup auto theme engine, safe-area design tokens, and i18n dictionaries"
