@@ -1053,7 +1053,7 @@ a {
 .brand-icon-box {
   width: 34px;
   height: 34px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   background: var(--accent-gradient);
   display: flex;
   align-items: center;
@@ -1061,6 +1061,15 @@ a {
   color: #ffffff;
   box-shadow: 0 4px 12px var(--accent-subtle);
   flex-shrink: 0;
+  overflow: hidden;
+  border: 1.5px solid var(--border-card);
+}
+
+.brand-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .header-actions {
@@ -1104,17 +1113,17 @@ a {
 
 .lang-btn {
   height: 32px;
-  padding: 0 8px;
-  border-radius: var(--radius-md);
+  padding: 0 10px;
+  border-radius: var(--radius-full);
   background: var(--bg-input);
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
   flex-shrink: 0;
   transition: all var(--transition-fast);

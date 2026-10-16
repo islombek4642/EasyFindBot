@@ -7,6 +7,13 @@ import { Icon } from '@iconify/react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useTranslation } from '../../locales/index.jsx';
 import { ThemeToggle } from '../common/ThemeToggle.jsx';
+import botAvatar from '../../../assets/bot_avatar.jpg';
+
+const LANG_FLAGS = {
+  uz: 'circle-flags:uz',
+  ru: 'circle-flags:ru',
+  en: 'circle-flags:us',
+};
 
 export function AppHeader({ onSwitchRole }) {
   const { role, switchRole, updateLanguage } = useAuth();
@@ -33,13 +40,21 @@ export function AppHeader({ onSwitchRole }) {
   };
 
   const isEmployer = role === 'employer';
+  const currentFlag = LANG_FLAGS[lang] || 'circle-flags:uz';
 
   return (
     <header className="app-header">
       <div className="header-inner">
         <div className="header-brand">
-          <div className="brand-icon-box" title="EasyFind">
-            <Icon icon="solar:magnifer-bold" width="18" height="18" />
+          <div className="brand-icon-box" title="EasyFind Bot">
+            <img
+              src={botAvatar}
+              alt="EasyFind"
+              className="brand-avatar-img"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
           </div>
         </div>
 
@@ -69,7 +84,12 @@ export function AppHeader({ onSwitchRole }) {
             title={t('profile.language') || "Tilni o'zgartirish"}
             aria-label="Switch Language"
           >
-            <Icon icon="solar:global-bold" width="14" height="14" />
+            <Icon
+              icon={currentFlag}
+              width="16"
+              height="16"
+              style={{ borderRadius: '50%', flexShrink: 0 }}
+            />
             <span>{(lang || 'uz').toUpperCase()}</span>
           </button>
 
