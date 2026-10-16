@@ -9,6 +9,7 @@ export const config = {
   // Bot & Channel identities
   channelUsername: 'EasyFindJobs',
   botUsername: 'EasyFind_UzBot',
+  miniAppUrl: 'https://app8716517896.tgcloud.ai',
 
   // App defaults
   defaultCurrency: 'USD',
