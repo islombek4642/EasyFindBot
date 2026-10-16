@@ -1,0 +1,16 @@
+export const REGIONS = [
+  'tashkent',
+  'andijan',
+  'bukhara',
+  'fergana',
+  'jizzakh',
+  'khorezm',
+  'namangan',
+  'navoiy',
+  'qashqadaryo',
+  'samarkand',
+  'sirdaryo',
+  'surxondaryo',
+  'karakalpakstan',
+  'remote',
+];

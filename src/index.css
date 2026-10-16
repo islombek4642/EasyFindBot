@@ -1,0 +1,336 @@
+/* ==========================================================================
+   EasyFindBot — Design System & Global Styles
+   ========================================================================== */
+
+:root {
+  /* Font Family */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Border Radius */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Safe Area Insets */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 12px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* --------------------------------------------------------------------------
+   Light Theme Tokens
+   -------------------------------------------------------------------------- */
+[data-theme='light'] {
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-input: #f1f5f9;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-modal-backdrop: rgba(15, 23, 42, 0.5);
+
+  --border-subtle: #e2e8f0;
+  --border-card: rgba(226, 232, 240, 0.9);
+  --border-focus: #3b82f6;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-subtle: rgba(37, 99, 235, 0.1);
+  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+
+  --success: #10b981;
+  --success-subtle: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-subtle: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-subtle: rgba(239, 68, 68, 0.12);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   Dark Theme Tokens (Default)
+   -------------------------------------------------------------------------- */
+[data-theme='dark'] {
+  --bg-app: #090d16;
+  --bg-surface: #0f172a;
+  --bg-card: rgba(26, 35, 54, 0.65);
+  --bg-card-hover: rgba(30, 41, 59, 0.85);
+  --bg-input: #131c2e;
+  --bg-glass: rgba(15, 23, 42, 0.75);
+  --bg-modal-backdrop: rgba(3, 7, 18, 0.75);
+
+  --border-subtle: rgba(51, 65, 85, 0.6);
+  --border-card: rgba(148, 163, 184, 0.12);
+  --border-focus: #38bdf8;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #090d16;
+
+  --accent-primary: #38bdf8;
+  --accent-hover: #0284c7;
+  --accent-subtle: rgba(56, 189, 248, 0.12);
+  --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+
+  --success: #34d399;
+  --success-subtle: rgba(52, 211, 153, 0.15);
+  --warning: #fbbf24;
+  --warning-subtle: rgba(251, 191, 36, 0.15);
+  --danger: #f87171;
+  --danger-subtle: rgba(248, 113, 113, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 24px rgba(56, 189, 248, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   Reset & Base Elements
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.1rem; }
+h4 { font-size: 1.0rem; }
+
+p {
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+}
+
+/* Interactive Elements */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   Layout Containers & Utilities
+   -------------------------------------------------------------------------- */
+.app-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-bottom: calc(76px + var(--safe-bottom));
+}
+
+.page-content {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Glassmorphism Card Utility */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.glass-card:hover {
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-subtle);
+}
+
+/* Pills and Badges */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-primary {
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+}
+
+.badge-success {
+  background: var(--success-subtle);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: var(--warning-subtle);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: var(--danger-subtle);
+  color: var(--danger);
+}
+
+.badge-neutral {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+
+/* Floating Bottom Navigation */
+.floating-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-card);
+  padding-top: 10px;
+  padding-bottom: max(12px, var(--safe-bottom));
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.nav-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 12px;
+}
+
+.nav-tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.nav-tab-btn.active {
+  color: var(--accent-primary);
+}
+
+.nav-tab-btn.active .nav-icon {
+  transform: translateY(-2px);
+  color: var(--accent-primary);
+}
+
+.nav-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+/* Shimmer Skeleton Animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-input) 0%,
+    var(--border-subtle) 50%,
+    var(--bg-input) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
