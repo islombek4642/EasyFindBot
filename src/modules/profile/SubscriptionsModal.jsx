@@ -18,9 +18,8 @@ export function SubscriptionsModal({ isOpen, onClose }) {
     try {
       setLoading(true);
       const res = await api.getSubscriptions();
-      if (res && res.items) {
-        setActiveCategories(new Set(res.items.map((s) => s.category)));
-      }
+      const list = res?.items || res?.subscriptions || [];
+      setActiveCategories(new Set(list.map((s) => s.category)));
     } catch (err) {
       console.error('Failed to load subscriptions:', err);
     } finally {

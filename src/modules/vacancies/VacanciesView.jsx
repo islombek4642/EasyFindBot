@@ -67,10 +67,9 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
         limit: 15,
       });
 
-      if (res && res.items) {
-        setVacancies((prev) => (append ? [...prev, ...res.items] : res.items));
-        setHasMore(res.hasMore || false);
-      }
+      const list = res?.items || res?.vacancies || [];
+      setVacancies((prev) => (append ? [...prev, ...list] : list));
+      setHasMore(res?.hasMore || false);
     } catch (err) {
       console.error('Failed to load vacancies:', err);
     } finally {

@@ -26,9 +26,8 @@ export function EmployerVacanciesModal({
     try {
       setLoading(true);
       const res = await api.getMyVacancies();
-      if (res && res.items) {
-        setItems(res.items);
-      }
+      const list = res?.items || res?.vacancies || [];
+      setItems(list);
     } catch (err) {
       console.error('Failed to load my vacancies:', err);
     } finally {

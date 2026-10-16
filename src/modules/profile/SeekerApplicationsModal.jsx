@@ -22,9 +22,8 @@ export function SeekerApplicationsModal({ isOpen, onClose }) {
     try {
       setLoading(true);
       const res = await api.getMyApplications();
-      if (res && res.items) {
-        setApplications(res.items);
-      }
+      const list = res?.items || res?.applications || [];
+      setApplications(list);
     } catch (err) {
       console.error('Failed to load my applications:', err);
     } finally {
@@ -76,11 +75,11 @@ export function SeekerApplicationsModal({ isOpen, onClose }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <h4 style={{ fontSize: '0.98rem', fontWeight: 700 }}>
-                    {app.vacancyTitle || `Vakansiya #${app.vacancyId}`}
+                    {app.vacancy?.title || app.vacancyTitle || `Vakansiya #${app.vacancyId}`}
                   </h4>
-                  {app.company && (
+                  {(app.vacancy?.companyName || app.vacancy?.company || app.company) && (
                     <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                      {app.company}
+                      {app.vacancy?.companyName || app.vacancy?.company || app.company}
                     </div>
                   )}
                 </div>

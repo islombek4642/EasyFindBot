@@ -50,10 +50,9 @@ export function ResumesView() {
         limit: 15,
       });
 
-      if (res && res.items) {
-        setResumes((prev) => (append ? [...prev, ...res.items] : res.items));
-        setHasMore(res.hasMore || false);
-      }
+      const list = res?.items || res?.resumes || [];
+      setResumes((prev) => (append ? [...prev, ...list] : list));
+      setHasMore(res?.hasMore || false);
     } catch (err) {
       console.error('Failed to load resumes:', err);
     } finally {

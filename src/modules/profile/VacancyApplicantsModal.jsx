@@ -28,9 +28,8 @@ export function VacancyApplicantsModal({
     try {
       setLoading(true);
       const res = await api.getVacancyApplications({ vacancyId: vacancy.id });
-      if (res && res.items) {
-        setApplicants(res.items);
-      }
+      const list = res?.items || res?.applications || [];
+      setApplicants(list);
     } catch (err) {
       console.error('Failed to load applicants:', err);
     } finally {

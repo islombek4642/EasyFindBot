@@ -106,6 +106,40 @@ function getAppUserInfo() {
 }
 
 /**
+ * Normalizes backend responses so UI components receive consistent properties
+ */
+function normalizeApiResponse(endpoint, result) {
+  if (!result || typeof result !== 'object') return result;
+
+  // Align ok and success
+  if (result.ok === undefined && result.success !== undefined) {
+    result.ok = result.success;
+  } else if (result.success === undefined && result.ok !== undefined) {
+    result.success = result.ok;
+  }
+
+  // Normalize entity arrays to items and vice versa
+  const list = result.items || result.vacancies || result.resumes || result.applications || result.subscriptions;
+  if (Array.isArray(list)) {
+    result.items = list;
+    const ep = endpoint.toLowerCase();
+    if (ep.includes('vacanc') && !result.vacancies) result.vacancies = list;
+    if (ep.includes('resume') && !result.resumes) result.resumes = list;
+    if (ep.includes('app') && !result.applications) result.applications = list;
+    if (ep.includes('sub') && !result.subscriptions) result.subscriptions = list;
+  }
+
+  // Normalize pagination hasMore
+  if (result.hasMore === undefined && typeof result.total === 'number' && typeof result.limit === 'number') {
+    const offset = Number(result.offset) || 0;
+    const count = (result.items || []).length;
+    result.hasMore = offset + count < result.total;
+  }
+
+  return result;
+}
+
+/**
  * Low-level RPC caller
  */
 async function callServerless(endpoint, params = {}) {
@@ -120,7 +154,7 @@ async function callServerless(endpoint, params = {}) {
             console.error(`[API Error] ${endpoint}:`, err);
             reject(err);
           } else {
-            resolve(result);
+            resolve(normalizeApiResponse(endpoint, result));
           }
         });
       } catch (err) {
@@ -132,7 +166,8 @@ async function callServerless(endpoint, params = {}) {
 
   // Standalone simulation mode
   await new Promise((resolve) => setTimeout(resolve, 150));
-  return handleMockCall(endpoint, params);
+  const mockResult = handleMockCall(endpoint, params);
+  return normalizeApiResponse(endpoint, mockResult);
 }
 
 /**
