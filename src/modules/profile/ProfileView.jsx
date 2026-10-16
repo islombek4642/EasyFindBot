@@ -39,9 +39,14 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
 
   const isEmployer = role === 'employer';
 
-  const handleRoleToggle = () => {
-    const nextRole = isEmployer ? 'seeker' : 'employer';
-    switchRole(nextRole);
+  const handleRoleSelect = (targetRole) => {
+    if (role === targetRole) return;
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp?.HapticFeedback) {
+      try {
+        window.Telegram.WebApp.HapticFeedback.selectionChanged();
+      } catch (err) {}
+    }
+    switchRole(targetRole);
   };
 
   const tgUser = typeof window !== 'undefined' ? window.Telegram?.WebApp?.initDataUnsafe?.user : null;
@@ -174,29 +179,76 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
         )}
       </div>
 
-      {/* Role Switch Banner */}
+      {/* Role Switcher Segmented Card */}
       <div
         className="glass-card"
         style={{
-          padding: '16px',
+          padding: '14px 16px',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
+          gap: '12px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Icon icon="solar:refresh-circle-bold" width="22" height="22" style={{ color: 'var(--accent-primary)' }} />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '0.92rem' }}>{t('profile.switch_role')}</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-              {isEmployer ? t('profile.role_employer') : t('profile.role_seeker')}
-            </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--accent-subtle)',
+                color: 'var(--accent-primary)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon icon="solar:user-speak-rounded-bold" width="16" height="16" />
+            </span>
+            <span style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+              {t('profile.switch_role')}
+            </span>
           </div>
+
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            {isEmployer ? t('profile.role_employer_short') : t('profile.role_seeker_short')}
+          </span>
         </div>
 
-        <Button variant="outline" size="sm" onClick={handleRoleToggle}>
-          {isEmployer ? t('profile.role_seeker') : t('profile.role_employer')}
-        </Button>
+        {/* Modern Segmented Control */}
+        <div className="role-segmented-control">
+          <button
+            type="button"
+            className={`role-segment-btn ${!isEmployer ? 'active' : ''}`}
+            onClick={() => handleRoleSelect('seeker')}
+          >
+            <Icon
+              icon="solar:user-bold"
+              width="18"
+              height="18"
+              className="role-segment-icon"
+            />
+            <span className="role-segment-text">
+              {t('profile.role_seeker_short')}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className={`role-segment-btn ${isEmployer ? 'active' : ''}`}
+            onClick={() => handleRoleSelect('employer')}
+          >
+            <Icon
+              icon="solar:buildings-2-bold"
+              width="18"
+              height="18"
+              className="role-segment-icon"
+            />
+            <span className="role-segment-text">
+              {t('profile.role_employer_short')}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Role-Specific Actions */}
