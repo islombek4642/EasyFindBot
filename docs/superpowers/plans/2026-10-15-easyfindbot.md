@@ -259,40 +259,40 @@
 - Consumes: `(input, ctx)` where `ctx.initData.user` contains verified Telegram user data.
 - Produces: 16 RPC endpoints returning JSON responses with `{ success: true, ... }` or `{ error: string }`.
 
-- [ ] **Step 1: Implement user initialization & profile update**
+- [x] **Step 1: Implement user initialization & profile update**
   - `getInitData.js`: Finds or creates user record; returns user profile, role, and language.
   - `updateUser.js`: Updates user language, role (`seeker` / `employer`), phone.
 
-- [ ] **Step 2: Implement vacancy query endpoints**
+- [x] **Step 2: Implement vacancy query endpoints**
   - `getVacancies.js`: Supports filters (category, region, search keyword, salaryMin).
   - **CRITICAL**: Use `WHERE (salary_min >= :min OR salary_type = 'negotiable')` to prevent excluding negotiable offers.
   - Implement pagination with `limit` (default 15) and `offset`.
   - `getVacancyById.js`: Returns vacancy details and increments `viewsCount`.
 
-- [ ] **Step 3: Implement vacancy creation & employer management**
+- [x] **Step 3: Implement vacancy creation & employer management**
   - `createVacancy.js`: Validates required fields, inserts with `status: 'pending'`, notifies moderation channel via `sendToModeration()`.
   - `closeVacancy.js`: Validates `employerTgId === ctx.initData.user.id`, updates `status: 'closed'`.
   - `getMyVacancies.js`: Returns all vacancies posted by the authenticated employer.
 
-- [ ] **Step 4: Implement resume & talent endpoints**
+- [x] **Step 4: Implement resume & talent endpoints**
   - `createResume.js`: Upserts user resume (unique per `seekerTgId`).
   - `getMyResume.js`: Retrieves active resume of authenticated user.
   - `getResumes.js`: Filterable talent search for employers (category, region, experience).
 
-- [ ] **Step 5: Implement application workflow endpoints**
+- [x] **Step 5: Implement application workflow endpoints**
   - `applyVacancy.js`: Inserts application record with duplicate prevention (`uniqueIndex` on `vacancyId, seekerTgId`).
   - `getMyApplications.js`: Returns candidate's applied vacancies with current status.
   - `getVacancyApplications.js`: Returns applicant list with resumes for an employer's vacancy.
   - `updateApplicationStatus.js`: Updates applicant status (`viewed`, `accepted`, `rejected`), notifies applicant.
 
-- [ ] **Step 6: Implement notification subscription endpoints**
+- [x] **Step 6: Implement notification subscription endpoints**
   - `getSubscriptions.js`: Lists active category subscriptions for candidate.
   - `toggleSubscription.js`: Adds or removes subscription.
 
-- [ ] **Step 7: Verify all endpoints compile cleanly**
+- [x] **Step 7: Verify all endpoints compile cleanly**
   - Execute syntax and dry-run check across `tgcloud/endpoints/*.js`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
   ```bash
   git add tgcloud/endpoints/
   git commit -m "feat(backend): implement complete 16 serverless rpc endpoints"
