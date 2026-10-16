@@ -201,7 +201,7 @@
   - Bot Admin Panel callbacks for queue inspection, channel ID updates, and stats.
   - Command menu registration with `api.setMyCommands`.
 
-- [ ] **Step 1: Implement `tgcloud/handlers/message.js`**
+- [x] **Step 1: Implement `tgcloud/handlers/message.js`**
   - Auto-register or fetch user in `users` table on `/start`. Default language `uz`.
   - Check `isUserAdmin(tgId)`. If admin, append 4th row `[{ text: '⚙️ Admin panel' }]` to the persistent Reply Keyboard.
   - Route `/start vac_<id>`: Send preview card with inline button to launch Mini App with deep link.
@@ -209,7 +209,7 @@
   - Handle channel ID text input states when an admin is updating moderation or public channel settings.
   - Register commands on startup using `api.setMyCommands` across locales (`uz`, `ru`, `en`).
 
-- [ ] **Step 2: Implement `tgcloud/handlers/callback_query.js`**
+- [x] **Step 2: Implement `tgcloud/handlers/callback_query.js`**
   - Handle `mod_approve:<id>`:
     - Check `isUserAdmin(userTgId)`.
     - Check vacancy status is still `pending` (race condition lock).
@@ -224,10 +224,10 @@
     - Notify employer via `notifyEmployer()`.
   - Handle `admin:queue`, `admin:stats`, `admin:channels`, `admin:set_channel:*` navigation callbacks.
 
-- [ ] **Step 3: Test message and callback query handlers**
+- [x] **Step 3: Test message and callback query handlers**
   - Verify syntax and run mock invocation via `npx tgcloud run handlers/message` with a `/start` update.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
   ```bash
   git add tgcloud/handlers/
   git commit -m "feat(backend): implement secure message and callback handlers with dynamic admin reply keyboard and admin panel"
