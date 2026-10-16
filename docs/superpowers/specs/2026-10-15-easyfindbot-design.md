@@ -225,8 +225,9 @@ export const subscriptions = table('subscriptions', {
 Since the V8 sandbox has no Node `process.env`, static owner credentials and environment configuration are centralized in `tgcloud/lib/config.js`:
 ```javascript
 export const config = {
-  superAdminTgId: 0,                // Primary Owner / Super Admin Telegram ID (immutable root authority)
-  channelId: '@EasyFindJobs',       // or -100xxxxxxxxxx numeric channel ID
+  superAdminTgId: 0,                           // Primary Owner / Super Admin Telegram ID (immutable root authority)
+  moderationChannelId: '@EasyFindModeration',  // Dedicated private channel/group for moderator review
+  publicChannelId: '@EasyFindJobs',            // Main public channel where approved vacancies are broadcast
   channelUsername: 'EasyFindJobs',
   botUsername: 'EasyFindBot',
   defaultCurrency: 'USD',
@@ -242,7 +243,7 @@ To enable team scaling without manual code redeployments, the system implements 
    - Exclusively possesses rights to grant or revoke moderator privileges (`role = 'admin'`) directly via the Bot Admin Panel.
 2. **Moderators / Team Admins**:
    - Stored and managed dynamically in the SQLite `users` table (`role = 'admin'`).
-   - Authorized to review pending vacancies (Approve / Reject), view moderation queues, and inspect system metrics.
+   - Authorized to review pending vacancies in the dedicated moderation channel (Approve / Reject), inspect queues, and access Bot Admin Panel.
    - Cannot demote the Super Admin or modify other admin privileges.
 
 **Admin Authorization Helper (`tgcloud/lib/bot/auth.js`)**:
@@ -274,24 +275,34 @@ export async function getAllAdminTgIds() {
 }
 ```
 
-### 4.3. Moderation Workflow
+### 4.3. Dedicated Moderation Channel Workflow
 1. **Submission**: Employer submits vacancy via Mini App -> `createVacancy` endpoint sets `status = 'pending'`.
-2. **Admin Alert**: Backend fetches all active moderators via `getAllAdminTgIds()` and dispatches an admin review card via `api.sendMessage` with Inline Keyboard:
-   - `[ Tasdiqlash / Approve ]` (`callback_data: "admin:approve:<id>"`)
-   - `[ Rad etish / Reject ]` (`callback_data: "admin:reject:<id>"`)
+2. **Dispatch to Dedicated Moderation Channel**:
+   - Backend formats a comprehensive review card (Title, Company, Category, Region, Salary, Requirements, Employer tgId/username, Timestamp).
+   - Sends the card directly to the **Dedicated Moderation Channel/Group** (`config.moderationChannelId`) via `api.sendMessage` with Inline Keyboard:
+     - `[ ✅ Tasdiqlash / Approve ]` (`callback_data: "admin:approve:<id>"`)
+     - `[ ❌ Rad etish / Reject ]` (`callback_data: "admin:reject:<id>"`)
+   - *Fallback*: If `config.moderationChannelId` is not configured or delivery fails, dispatches review cards directly to all active moderators via `getAllAdminTgIds()`.
 3. **Authorization & Concurrency Check (`callback_query.js`)**:
    - Verifies caller authority via `await isUserAdmin(callbackQuery.from.id)`.
-   - If unauthorized: answers callback query with alert `"Sizda administrator huquqi yo'q"`.
-   - Race condition protection: If another admin already approved/rejected the vacancy, edits the moderation card to indicate `"⚠️ Ushbu e'lon allaqachon ko'rib chiqilgan"` to prevent duplicate actions.
+   - If unauthorized: answers callback query with alert `"Sizda moderatorlik huquqi yo'q"`.
+   - Race condition protection: If another moderator already acted on this vacancy, answers with alert `"⚠️ Ushbu e'lon allaqachon ko'rib chiqilgan"` to prevent duplicate actions.
 4. **On Approve**:
    - Updates `vacancies.status = 'approved'`, records `moderatedByTgId`.
-   - Formats a clean Telegram post with title, company, salary (range/fixed/negotiable), requirements, and inline button opening Mini App deep link (`t.me/EasyFindBot/app?startapp=vac_<id>`).
-   - Dispatches post to channel with error handling (logging error without failing transaction).
-   - Queries `subscriptions` matching vacancy category & region and dispatches push alerts.
-   - Dispatches confirmation notification to employer that vacancy is now live.
+   - **In Moderation Channel**: Edits the card via `api.editMessageText` removing buttons and displaying:
+     > *"✅ TASDIQLANDI"*  
+     > *"👤 Moderator: @{moderatorUsername} (ID: {moderatorTgId})"*  
+     > *"⏰ Vaqt: {timestamp}"*
+   - **In Public Channel (`config.publicChannelId`)**: Publishes a formatted, branded public post with an inline button: `[ 📄 To'liq ko'rish va ariza topshirish ]` with `web_app: { url: 'https://app<id>.tgcloud.ai?startapp=vac_<id>' }`.
+   - Stores `channelMessageId` in the `vacancies` table.
+   - Dispatches matching push notifications to subscribed candidates in the bot.
+   - Dispatches confirmation notification to employer via the bot that their vacancy is live.
 5. **On Reject**:
    - Updates `vacancies.status = 'rejected'`.
-   - Dispatches notification to employer with optional reason.
+   - **In Moderation Channel**: Edits the card to show:
+     > *"❌ RAD ETILDI"*  
+     > *"👤 Moderator: @{moderatorUsername}"*
+   - Dispatches notification to employer with explanation.
 
 ---
 
