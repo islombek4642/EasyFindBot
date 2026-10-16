@@ -22,26 +22,27 @@ export function buildMainReplyKeyboard(isAdmin, lang = 'uz', user = null) {
     if (ln) userParams += `&last_name=${encodeURIComponent(ln)}`;
     if (un) userParams += `&username=${encodeURIComponent(un)}`;
   }
+  const vParam = '&v=1.0.1';
 
   const rows = [
     [
       {
         text: t(lang, 'keyboard.search_jobs'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=jobs${userParams}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=jobs${userParams}${vParam}` },
       },
       {
         text: t(lang, 'keyboard.post_job'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=post_job${userParams}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=post_job${userParams}${vParam}` },
       },
     ],
     [
       {
         text: t(lang, 'keyboard.my_applications'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps${userParams}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps${userParams}${vParam}` },
       },
       {
         text: t(lang, 'keyboard.my_vacancies'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs${userParams}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs${userParams}${vParam}` },
       },
     ],
     [
