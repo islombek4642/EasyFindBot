@@ -52,20 +52,20 @@ export function PostJobWizard({ onSuccess }) {
   const validateStep = (currentStep) => {
     const errs = {};
     if (currentStep === 1) {
-      if (!formData.title.trim()) errs.title = t('common.error');
-      if (!formData.company.trim()) errs.company = t('common.error');
+      if (!formData.title.trim()) errs.title = t('common.required_field');
+      if (!formData.company.trim()) errs.company = t('common.required_field');
     } else if (currentStep === 2) {
       if (formData.salaryType === 'fixed' && !formData.salaryMin) {
-        errs.salaryMin = t('common.error');
+        errs.salaryMin = t('common.required_field');
       } else if (formData.salaryType === 'range') {
-        if (!formData.salaryMin) errs.salaryMin = t('common.error');
-        if (!formData.salaryMax) errs.salaryMax = t('common.error');
+        if (!formData.salaryMin) errs.salaryMin = t('common.required_field');
+        if (!formData.salaryMax) errs.salaryMax = t('common.required_field');
       }
     } else if (currentStep === 3) {
-      if (!formData.description.trim()) errs.description = t('common.error');
-      if (!formData.requirements.trim()) errs.requirements = t('common.error');
+      if (!formData.description.trim()) errs.description = t('common.required_field');
+      if (!formData.requirements.trim()) errs.requirements = t('common.required_field');
     } else if (currentStep === 4) {
-      if (!formData.contacts.trim()) errs.contacts = t('common.error');
+      if (!formData.contacts.trim()) errs.contacts = t('common.required_field');
     }
 
     setErrors(errs);

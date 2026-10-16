@@ -60,9 +60,9 @@ export function CreateResumeModal({ isOpen, onClose, existingResume = null, onSa
 
   const validate = () => {
     const errs = {};
-    if (!formData.title.trim()) errs.title = t('common.error');
-    if (!formData.skills.trim()) errs.skills = t('common.error');
-    if (!formData.contacts.trim()) errs.contacts = t('common.error');
+    if (!formData.title.trim()) errs.title = t('common.required_field');
+    if (!formData.skills.trim()) errs.skills = t('common.required_field');
+    if (!formData.contacts.trim()) errs.contacts = t('common.required_field');
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };

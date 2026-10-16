@@ -78,6 +78,7 @@ export default {
     error: "Произошла ошибка",
     select: "Выберите...",
     not_found: "Ничего не найдено",
+    required_field: "Заполните это поле",
   },
   vacancies: {
     title: "Вакансии",

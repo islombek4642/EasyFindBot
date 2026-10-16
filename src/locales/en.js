@@ -78,6 +78,7 @@ export default {
     error: "An error occurred",
     select: "Select...",
     not_found: "No results found",
+    required_field: "This field is required",
   },
   vacancies: {
     title: "Available Jobs",

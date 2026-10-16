@@ -78,6 +78,7 @@ export default {
     error: "Xatolik yuz berdi",
     select: "Tanlang...",
     not_found: "Hech narsa topilmadi",
+    required_field: "Ushbu maydonni to'ldiring",
   },
   vacancies: {
     title: "Vakansiyalar",
