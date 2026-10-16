@@ -11,20 +11,26 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) {
-      const u = window.Telegram.WebApp.initDataUnsafe.user;
-      return {
-        id: u.id,
-        tgId: u.id,
-        first_name: u.first_name || '',
-        last_name: u.last_name || '',
-        firstName: u.first_name || '',
-        lastName: u.last_name || '',
-        username: u.username || '',
-        photo_url: u.photo_url || null,
-        role: 'seeker',
-        language: u.language_code || 'uz',
-      };
+    if (typeof window !== 'undefined') {
+      const u = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      if (u?.id) {
+        return {
+          id: u.id,
+          tgId: u.id,
+          first_name: u.first_name || '',
+          last_name: u.last_name || '',
+          firstName: u.first_name || '',
+          lastName: u.last_name || '',
+          username: u.username || '',
+          photo_url: u.photo_url || null,
+          role: 'seeker',
+          language: u.language_code || 'uz',
+        };
+      }
+      try {
+        const cached = localStorage.getItem('easyfind_user');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
     }
     return null;
   });
@@ -40,17 +46,25 @@ export function AuthProvider({ children }) {
       const tgUser = (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) || {};
       const backendUser = (data && data.user) || {};
 
-      setUser((prev) => ({
-        ...(prev || {}),
-        ...backendUser,
-        first_name: backendUser.first_name || backendUser.firstName || tgUser.first_name || prev?.first_name || '',
-        last_name: backendUser.last_name || backendUser.lastName || tgUser.last_name || prev?.last_name || '',
-        firstName: backendUser.firstName || backendUser.first_name || tgUser.first_name || prev?.firstName || '',
-        lastName: backendUser.lastName || backendUser.last_name || tgUser.last_name || prev?.lastName || '',
-        username: backendUser.username || tgUser.username || prev?.username || '',
-        photo_url: backendUser.photo_url || tgUser.photo_url || prev?.photo_url || null,
-        role: backendUser.role || prev?.role || 'seeker',
-      }));
+      setUser((prev) => {
+        const updated = {
+          ...(prev || {}),
+          ...backendUser,
+          first_name: backendUser.first_name || backendUser.firstName || tgUser.first_name || prev?.first_name || '',
+          last_name: backendUser.last_name || backendUser.lastName || tgUser.last_name || prev?.last_name || '',
+          firstName: backendUser.firstName || backendUser.first_name || tgUser.first_name || prev?.firstName || '',
+          lastName: backendUser.lastName || backendUser.last_name || tgUser.last_name || prev?.lastName || '',
+          username: backendUser.username || tgUser.username || prev?.username || '',
+          photo_url: backendUser.photo_url || tgUser.photo_url || prev?.photo_url || null,
+          role: backendUser.role || prev?.role || 'seeker',
+        };
+        try {
+          if (updated.first_name || updated.firstName || updated.username) {
+            localStorage.setItem('easyfind_user', JSON.stringify(updated));
+          }
+        } catch (e) {}
+        return updated;
+      });
 
       if (data && data.resume) {
         setResume(data.resume);

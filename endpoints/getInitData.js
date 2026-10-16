@@ -1,21 +1,21 @@
 import { db } from 'sdk';
 import { eq } from 'sdk/db';
 import { users, resumes } from '../schema.js';
-import { isUserAdmin } from '../lib/bot/auth.js';
+import { isUserAdmin, getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const tgUser = ctx?.initData?.user;
+  const userId = getAuthenticatedUserId(ctx, input);
+  if (!userId) {
     return { success: false, error: 'Unauthorized' };
   }
 
-  const userId = Number(tgUser.id);
   let dbUser = await db.select().from(users).where(eq(users.tgId, userId)).get();
 
   if (!dbUser) {
-    const defaultLang = (tgUser.language_code || '').startsWith('ru')
+    const defaultLang = (tgUser?.language_code || '').startsWith('ru')
       ? 'ru'
-      : (tgUser.language_code || '').startsWith('en')
+      : (tgUser?.language_code || '').startsWith('en')
       ? 'en'
       : 'uz';
 

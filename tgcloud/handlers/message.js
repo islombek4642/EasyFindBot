@@ -9,28 +9,29 @@ import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
 import { registerBotCommands } from '../lib/bot/setup.js';
 
-export function buildMainReplyKeyboard(isAdmin, lang = 'uz') {
+export function buildMainReplyKeyboard(isAdmin, lang = 'uz', userId = null) {
   const miniAppBaseUrl = config.miniAppUrl || 'https://app.tgcloud.ai';
+  const uidParam = userId ? `&uid=${userId}` : '';
 
   const rows = [
     [
       {
         text: t(lang, 'keyboard.search_jobs'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=jobs` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=jobs${uidParam}` },
       },
       {
         text: t(lang, 'keyboard.post_job'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=post_job` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=post_job${uidParam}` },
       },
     ],
     [
       {
         text: t(lang, 'keyboard.my_applications'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps${uidParam}` },
       },
       {
         text: t(lang, 'keyboard.my_vacancies'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs${uidParam}` },
       },
     ],
     [
@@ -106,7 +107,7 @@ export default async function (message, ctx) {
 
   const isAdmin = await isUserAdmin(userId);
   const replyKeyboard = {
-    keyboard: buildMainReplyKeyboard(isAdmin, userLang),
+    keyboard: buildMainReplyKeyboard(isAdmin, userLang, userId),
     resize_keyboard: true,
   };
 
@@ -221,7 +222,7 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: t('uz', 'commands.language_updated'),
       reply_markup: {
-        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'uz'),
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'uz', userId),
         resize_keyboard: true,
       },
     });
@@ -239,7 +240,7 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: t('ru', 'commands.language_updated'),
       reply_markup: {
-        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'ru'),
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'ru', userId),
         resize_keyboard: true,
       },
     });
@@ -257,7 +258,7 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: t('en', 'commands.language_updated'),
       reply_markup: {
-        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'en'),
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'en', userId),
         resize_keyboard: true,
       },
     });

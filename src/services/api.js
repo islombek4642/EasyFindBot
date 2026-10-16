@@ -30,14 +30,32 @@ const isTelegramServerless = () => {
     typeof window.Telegram.WebApp.Serverless.call === 'function';
 };
 
+function getAppUserId() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uidFromUrl = urlParams.get('uid');
+    if (uidFromUrl && !isNaN(Number(uidFromUrl))) {
+      sessionStorage.setItem('easyfind_uid', uidFromUrl);
+      return Number(uidFromUrl);
+    }
+    const saved = sessionStorage.getItem('easyfind_uid');
+    if (saved && !isNaN(Number(saved))) return Number(saved);
+  } catch (e) {}
+  return null;
+}
+
 /**
  * Low-level RPC caller
  */
 async function callServerless(endpoint, params = {}) {
+  const uid = getAppUserId();
+  const payload = uid && !params.uid ? { ...params, uid } : params;
+
   if (isTelegramServerless()) {
     return new Promise((resolve, reject) => {
       try {
-        window.Telegram.WebApp.Serverless.call(endpoint, params, (err, result) => {
+        window.Telegram.WebApp.Serverless.call(endpoint, payload, (err, result) => {
           if (err) {
             console.error(`[API Error] ${endpoint}:`, err);
             reject(err);

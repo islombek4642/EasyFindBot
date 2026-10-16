@@ -40,3 +40,16 @@ export async function getAllAdminTgIds() {
   }
   return ids;
 }
+
+export function getAuthenticatedUserId(ctx, input = {}) {
+  if (ctx?.initData?.user?.id) {
+    return Number(ctx.initData.user.id);
+  }
+  if (input?.uid) {
+    return Number(input.uid);
+  }
+  if (input?.userId) {
+    return Number(input.userId);
+  }
+  return null;
+}
