@@ -46,6 +46,19 @@ export function buildMainReplyKeyboard(isAdmin, lang = 'uz') {
   return rows;
 }
 
+export function buildLanguageReplyKeyboard(lang = 'uz') {
+  return [
+    [
+      { text: t(lang, 'keyboard.lang_uz') },
+      { text: t(lang, 'keyboard.lang_ru') },
+      { text: t(lang, 'keyboard.lang_en') },
+    ],
+    [
+      { text: t(lang, 'keyboard.back') },
+    ],
+  ];
+}
+
 export default async function (message, ctx) {
   const chatId = message?.chat?.id;
   const userId = message?.from?.id;
@@ -189,14 +202,81 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: langPrompt,
       reply_markup: {
-        inline_keyboard: [
-          [
-            { text: "🇺🇿 O'zbekcha", callback_data: "set_lang:uz" },
-            { text: "🇷🇺 Русский", callback_data: "set_lang:ru" },
-            { text: "🇬🇧 English", callback_data: "set_lang:en" },
-          ],
-        ],
+        keyboard: buildLanguageReplyKeyboard(userLang),
+        resize_keyboard: true,
       },
+    });
+    return;
+  }
+
+  // 5.1 Language Selection Reply Button Handlers
+  if (
+    text === t(userLang, 'keyboard.lang_uz') ||
+    text === "🇺🇿 O'zbekcha" ||
+    text.includes("O'zbekcha")
+  ) {
+    await db.update(users).set({ language: 'uz' }).where(eq(users.tgId, Number(userId))).run();
+    const updatedIsAdmin = await isUserAdmin(userId);
+    await api.sendMessage({
+      chat_id: chatId,
+      text: t('uz', 'commands.language_updated'),
+      reply_markup: {
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'uz'),
+        resize_keyboard: true,
+      },
+    });
+    return;
+  }
+
+  if (
+    text === t(userLang, 'keyboard.lang_ru') ||
+    text === "🇷🇺 Русский" ||
+    text.includes("Русский")
+  ) {
+    await db.update(users).set({ language: 'ru' }).where(eq(users.tgId, Number(userId))).run();
+    const updatedIsAdmin = await isUserAdmin(userId);
+    await api.sendMessage({
+      chat_id: chatId,
+      text: t('ru', 'commands.language_updated'),
+      reply_markup: {
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'ru'),
+        resize_keyboard: true,
+      },
+    });
+    return;
+  }
+
+  if (
+    text === t(userLang, 'keyboard.lang_en') ||
+    text === "🇬🇧 English" ||
+    text.includes("English")
+  ) {
+    await db.update(users).set({ language: 'en' }).where(eq(users.tgId, Number(userId))).run();
+    const updatedIsAdmin = await isUserAdmin(userId);
+    await api.sendMessage({
+      chat_id: chatId,
+      text: t('en', 'commands.language_updated'),
+      reply_markup: {
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'en'),
+        resize_keyboard: true,
+      },
+    });
+    return;
+  }
+
+  // 5.2 Back button handler from Language Reply Keyboard
+  if (
+    text === t(userLang, 'keyboard.back') ||
+    text.includes('Orqaga') ||
+    text.includes('Назад') ||
+    text.includes('Back')
+  ) {
+    await api.sendMessage({
+      chat_id: chatId,
+      text: t(userLang, 'commands.welcome', {
+        name: from.first_name || 'Foydalanuvchi',
+      }),
+      reply_markup: replyKeyboard,
     });
     return;
   }

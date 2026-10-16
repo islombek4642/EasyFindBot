@@ -33,6 +33,10 @@ export default {
     about_bot: "ℹ️ About Bot",
     help: "❓ Help",
     admin_panel: "⚙️ Admin Panel",
+    lang_uz: "🇺🇿 O'zbekcha",
+    lang_ru: "🇷🇺 Русский",
+    lang_en: "🇬🇧 English",
+    back: "⬅️ Back",
   },
   admin: {
     menu_title: "⚙️ **EasyFindBot Admin Control Center**\n\nChoose an administrative management section:",
