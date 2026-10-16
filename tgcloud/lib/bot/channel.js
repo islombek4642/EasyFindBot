@@ -51,7 +51,9 @@ export async function publishToChannel(api, vacancy, lang = 'uz') {
   const { text, reply_markup } = formatChannelPost(vacancy, lang);
 
   try {
-    const sent = await api.sendMessage(channelId, text, {
+    const sent = await api.sendMessage({
+      chat_id: channelId,
+      text,
       parse_mode: 'Markdown',
       reply_markup,
     });

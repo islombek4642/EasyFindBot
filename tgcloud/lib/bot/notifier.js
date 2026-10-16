@@ -38,7 +38,11 @@ export async function notifyEmployer(api, employerTgId, vacancy, status, reason 
   if (!text) return;
 
   try {
-    await api.sendMessage(employerTgId, text, { parse_mode: 'Markdown' });
+    await api.sendMessage({
+      chat_id: employerTgId,
+      text,
+      parse_mode: 'Markdown',
+    });
   } catch (err) {
     // Ignore employer DM failure
   }
@@ -101,7 +105,9 @@ export async function notifySubscribers(api, vacancy) {
             ],
           };
 
-          return api.sendMessage(userId, text, {
+          return api.sendMessage({
+            chat_id: userId,
+            text,
             parse_mode: 'Markdown',
             reply_markup,
           });

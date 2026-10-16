@@ -48,7 +48,9 @@ export async function sendToModeration(api, vacancy, lang = 'uz') {
   let sent = false;
   if (channelId) {
     try {
-      await api.sendMessage(channelId, text, {
+      await api.sendMessage({
+        chat_id: channelId,
+        text,
         parse_mode: 'Markdown',
         reply_markup,
       });
@@ -63,7 +65,9 @@ export async function sendToModeration(api, vacancy, lang = 'uz') {
     const adminIds = await getAllAdminTgIds();
     for (const adminId of adminIds) {
       try {
-        await api.sendMessage(adminId, text, {
+        await api.sendMessage({
+          chat_id: adminId,
+          text,
           parse_mode: 'Markdown',
           reply_markup,
         });
