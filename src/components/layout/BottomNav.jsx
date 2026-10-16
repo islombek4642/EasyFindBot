@@ -12,59 +12,45 @@ export function BottomNav({ activeTab, onTabChange }) {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   useEffect(() => {
-    const isInteractiveInput = (el) => {
-      if (!el || !el.tagName) return false;
-      const tag = el.tagName.toLowerCase();
-      if (tag === 'textarea') return true;
-      if (tag === 'input') {
-        const type = (el.type || 'text').toLowerCase();
-        return !['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'image'].includes(type);
-      }
-      return false;
-    };
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
 
-    const handleFocusIn = (e) => {
-      if (isInteractiveInput(e.target)) {
-        setIsKeyboardOpen(true);
-      }
-    };
-
-    const handleFocusOut = () => {
-      // Delay slightly in case focus shifts to another input element
-      setTimeout(() => {
-        if (!isInteractiveInput(document.activeElement)) {
-          setIsKeyboardOpen(false);
-        }
-      }, 100);
-    };
-
-    window.addEventListener('focusin', handleFocusIn);
-    window.addEventListener('focusout', handleFocusOut);
-
-    // Visual viewport resize listener for mobile WebView / Telegram client
-    const vv = window.visualViewport;
-    const handleViewportResize = () => {
+    // Viewport-based keyboard detection (reliable on mobile iOS / Android WebView)
+    const checkViewport = () => {
       if (vv && window.innerHeight) {
         const heightDiff = window.innerHeight - vv.height;
-        // Viewport shrunk by more than 150px means keyboard is visible
-        if (heightDiff > 150) {
+        // Virtual keyboard takes at least 120px when open
+        if (heightDiff > 120) {
           setIsKeyboardOpen(true);
-        } else if (!isInteractiveInput(document.activeElement)) {
+        } else {
           setIsKeyboardOpen(false);
         }
       }
     };
 
     if (vv) {
-      vv.addEventListener('resize', handleViewportResize);
+      vv.addEventListener('resize', checkViewport);
+      vv.addEventListener('scroll', checkViewport);
     }
 
+    // Safety fallback: when focus leaves input/textarea, always restore navigation
+    const handleFocusOut = () => {
+      setTimeout(() => {
+        const active = document.activeElement;
+        const tag = active?.tagName?.toLowerCase();
+        if (tag !== 'input' && tag !== 'textarea') {
+          setIsKeyboardOpen(false);
+        }
+      }, 50);
+    };
+
+    window.addEventListener('focusout', handleFocusOut);
+
     return () => {
-      window.removeEventListener('focusin', handleFocusIn);
-      window.removeEventListener('focusout', handleFocusOut);
       if (vv) {
-        vv.removeEventListener('resize', handleViewportResize);
+        vv.removeEventListener('resize', checkViewport);
+        vv.removeEventListener('scroll', checkViewport);
       }
+      window.removeEventListener('focusout', handleFocusOut);
     };
   }, []);
 
