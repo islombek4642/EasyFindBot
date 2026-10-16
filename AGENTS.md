@@ -11,6 +11,7 @@ All AI agents must strictly uphold clean architectural boundaries and single-res
   - `endpoints/`: Exclusively handles Mini App RPC requests. Validates incoming payload, checks session (`ctx.initData.user`), invokes database or helper logic, and returns formatted JSON.
   - `lib/bot/`: Dedicated business logic and external integration modules (`auth.js`, `admin.js`, `moderator.js`, `channel.js`, `notifier.js`, `settings.js`).
   - `lib/constants/`: Pure immutable domain enums and lookup arrays (`roles.js`, `statuses.js`, `categories.js`, `salaryTypes.js`).
+  - `lib/locales/`: Pure bot localization dictionaries (`uz.js`, `ru.js`, `en.js`) and `t(lang, key, params)` resolver.
   - `schema.js`: Pure data schema definition with SQLite table mappings and indices.
 - **Frontend Layers (`src/`)**:
   - `services/api.js`: Exclusively handles network transport (`Telegram.WebApp.Serverless.call`) and dev mock data. Never manipulates UI state or DOM directly.
@@ -22,6 +23,10 @@ All AI agents must strictly uphold clean architectural boundaries and single-res
   - `index.css`: Pure design tokens and utility rules. Zero inline hardcoded styling in JSX.
 
 ### 2. Telegram Serverless Backend (`tgcloud/`)
+- **Zero Hardcoded Strings in Bot Backend**:
+  - All bot messages, commands, replies, keyboards, admin panel text, moderation templates, channel posts, and notifications must strictly reside in `tgcloud/lib/locales/{uz, ru, en}.js` and be accessed via `t(lang, key, params)` from `tgcloud/lib/locales/index.js`.
+  - Never write raw user-facing strings or messages inside handlers or services.
+  - Always determine recipient's language (`users.language` or `message.from.language_code` with fallback `'uz'`).
 - **Zero NPM Packages at Runtime**: Only import `sdk`, `sdk/db`, `sdk/api` or internal modules from `tgcloud/lib/`.
 - **Strict Relative Imports with `.js` Extension**: Every internal import must include `.js` (e.g., `import { users } from '../schema.js';`).
 - **No SQLite Foreign Keys**: `PRAGMA foreign_keys = off`. Never use `.references()` or `foreignKey()`.

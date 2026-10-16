@@ -12,6 +12,7 @@ All agents must uphold clean architectural boundaries. Never mix layer responsib
 - **Telegram Handlers (`tgcloud/handlers/`)**: Exclusively responsible for incoming Telegram webhooks (updates), parsing commands and callback data, and delegating immediately to service modules in `tgcloud/lib/bot/`. Do NOT embed raw SQL queries or direct business workflows in handlers.
 - **Serverless RPC Endpoints (`tgcloud/endpoints/`)**: Exclusively responsible for handling Mini App requests, validating input parameters, verifying `ctx.initData.user`, executing data queries, and returning standard JSON results.
 - **Domain Services & Integrations (`tgcloud/lib/bot/`)**: Dedicated modules for domain logic (`auth.js`, `admin.js`, `moderator.js`, `channel.js`, `notifier.js`, `settings.js`).
+- **Bot Localization (`tgcloud/lib/locales/`)**: Dedicated dictionaries (`uz.js`, `ru.js`, `en.js`) and `t(lang, key, params)` resolver.
 - **Data Definition (`tgcloud/schema.js`)**: Pure SQLite schema definitions and indexes.
 - **Constants (`tgcloud/lib/constants/`)**: Pure domain constants and enumerations.
 - **API Transport (`src/services/api.js`)**: Pure data transport layer invoking `Telegram.WebApp.Serverless.call` with mock fallback for standalone dev. Zero UI or DOM logic.
@@ -19,10 +20,14 @@ All agents must uphold clean architectural boundaries. Never mix layer responsib
 - **Atomic Presentation Components (`src/components/common/`)**: Pure presentational components receiving data via props. Decoupled from specific backend routes or global application flows.
 - **Layout (`src/components/layout/`)**: Application navigation shell (`AppHeader`, `BottomNav`).
 - **Feature Modules (`src/modules/`)**: High-level page views composing common components and consuming context.
-- **Localization (`src/locales/`)**: Pure translation dictionaries (`uz.js`, `ru.js`, `en.js`). Zero hardcoded text in UI.
+- **Frontend Localization (`src/locales/`)**: Pure translation dictionaries (`uz.js`, `ru.js`, `en.js`). Zero hardcoded text in UI.
 - **Styling (`src/index.css`)**: Pure CSS design tokens and base styles. Zero hardcoded inline CSS in JSX.
 
 ## 2. Telegram Serverless Backend (`tgcloud/`)
+- **Zero Hardcoded Strings in Bot Backend**:
+  - All bot messages, commands, replies, keyboards, admin panel text, moderation templates, channel posts, and notifications must strictly reside in `tgcloud/lib/locales/{uz, ru, en}.js` and be accessed via `t(lang, key, params)` from `tgcloud/lib/locales/index.js`.
+  - Never write raw user-facing strings or messages inside handlers, services, or helpers.
+  - Always determine recipient's language (`users.language` or `message.from.language_code` with fallback `'uz'`).
 - **Zero NPM Packages**: Never import or install NPM packages inside `tgcloud/`. Only import platform `sdk`, `sdk/db`, `sdk/api` or internal modules from `tgcloud/lib/`.
 - **Strict Relative Imports with `.js`**: Always include the `.js` extension (e.g. `import { users } from '../schema.js';`).
 - **No SQLite Foreign Keys**: SQLite runs with `PRAGMA foreign_keys = off`. Never call `.references()` or `foreignKey()` — they throw at runtime. Enforce relational integrity in application code.
