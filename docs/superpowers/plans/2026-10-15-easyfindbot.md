@@ -25,12 +25,12 @@
 
 ## Review Focus
 
-1. `Telegram.WebApp.Serverless.call` missing or failing outside Telegram environment: provide robust fallback/mock in `src/services/api.js` for local dev.
-2. SQLite query parameter injection: always use `sdk/db` builders and `sql` template tags, never string interpolation.
-3. Moderator authentication: verify caller ID against `config.adminTgIds` in `callback_query.js` before executing moderation actions.
-4. Channel broadcast failure on invalid channel ID: gracefully record failure without crashing update handler.
-5. Unique constraint on applications: prevent duplicate submissions per user per vacancy.
-6. Automatic theme synchronization: listen for Telegram `themeChanged` event and update CSS tokens seamlessly.
+1. `Telegram.WebApp.Serverless.call` missing outside Telegram environment: provide high-fidelity in-memory mock adapter in `src/services/api.js` and `src/services/mockData.js` for seamless local browser development (`npm run dev`).
+2. Telegram Channel inline button rule: Telegram Bot API explicitly rejects `web_app` buttons in channel messages (`BUTTON_TYPE_INVALID`); channel posts MUST use direct URL buttons: `url: 'https://t.me/' + config.botUsername + '/app?startapp=vac_' + id`.
+3. Channel broadcast fault tolerance: wrap channel publishing in `try...catch` so unexpected channel permission/ID errors do not fail the database approval transaction.
+4. Negotiable salary query logic: `getVacancies.js` must query `WHERE (salary_min >= :min OR salary_type = 'negotiable')` to prevent excluding competitive negotiable offers.
+5. Mobile viewport & safe-area insets: call `Telegram.WebApp.expand()` on mount and apply `env(safe-area-inset-bottom)` to `BottomNav` to avoid home-bar clipping.
+6. Broadcast rate-limiting: process recipients in chunks of 25 with 1-second delays and per-recipient `try...catch` to prevent Telegram 429 (`Too Many Requests`) and serverless execution timeouts.
 
 ---
 
@@ -78,7 +78,7 @@ git commit -m "chore: scaffold react mini app and tgcloud config"
 
 **Interfaces:**
 - Consumes: `sdk/db`, `sdk/api`.
-- Produces: Tables (`users`, `vacancies`, `resumes`, `applications`, `subscriptions`, `settings`) with unified `tgId` keys, dynamic settings persistence, two-tier admin auth helpers, admin panel formatters, and bot publishing helpers.
+- Produces: Tables (`users`, `vacancies`, `resumes`, `applications`, `subscriptions`, `settings`) with unified `tgId` keys, dynamic settings persistence, two-tier admin auth helpers, admin panel formatters, and fault-tolerant bot publishing helpers.
 
 - [ ] **Step 1: Implement `tgcloud/lib/config.js` with superAdminTgId, moderationChannelId, publicChannelId, and defaults**
 - [ ] **Step 2: Implement `tgcloud/lib/bot/settings.js` (`getSetting`, `setSetting`, `getModerationChannelId`, `getPublicChannelId`)**
@@ -87,7 +87,7 @@ git commit -m "chore: scaffold react mini app and tgcloud config"
 - [ ] **Step 5: Implement `tgcloud/lib/constants/*.js` with typed constants (ROLES, STATUSES, CATEGORIES, REGIONS, SALARY_TYPES)**
 - [ ] **Step 6: Implement `tgcloud/schema.js` with unified `tgId` fields, salary types, unique application and subscription indexes, and `settings` table**
 - [ ] **Step 7: Implement `tgcloud/lib/bot/moderator.js` to construct review card for dedicated moderation channel (`getModerationChannelId()`) with fallback to direct messaging**
-- [ ] **Step 8: Implement `tgcloud/lib/bot/channel.js` to format and post approved vacancies to public channel (`getPublicChannelId()`) with Mini App deep link and error handling**
+- [ ] **Step 8: Implement `tgcloud/lib/bot/channel.js` to format and post approved vacancies to public channel (`getPublicChannelId()`) using Telegram direct URL button (`https://t.me/<bot>/app?startapp=vac_<id>`) and fault-tolerant `try...catch` error handling**
 - [ ] **Step 9: Implement `tgcloud/lib/bot/notifier.js` to dispatch push updates to matching subscribers and employers**
 - [ ] **Step 10: Commit**
 
@@ -147,7 +147,7 @@ git commit -m "feat(backend): implement secure message and callback_query handle
 - Produces: Complete JSON RPC API for vacancies, talent search, application management, and subscriptions.
 
 - [ ] **Step 1: Implement `getInitData.js` (retrieves/creates user record and returns initial profile)**
-- [ ] **Step 2: Implement `getVacancies.js` (keyword search, category/region filter, salary filter, pagination) and `getVacancyById.js`**
+- [ ] **Step 2: Implement `getVacancies.js` (keyword search, category/region filter, negotiable salary fallback `WHERE (salary_min >= :min OR salary_type = 'negotiable')`, pagination) and `getVacancyById.js`**
 - [ ] **Step 3: Implement `createVacancy.js`, `closeVacancy.js`, and `getMyVacancies.js`**
 - [ ] **Step 4: Implement `createResume.js`, `getResumes.js`, and `getMyResume.js`**
 - [ ] **Step 5: Implement `applyVacancy.js` (with duplicate check), `getMyApplications.js`, `getVacancyApplications.js`, and `updateApplicationStatus.js`**
@@ -157,7 +157,7 @@ git commit -m "feat(backend): implement secure message and callback_query handle
 
 ```bash
 git add tgcloud/endpoints/
-git commit -m "feat(backend): implement comprehensive mini app rpc endpoints"
+git commit -m "feat(backend): implement comprehensive mini app rpc endpoints with negotiable salary logic"
 ```
 
 ---
@@ -179,18 +179,18 @@ git commit -m "feat(backend): implement comprehensive mini app rpc endpoints"
 
 **Interfaces:**
 - Consumes: `@iconify/react`, CSS custom properties, `Telegram.WebApp.colorScheme`.
-- Produces: Dynamic automatic Day/Night theme provider, `useTranslation()` hook, design system CSS.
+- Produces: Dynamic automatic Day/Night theme provider, `useTranslation()` hook, design system CSS with mobile safe-area insets.
 
 - [ ] **Step 1: Write comprehensive translation dictionaries in `src/locales/uz.js`, `ru.js`, and `en.js`**
 - [ ] **Step 2: Implement `src/locales/index.jsx` TranslationProvider with state persistence**
 - [ ] **Step 3: Implement `src/context/ThemeContext.jsx` with automatic Telegram Day/Night synchronization and manual toggle**
-- [ ] **Step 4: Implement `src/index.css` design system with light/dark tokens, glassmorphism cards, and typography**
+- [ ] **Step 4: Implement `src/index.css` design system with light/dark tokens, glassmorphism cards, typography, and mobile safe-area insets `env(safe-area-inset-bottom)`**
 - [ ] **Step 5: Implement `src/constants/*.js` matching backend domain models**
 - [ ] **Step 6: Commit**
 
 ```bash
 git add src/locales/ src/context/ThemeContext.jsx src/hooks/useTheme.js src/index.css src/constants/
-git commit -m "feat(frontend): setup auto day/night theme engine, design tokens, and i18n dictionaries"
+git commit -m "feat(frontend): setup auto day/night theme engine, safe-area design tokens, and i18n dictionaries"
 ```
 
 ---
@@ -199,6 +199,7 @@ git commit -m "feat(frontend): setup auto day/night theme engine, design tokens,
 
 **Files:**
 - Create: `src/services/api.js`
+- Create: `src/services/mockData.js`
 - Create: `src/context/AuthContext.jsx`
 - Create: `src/components/common/Button.jsx`
 - Create: `src/components/common/Input.jsx`
@@ -215,18 +216,19 @@ git commit -m "feat(frontend): setup auto day/night theme engine, design tokens,
 
 **Interfaces:**
 - Consumes: `@iconify/react`, `useTranslation()`, `Telegram.WebApp.Serverless.call`.
-- Produces: Reusable UI widgets, atomic cards, layout containers, and typed RPC calling service with local dev mock adapter.
+- Produces: Reusable UI widgets, atomic cards, layout containers with safe-area support, and typed RPC calling service with in-memory mock adapter.
 
-- [ ] **Step 1: Implement `src/services/api.js` wrapping `Telegram.WebApp.Serverless.call` with mock data adapter for local browser dev**
-- [ ] **Step 2: Implement `src/context/AuthContext.jsx` for cached user session and role management**
-- [ ] **Step 3: Implement atomic primitives (`Button`, `Input`, `Select`, `Badge`, `Modal`, `ThemeToggle`) using Iconify icons exclusively**
-- [ ] **Step 4: Implement reusable entity cards and feedback widgets (`VacancyCard`, `ResumeCard`, `EmptyState`, `Skeleton`)**
-- [ ] **Step 5: Implement AppHeader and BottomNav with active tab routing and theme toggle**
-- [ ] **Step 6: Commit**
+- [ ] **Step 1: Implement `src/services/mockData.js` with realistic demo vacancies, resumes, and user states**
+- [ ] **Step 2: Implement `src/services/api.js` wrapping `Telegram.WebApp.Serverless.call` with automatic fallback to `mockData.js` when running in standalone browser dev (`npm run dev`)**
+- [ ] **Step 3: Implement `src/context/AuthContext.jsx` for cached user session and role management**
+- [ ] **Step 4: Implement atomic primitives (`Button`, `Input`, `Select`, `Badge`, `Modal`, `ThemeToggle`) using Iconify icons exclusively**
+- [ ] **Step 5: Implement reusable entity cards and feedback widgets (`VacancyCard`, `ResumeCard`, `EmptyState`, `Skeleton`)**
+- [ ] **Step 6: Implement AppHeader and BottomNav with active tab routing, mobile safe-area padding `env(safe-area-inset-bottom)`, and theme toggle**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add src/services/ src/context/AuthContext.jsx src/components/
-git commit -m "feat(frontend): implement api transport service with dev mock and atomic reusable ui components"
+git commit -m "feat(frontend): implement api transport service with dev mock adapter and atomic reusable ui components"
 ```
 
 ---
@@ -257,7 +259,7 @@ git commit -m "feat(frontend): implement api transport service with dev mock and
 - [ ] **Step 3: Implement `PostJobWizard.jsx` multi-step form supporting salary types (Range, Fixed, Negotiable)**
 - [ ] **Step 4: Implement `ResumesView.jsx` talent search and `CreateResumeModal.jsx` resume editor**
 - [ ] **Step 5: Implement `ProfileView.jsx` with employer dashboard (my vacancies, view applicants, change status) and seeker dashboard (my applications, alert subscriptions)**
-- [ ] **Step 6: Assemble `App.jsx` and `main.jsx` with ThemeProvider, AuthProvider, and TranslationProvider**
+- [ ] **Step 6: Assemble `App.jsx` and `main.jsx` with ThemeProvider, AuthProvider, TranslationProvider, and immediate `Telegram.WebApp.ready()` / `Telegram.WebApp.expand()` initialization**
 - [ ] **Step 7: Run `npm run build` and ensure build passes with zero errors**
 - [ ] **Step 8: Commit**
 
