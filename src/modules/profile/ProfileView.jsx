@@ -349,16 +349,28 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
         {/* Language Selection */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{t('profile.language')}</span>
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {['uz', 'ru', 'en'].map((l) => (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {[
+              { code: 'uz', icon: 'circle-flags:uz', label: 'UZ' },
+              { code: 'ru', icon: 'circle-flags:ru', label: 'RU' },
+              { code: 'en', icon: 'circle-flags:us', label: 'EN' },
+            ].map((item) => (
               <button
-                key={l}
+                key={item.code}
                 type="button"
-                className={`badge-pill ${lang === l ? 'badge-primary' : 'badge-neutral'}`}
-                onClick={() => setLang(l)}
-                style={{ cursor: 'pointer', textTransform: 'uppercase', border: 'none' }}
+                className={`lang-pill-btn ${lang === item.code ? 'active' : ''}`}
+                onClick={() => {
+                  setLang(item.code);
+                  if (updateLanguage) updateLanguage(item.code);
+                }}
               >
-                {l}
+                <Icon
+                  icon={item.icon}
+                  width="18"
+                  height="18"
+                  style={{ borderRadius: '50%', flexShrink: 0 }}
+                />
+                <span>{item.label}</span>
               </button>
             ))}
           </div>
