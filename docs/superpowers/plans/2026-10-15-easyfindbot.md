@@ -118,6 +118,7 @@
 - Create: `tgcloud/lib/bot/moderator.js`
 - Create: `tgcloud/lib/bot/channel.js`
 - Create: `tgcloud/lib/bot/notifier.js`
+- Create: `tgcloud/lib/logger.js`
 
 **Interfaces:**
 - Consumes: `sdk`, `sdk/db`, `sdk/api`.
@@ -128,6 +129,7 @@
   - Moderation card builder: `buildModerationCard(vacancy)`.
   - Channel publisher: `publishToChannel(api, vacancy) -> Promise<number>`.
   - Push notifier: `notifySubscribers(api, vacancy)`, `notifyEmployer(api, vacancy, status)`.
+  - Structured console logger: `logger.info(source, msg, data)`, `logger.warn(source, msg, data)`, `logger.error(source, msg, data)` formatted for `tgcloud logs` terminal inspection.
 
 - [ ] **Step 1: Implement typed domain constants**
   - `tgcloud/lib/constants/roles.js`: `SEEKER: 'seeker'`, `EMPLOYER: 'employer'`, `ADMIN: 'admin'`.
@@ -173,10 +175,13 @@
   - `notifyEmployer(api, employerTgId, vacancy, status, reason)`: Sends status notification when vacancy is approved or rejected.
   - `notifySubscribers(api, vacancy)`: Queries active subscribers matching vacancy category and region, sends notification in batches of 25 with 1-second delay and per-recipient `try...catch`.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 10: Implement `tgcloud/lib/logger.js`**
+  - Implement structured console logging (`logger.info`, `logger.warn`, `logger.error`) outputting timestamped ISO entries formatted for real-time `npx tgcloud logs` inspection.
+
+- [ ] **Step 11: Commit**
   ```bash
   git add tgcloud/schema.js tgcloud/lib/
-  git commit -m "feat(backend): implement db schema, settings table, two-tier admin auth, and bot helper modules"
+  git commit -m "feat(backend): implement db schema, settings table, two-tier admin auth, structured logger, and bot helper modules"
   ```
 
 ---

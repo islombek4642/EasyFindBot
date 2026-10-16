@@ -73,6 +73,7 @@ EasyFindBot/
 │   │   └── updateUser.js                 # Language & profile update
 │   ├── lib/                              # Shared backend logic
 │   │   ├── config.js                     # Admin IDs, Channel IDs, bot configuration
+│   │   ├── logger.js                     # Structured console logger for terminal debugging
 │   │   ├── constants/
 │   │   │   ├── categories.js             # Standard job categories & regions
 │   │   │   ├── statuses.js               # PENDING, APPROVED, REJECTED, CLOSED
