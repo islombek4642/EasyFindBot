@@ -7,6 +7,7 @@ import { buildAdminPanelMenu } from '../lib/bot/admin.js';
 import { getSetting, setSetting } from '../lib/bot/settings.js';
 import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
+import { registerBotCommands } from '../lib/bot/setup.js';
 
 export function buildMainReplyKeyboard(isAdmin, lang = 'uz') {
   const miniAppBaseUrl = config.miniAppUrl || 'https://app.tgcloud.ai';
@@ -157,6 +158,12 @@ export default async function (message, ctx) {
 
   // 4. Command: /start
   if (text.startsWith('/start')) {
+    try {
+      await registerBotCommands();
+    } catch (e) {
+      // non-blocking
+    }
+
     const welcomeText = t(userLang, 'commands.welcome', {
       name: from.first_name || 'Foydalanuvchi',
     });
