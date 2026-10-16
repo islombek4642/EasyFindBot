@@ -35,6 +35,10 @@
    - All imports within `tgcloud/` are relative and must include the `.js` extension.
    - Native SQLite via `sdk/db` with **no foreign keys** (`PRAGMA foreign_keys = off`). Relational integrity is enforced in application code.
    - Two-step deployment: `tgcloud push` for code/assets, `tgcloud migrate` for database schema updates.
+7. **Separation of Concerns (SoC) Across All Layers**:
+   - **Backend**: Handlers (`handlers/`) strictly route incoming Telegram updates; Mini App endpoints (`endpoints/`) strictly process client RPC requests; Domain services (`lib/bot/`) encapsulate business orchestration and external Telegram APIs; `schema.js` defines data structure; `lib/constants/` holds immutable constants.
+   - **Frontend**: `services/api.js` handles network transport and dev mock data; `context/` manages global state; `components/common/` contains pure presentational atomic widgets; `modules/` houses domain views; `locales/` isolates all UI copy; `index.css` manages design tokens.
+   - No layer may leak responsibilities (e.g. no database queries inside message handlers; no Telegram Bot API calls inside React components; no inline styling in JSX).
 
 ---
 

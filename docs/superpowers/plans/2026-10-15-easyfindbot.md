@@ -25,6 +25,16 @@
   - All database queries must be awaited (`await db.select()...`).
   - Relational foreign keys strictly use Telegram User IDs (`tgId`, `employerTgId`, `seekerTgId`, `userTgId`).
   - Dynamic configuration stored in `settings` table; static root authority in `tgcloud/lib/config.js`. No `process.env`.
+- **Separation of Concerns (SoC) Strictly Enforced Across All Layers**:
+  - `tgcloud/handlers/`: Exclusively handles Telegram webhook updates, command/callback routing, delegates to services. Never embeds raw database queries.
+  - `tgcloud/endpoints/`: Exclusively handles Mini App RPC requests, validates input, checks user session, returns JSON.
+  - `tgcloud/lib/bot/`: Dedicated domain services (`auth.js`, `admin.js`, `moderator.js`, `channel.js`, `notifier.js`, `settings.js`).
+  - `tgcloud/schema.js` & `tgcloud/lib/constants/`: Pure data structure definitions and immutable constants.
+  - `src/services/api.js`: Pure network transport and dev mock data. Never interacts directly with UI state or DOM.
+  - `src/context/`: Application state management (`AuthContext`, `ThemeContext`, `TranslationContext`).
+  - `src/components/common/`: Pure presentational atomic UI components receiving props, decoupled from business logic or API endpoints.
+  - `src/modules/`: Feature-level page views assembling components and consuming context.
+  - `src/locales/` & `src/index.css`: Isolated copy dictionaries and CSS design tokens.
 - **Automatic Day / Night Theme Adaptation**:
   - Automatic synchronization with `Telegram.WebApp.colorScheme` and `Telegram.WebApp.themeParams`.
   - Listen for `themeChanged` event with instant theme updating.
