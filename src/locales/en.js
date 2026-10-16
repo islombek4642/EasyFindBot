@@ -76,6 +76,8 @@ export default {
     salary: "Salary",
     success: "Success",
     error: "An error occurred",
+    select: "Select...",
+    not_found: "No results found",
   },
   vacancies: {
     title: "Available Jobs",

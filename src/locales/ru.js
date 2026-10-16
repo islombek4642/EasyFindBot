@@ -76,6 +76,8 @@ export default {
     salary: "Зарплата",
     success: "Успешно",
     error: "Произошла ошибка",
+    select: "Выберите...",
+    not_found: "Ничего не найдено",
   },
   vacancies: {
     title: "Вакансии",

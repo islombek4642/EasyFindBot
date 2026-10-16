@@ -76,6 +76,8 @@ export default {
     salary: "Maosh",
     success: "Muvaffaqiyatli",
     error: "Xatolik yuz berdi",
+    select: "Tanlang...",
+    not_found: "Hech narsa topilmadi",
   },
   vacancies: {
     title: "Vakansiyalar",

@@ -120,8 +120,12 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
   };
 
   const regionOptions = [
-    { value: 'all', label: t('regions.all') },
-    ...REGIONS.map((r) => ({ value: r, label: t(`regions.${r}`) || r })),
+    { value: 'all', label: t('regions.all'), icon: 'solar:map-point-wave-bold' },
+    ...REGIONS.map((r) => ({
+      value: r,
+      label: t(`regions.${r}`) || r,
+      icon: r === 'remote' ? 'solar:global-bold' : 'solar:map-point-bold',
+    })),
   ];
 
   // Client-side text filter on title or company

@@ -13,6 +13,7 @@ export function Modal({
   footer = null,
   showHandle = true,
   className = '',
+  variant = 'bottom',
 }) {
   useEffect(() => {
     if (isOpen) {
@@ -28,15 +29,20 @@ export function Modal({
   if (!isOpen) return null;
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && onClose) {
       onClose();
     }
   };
 
+  const isCenter = variant === 'center';
+
   return (
-    <div className="modal-backdrop open" onClick={handleBackdropClick}>
-      <div className={`modal-sheet ${className}`}>
-        {showHandle && <div className="modal-sheet-handle" />}
+    <div
+      className={`modal-backdrop open ${isCenter ? 'modal-centered' : ''}`}
+      onClick={handleBackdropClick}
+    >
+      <div className={`modal-sheet ${isCenter ? 'modal-sheet-center' : ''} ${className}`}>
+        {!isCenter && showHandle && <div className="modal-sheet-handle" />}
 
         {(title || onClose) && (
           <div className="modal-header">

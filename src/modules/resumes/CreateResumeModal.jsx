@@ -98,11 +98,13 @@ export function CreateResumeModal({ isOpen, onClose, existingResume = null, onSa
   const categoryOptions = CATEGORIES.map((c) => ({
     value: c.id,
     label: t(`categories.${c.id}`) || c.id,
+    icon: c.icon,
   }));
 
   const regionOptions = REGIONS.map((r) => ({
     value: r,
     label: t(`regions.${r}`) || r,
+    icon: r === 'remote' ? 'solar:global-bold' : 'solar:map-point-bold',
   }));
 
   return (

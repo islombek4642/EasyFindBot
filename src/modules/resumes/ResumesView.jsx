@@ -73,8 +73,12 @@ export function ResumesView() {
   };
 
   const regionOptions = [
-    { value: 'all', label: t('regions.all') },
-    ...REGIONS.map((r) => ({ value: r, label: t(`regions.${r}`) || r })),
+    { value: 'all', label: t('regions.all'), icon: 'solar:map-point-wave-bold' },
+    ...REGIONS.map((r) => ({
+      value: r,
+      label: t(`regions.${r}`) || r,
+      icon: r === 'remote' ? 'solar:global-bold' : 'solar:map-point-bold',
+    })),
   ];
 
   const filteredResumes = resumes.filter((r) => {

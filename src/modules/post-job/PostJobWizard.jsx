@@ -174,21 +174,37 @@ export function PostJobWizard({ onSuccess }) {
   const categoryOptions = CATEGORIES.map((c) => ({
     value: c.id,
     label: t(`categories.${c.id}`) || c.id,
+    icon: c.icon,
   }));
 
   const regionOptions = REGIONS.map((r) => ({
     value: r,
     label: t(`regions.${r}`) || r,
+    icon: r === 'remote' ? 'solar:global-bold' : 'solar:map-point-bold',
   }));
 
   const employmentOptions = EMPLOYMENT_TYPES.map((et) => ({
     value: et,
     label: t(`employment_types.${et}`) || et,
+    icon:
+      et === 'full_time'
+        ? 'solar:case-round-bold'
+        : et === 'part_time'
+        ? 'solar:clock-circle-bold'
+        : et === 'remote'
+        ? 'solar:laptop-bold'
+        : 'solar:diploma-bold',
   }));
 
   const salaryTypeOptions = (Array.isArray(SALARY_TYPES) ? SALARY_TYPES : Object.values(SALARY_TYPES)).map((st) => ({
     value: st,
     label: t(`salary_types.${st}`) || st,
+    icon:
+      st === 'fixed'
+        ? 'solar:tag-price-bold'
+        : st === 'range'
+        ? 'solar:chart-2-bold'
+        : 'solar:hand-shake-bold',
   }));
 
   return (
@@ -333,8 +349,8 @@ export function PostJobWizard({ onSuccess }) {
                   label={t('post_job.currency_label')}
                   icon="solar:card-2-bold"
                   options={[
-                    { value: 'UZS', label: 'UZS (So\'m)' },
-                    { value: 'USD', label: 'USD ($)' },
+                    { value: 'UZS', label: "UZS (So'm)", icon: 'solar:bill-check-bold' },
+                    { value: 'USD', label: 'USD ($)', icon: 'solar:dollar-minimalistic-bold' },
                   ]}
                   value={formData.currency}
                   onChange={(e) => updateField('currency', e.target.value)}
