@@ -58,6 +58,31 @@ function getAppUserInfo() {
     if (tg?.photo_url) info.photo_url = tg.photo_url;
     if (tg?.language_code) info.language = tg.language_code;
 
+    // Check parsed user from Telegram.WebApp.initData string
+    if ((!info.firstName || !info.username) && window.Telegram?.WebApp?.initData) {
+      try {
+        const initParams = new URLSearchParams(window.Telegram.WebApp.initData);
+        const userRaw = initParams.get('user');
+        if (userRaw) {
+          const parsed = JSON.parse(userRaw);
+          if (parsed.id && !info.uid) info.uid = Number(parsed.id);
+          if (!info.firstName && parsed.first_name) info.firstName = parsed.first_name;
+          if (!info.lastName && parsed.last_name) info.lastName = parsed.last_name;
+          if (!info.username && parsed.username) info.username = parsed.username;
+          if (!info.photo_url && parsed.photo_url) info.photo_url = parsed.photo_url;
+          if (!info.language && parsed.language_code) info.language = parsed.language_code;
+        }
+      } catch (e) {}
+    }
+
+    // Check URL parameters
+    const urlFn = urlParams.get('first_name') || hashParams.get('first_name');
+    const urlLn = urlParams.get('last_name') || hashParams.get('last_name');
+    const urlUn = urlParams.get('username') || hashParams.get('username');
+    if (!info.firstName && urlFn) info.firstName = decodeURIComponent(urlFn);
+    if (!info.lastName && urlLn) info.lastName = decodeURIComponent(urlLn);
+    if (!info.username && urlUn) info.username = decodeURIComponent(urlUn);
+
     try {
       const cached = localStorage.getItem('easyfind_user');
       if (cached) {
@@ -67,6 +92,13 @@ function getAppUserInfo() {
         if (!info.username && u.username) info.username = u.username;
       }
     } catch (e) {}
+
+    // Synchronize currentUser in mock mode so standalone preview gets real data
+    if (info.uid) currentUser.id = info.uid;
+    if (info.firstName) currentUser.first_name = info.firstName;
+    if (info.lastName) currentUser.last_name = info.lastName;
+    if (info.username) currentUser.username = info.username;
+    if (info.photo_url) currentUser.photo_url = info.photo_url;
 
     return info;
   } catch (e) {}

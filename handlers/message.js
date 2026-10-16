@@ -9,29 +9,39 @@ import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
 import { registerBotCommands } from '../lib/bot/setup.js';
 
-export function buildMainReplyKeyboard(isAdmin, lang = 'uz', userId = null) {
+export function buildMainReplyKeyboard(isAdmin, lang = 'uz', user = null) {
   const miniAppBaseUrl = config.miniAppUrl || 'https://app.tgcloud.ai';
-  const uidParam = userId ? `&uid=${userId}` : '';
+  let userParams = '';
+  if (user) {
+    const uid = typeof user === 'object' ? user.id : user;
+    const fn = typeof user === 'object' ? (user.first_name || user.firstName || '') : '';
+    const ln = typeof user === 'object' ? (user.last_name || user.lastName || '') : '';
+    const un = typeof user === 'object' ? (user.username || '') : '';
+    userParams = `&uid=${uid}`;
+    if (fn) userParams += `&first_name=${encodeURIComponent(fn)}`;
+    if (ln) userParams += `&last_name=${encodeURIComponent(ln)}`;
+    if (un) userParams += `&username=${encodeURIComponent(un)}`;
+  }
 
   const rows = [
     [
       {
         text: t(lang, 'keyboard.search_jobs'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=jobs${uidParam}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=jobs${userParams}` },
       },
       {
         text: t(lang, 'keyboard.post_job'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=post_job${uidParam}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=post_job${userParams}` },
       },
     ],
     [
       {
         text: t(lang, 'keyboard.my_applications'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps${uidParam}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps${userParams}` },
       },
       {
         text: t(lang, 'keyboard.my_vacancies'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs${uidParam}` },
+        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs${userParams}` },
       },
     ],
     [
@@ -116,9 +126,9 @@ export default async function (message, ctx) {
     logger.error('handlers/message.js', 'Error registering user', err);
   }
 
-  const isAdmin = await isUserAdmin(userId);
+  const userObj = { id: userId, ...from };
   const replyKeyboard = {
-    keyboard: buildMainReplyKeyboard(isAdmin, userLang, userId),
+    keyboard: buildMainReplyKeyboard(isAdmin, userLang, userObj),
     resize_keyboard: true,
   };
 
@@ -233,7 +243,7 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: t('uz', 'commands.language_updated'),
       reply_markup: {
-        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'uz', userId),
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'uz', userObj),
         resize_keyboard: true,
       },
     });
@@ -251,7 +261,7 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: t('ru', 'commands.language_updated'),
       reply_markup: {
-        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'ru', userId),
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'ru', userObj),
         resize_keyboard: true,
       },
     });
@@ -269,7 +279,7 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: t('en', 'commands.language_updated'),
       reply_markup: {
-        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'en', userId),
+        keyboard: buildMainReplyKeyboard(updatedIsAdmin, 'en', userObj),
         resize_keyboard: true,
       },
     });

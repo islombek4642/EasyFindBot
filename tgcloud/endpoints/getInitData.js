@@ -57,7 +57,7 @@ export default async function (input, ctx) {
     }
   }
 
-  const userResume = await db.select({ id: resumes.id })
+  const userResume = await db.select()
     .from(resumes)
     .where(eq(resumes.seekerTgId, userId))
     .get();
@@ -74,6 +74,7 @@ export default async function (input, ctx) {
       username: dbUser.username || tgUser?.username || '',
       photo_url: tgUser?.photo_url || null,
     },
+    resume: userResume || null,
     hasResume: !!userResume,
     isAdmin,
   };

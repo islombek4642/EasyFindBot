@@ -44,9 +44,20 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
     switchRole(nextRole);
   };
 
-  const displayName = user
-    ? `${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim() || user.username || 'Foydalanuvchi'
-    : 'Foydalanuvchi';
+  const displayName = (() => {
+    if (user) {
+      const full = `${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim();
+      if (full) return full;
+      if (user.username) return `@${user.username}`;
+    }
+    const tg = typeof window !== 'undefined' ? window.Telegram?.WebApp?.initDataUnsafe?.user : null;
+    if (tg) {
+      const tgFull = `${tg.first_name || ''} ${tg.last_name || ''}`.trim();
+      if (tgFull) return tgFull;
+      if (tg.username) return `@${tg.username}`;
+    }
+    return t('profile.role_seeker');
+  })();
 
   return (
     <div className="page-content">
