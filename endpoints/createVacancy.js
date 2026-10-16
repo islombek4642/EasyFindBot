@@ -3,14 +3,13 @@ import { eq } from 'sdk/db';
 import { vacancies, users } from '../schema.js';
 import { sendToModeration } from '../lib/bot/moderator.js';
 import { t } from '../lib/locales/index.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const employerTgId = getAuthenticatedUserId(ctx, input);
+  if (!employerTgId) {
     return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
-
-  const employerTgId = Number(tgUser.id);
   const userRow = await db.select({ language: users.language }).from(users).where(eq(users.tgId, employerTgId)).get();
   const lang = userRow?.language || 'uz';
 

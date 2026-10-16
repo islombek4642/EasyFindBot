@@ -1,14 +1,13 @@
 import { db } from 'sdk';
 import { eq, sql } from 'sdk/db';
 import { users } from '../schema.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const userId = getAuthenticatedUserId(ctx, input);
+  if (!userId) {
     return { success: false, error: 'Unauthorized' };
   }
-
-  const userId = Number(tgUser.id);
   const { language, role, phone, firstName, lastName } = input || {};
 
   const updates = {

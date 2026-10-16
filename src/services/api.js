@@ -30,27 +30,55 @@ const isTelegramServerless = () => {
     typeof window.Telegram.WebApp.Serverless.call === 'function';
 };
 
-function getAppUserId() {
-  if (typeof window === 'undefined') return null;
+function getAppUserInfo() {
+  if (typeof window === 'undefined') return {};
   try {
+    const tg = window.Telegram?.WebApp?.initDataUnsafe?.user;
     const urlParams = new URLSearchParams(window.location.search);
-    const uidFromUrl = urlParams.get('uid');
+    const hashParams = new URLSearchParams(window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash);
+    const uidFromUrl = urlParams.get('uid') || hashParams.get('uid');
+
     if (uidFromUrl && !isNaN(Number(uidFromUrl))) {
       sessionStorage.setItem('easyfind_uid', uidFromUrl);
-      return Number(uidFromUrl);
+      localStorage.setItem('easyfind_uid', uidFromUrl);
     }
-    const saved = sessionStorage.getItem('easyfind_uid');
-    if (saved && !isNaN(Number(saved))) return Number(saved);
+    if (tg?.id) {
+      sessionStorage.setItem('easyfind_uid', String(tg.id));
+      localStorage.setItem('easyfind_uid', String(tg.id));
+    }
+
+    const savedUid = sessionStorage.getItem('easyfind_uid') || localStorage.getItem('easyfind_uid');
+    const uid = tg?.id ? Number(tg.id) : (uidFromUrl || savedUid ? Number(uidFromUrl || savedUid) : null);
+
+    const info = {};
+    if (uid) info.uid = uid;
+    if (tg?.first_name) info.firstName = tg.first_name;
+    if (tg?.last_name) info.lastName = tg.last_name;
+    if (tg?.username) info.username = tg.username;
+    if (tg?.photo_url) info.photo_url = tg.photo_url;
+    if (tg?.language_code) info.language = tg.language_code;
+
+    try {
+      const cached = localStorage.getItem('easyfind_user');
+      if (cached) {
+        const u = JSON.parse(cached);
+        if (!info.firstName && (u.firstName || u.first_name)) info.firstName = u.firstName || u.first_name;
+        if (!info.lastName && (u.lastName || u.last_name)) info.lastName = u.lastName || u.last_name;
+        if (!info.username && u.username) info.username = u.username;
+      }
+    } catch (e) {}
+
+    return info;
   } catch (e) {}
-  return null;
+  return {};
 }
 
 /**
  * Low-level RPC caller
  */
 async function callServerless(endpoint, params = {}) {
-  const uid = getAppUserId();
-  const payload = uid && !params.uid ? { ...params, uid } : params;
+  const userInfo = getAppUserInfo();
+  const payload = { ...userInfo, ...params };
 
   if (isTelegramServerless()) {
     return new Promise((resolve, reject) => {

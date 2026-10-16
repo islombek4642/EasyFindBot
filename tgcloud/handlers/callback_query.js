@@ -71,7 +71,7 @@ export default async function (callbackQuery, ctx) {
         chat_id: chatId,
         text: t(newLang, 'commands.language_updated'),
         reply_markup: {
-          keyboard: buildMainReplyKeyboard(isAdmin, newLang),
+          keyboard: buildMainReplyKeyboard(isAdmin, newLang, fromId),
           resize_keyboard: true,
         },
       });

@@ -3,10 +3,11 @@ import { eq, sql } from 'sdk/db';
 import { applications, vacancies, users } from '../schema.js';
 import { APPLICATION_STATUSES } from '../lib/constants/statuses.js';
 import { t } from '../lib/locales/index.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const employerTgId = getAuthenticatedUserId(ctx, input);
+  if (!employerTgId) {
     return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
 
@@ -16,8 +17,6 @@ export default async function (input, ctx) {
   if (!appId || !Object.values(APPLICATION_STATUSES).includes(status)) {
     return { success: false, error: 'ERR_INVALID_INPUT' };
   }
-
-  const employerTgId = Number(tgUser.id);
 
   try {
     const application = await db.select().from(applications).where(eq(applications.id, appId)).get();

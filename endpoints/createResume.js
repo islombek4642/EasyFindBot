@@ -2,14 +2,13 @@ import { db } from 'sdk';
 import { eq, sql } from 'sdk/db';
 import { resumes, users } from '../schema.js';
 import { t } from '../lib/locales/index.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const seekerTgId = getAuthenticatedUserId(ctx, input);
+  if (!seekerTgId) {
     return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
-
-  const seekerTgId = Number(tgUser.id);
   const userRow = await db.select({ language: users.language }).from(users).where(eq(users.tgId, seekerTgId)).get();
   const lang = userRow?.language || 'uz';
 

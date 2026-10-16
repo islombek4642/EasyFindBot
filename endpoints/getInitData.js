@@ -10,45 +10,50 @@ export default async function (input, ctx) {
     return { success: false, error: 'Unauthorized' };
   }
 
+  const firstName = tgUser?.first_name || input?.firstName || input?.first_name || null;
+  const lastName = tgUser?.last_name || input?.lastName || input?.last_name || null;
+  const username = tgUser?.username || input?.username || null;
+  const userLang = tgUser?.language_code || input?.language || 'uz';
+
   let dbUser = await db.select().from(users).where(eq(users.tgId, userId)).get();
 
   if (!dbUser) {
-    const defaultLang = (tgUser?.language_code || '').startsWith('ru')
+    const defaultLang = userLang.startsWith('ru')
       ? 'ru'
-      : (tgUser?.language_code || '').startsWith('en')
+      : userLang.startsWith('en')
       ? 'en'
       : 'uz';
 
     await db.insert(users)
       .values({
         tgId: userId,
-        username: tgUser.username || null,
-        firstName: tgUser.first_name || null,
-        lastName: tgUser.last_name || null,
+        username: username || null,
+        firstName: firstName || null,
+        lastName: lastName || null,
         role: 'seeker',
         language: defaultLang,
       })
       .run();
 
     dbUser = await db.select().from(users).where(eq(users.tgId, userId)).get();
-  } else if (tgUser) {
+  } else {
     const shouldUpdate =
-      (tgUser.first_name && dbUser.firstName !== tgUser.first_name) ||
-      (tgUser.last_name && dbUser.lastName !== tgUser.last_name) ||
-      (tgUser.username && dbUser.username !== tgUser.username);
+      (firstName && dbUser.firstName !== firstName) ||
+      (lastName && dbUser.lastName !== lastName) ||
+      (username && dbUser.username !== username);
 
     if (shouldUpdate) {
       await db.update(users)
         .set({
-          firstName: tgUser.first_name || dbUser.firstName,
-          lastName: tgUser.last_name || dbUser.lastName,
-          username: tgUser.username || dbUser.username,
+          firstName: firstName || dbUser.firstName,
+          lastName: lastName || dbUser.lastName,
+          username: username || dbUser.username,
         })
         .where(eq(users.tgId, userId))
         .run();
-      dbUser.firstName = tgUser.first_name || dbUser.firstName;
-      dbUser.lastName = tgUser.last_name || dbUser.lastName;
-      dbUser.username = tgUser.username || dbUser.username;
+      dbUser.firstName = firstName || dbUser.firstName;
+      dbUser.lastName = lastName || dbUser.lastName;
+      dbUser.username = username || dbUser.username;
     }
   }
 

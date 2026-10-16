@@ -3,10 +3,12 @@ import { eq, and } from 'sdk/db';
 import { applications, vacancies, users, resumes } from '../schema.js';
 import { t } from '../lib/locales/index.js';
 import { config } from '../lib/config.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const tgUser = ctx?.initData?.user;
+  const seekerTgId = getAuthenticatedUserId(ctx, input);
+  if (!seekerTgId) {
     return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
 
@@ -14,8 +16,6 @@ export default async function (input, ctx) {
   if (!vacId) {
     return { success: false, error: 'ERR_INVALID_INPUT' };
   }
-
-  const seekerTgId = Number(tgUser.id);
 
   try {
     const seekerUser = await db.select({ language: users.language })
@@ -72,7 +72,7 @@ export default async function (input, ctx) {
         .get();
       const empLang = employerRow?.language || 'uz';
 
-      const candidateName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') || tgUser.username || String(seekerTgId);
+      const candidateName = [input?.firstName || tgUser?.first_name, input?.lastName || tgUser?.last_name].filter(Boolean).join(' ') || input?.username || tgUser?.username || String(seekerTgId);
       const notifTitle = t(empLang, 'notifier.new_application_title', { title: vacancy.title });
       const notifBody = t(empLang, 'notifier.new_application_candidate', { name: candidateName });
       const btnText = t(empLang, 'notifier.new_application_btn');

@@ -82,6 +82,17 @@ export default async function (message, ctx) {
     if (existingUser) {
       userLang = existingUser.language || 'uz';
       isRegistered = true;
+      if (
+        (from.first_name && existingUser.firstName !== from.first_name) ||
+        (from.last_name && existingUser.lastName !== from.last_name) ||
+        (from.username && existingUser.username !== from.username)
+      ) {
+        await db.update(users).set({
+          firstName: from.first_name || existingUser.firstName,
+          lastName: from.last_name || existingUser.lastName,
+          username: from.username || existingUser.username,
+        }).where(eq(users.tgId, Number(userId))).run();
+      }
     } else {
       // Auto-detect initial language
       const userLocale = (from.language_code || '').toLowerCase();

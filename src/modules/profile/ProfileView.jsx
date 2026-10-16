@@ -15,7 +15,7 @@ import { SubscriptionsModal } from './SubscriptionsModal.jsx';
 import { CreateResumeModal } from '../resumes/CreateResumeModal.jsx';
 
 export function ProfileView({ initialModal = null, onClearInitialModal = null }) {
-  const { user, role, resume, switchRole } = useAuth();
+  const { user, role, resume, switchRole, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { lang, setLang, t } = useTranslation();
 
@@ -60,55 +60,75 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
           gap: '16px',
         }}
       >
-        {user?.photo_url ? (
-          <img
-            src={user.photo_url}
-            alt={displayName}
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: 'var(--radius-full)',
-              objectFit: 'cover',
-              flexShrink: 0,
-              boxShadow: 'var(--shadow-glow)',
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: 'var(--radius-full)',
-              background: 'var(--accent-gradient)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              fontSize: '1.4rem',
-              fontWeight: 800,
-              flexShrink: 0,
-              boxShadow: 'var(--shadow-glow)',
-            }}
-          >
-            {displayName.charAt(0).toUpperCase()}
-          </div>
-        )}
-
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ fontSize: '1.15rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {displayName}
-          </h3>
-          {user?.username && (
-            <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-              @{user.username}
+        {loading && !user ? (
+          <>
+            <div
+              className="skeleton"
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: 'var(--radius-full)',
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="skeleton" style={{ width: '140px', height: '20px', borderRadius: '4px' }} />
+              <div className="skeleton" style={{ width: '90px', height: '14px', borderRadius: '4px' }} />
             </div>
-          )}
-          <div style={{ marginTop: '6px' }}>
-            <Badge variant={isEmployer ? 'primary' : 'neutral'} icon={isEmployer ? 'solar:buildings-bold' : 'solar:user-bold'}>
-              {isEmployer ? t('profile.role_employer') : t('profile.role_seeker')}
-            </Badge>
-          </div>
-        </div>
+          </>
+        ) : (
+          <>
+            {user?.photo_url ? (
+              <img
+                src={user.photo_url}
+                alt={displayName}
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: 'var(--radius-full)',
+                  objectFit: 'cover',
+                  flexShrink: 0,
+                  boxShadow: 'var(--shadow-glow)',
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--accent-gradient)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                  fontSize: '1.4rem',
+                  fontWeight: 800,
+                  flexShrink: 0,
+                  boxShadow: 'var(--shadow-glow)',
+                }}
+              >
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h3 style={{ fontSize: '1.15rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {displayName}
+              </h3>
+              {user?.username && (
+                <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
+                  @{user.username}
+                </div>
+              )}
+              <div style={{ marginTop: '6px' }}>
+                <Badge variant={isEmployer ? 'primary' : 'neutral'} icon={isEmployer ? 'solar:buildings-bold' : 'solar:user-bold'}>
+                  {isEmployer ? t('profile.role_employer') : t('profile.role_seeker')}
+                </Badge>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Role Switch Banner */}

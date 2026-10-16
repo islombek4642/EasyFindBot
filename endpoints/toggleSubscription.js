@@ -1,10 +1,11 @@
 import { db } from 'sdk';
 import { eq, and } from 'sdk/db';
 import { subscriptions } from '../schema.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const userTgId = getAuthenticatedUserId(ctx, input);
+  if (!userTgId) {
     return { success: false, error: 'Unauthorized' };
   }
 
@@ -13,7 +14,6 @@ export default async function (input, ctx) {
     return { success: false, error: 'ERR_CATEGORY_REQUIRED' };
   }
 
-  const userTgId = Number(tgUser.id);
   const regionVal = region && region !== 'all' ? region : null;
 
   try {

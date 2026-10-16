@@ -1,14 +1,13 @@
 import { db } from 'sdk';
 import { eq } from 'sdk/db';
 import { resumes } from '../schema.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const seekerTgId = getAuthenticatedUserId(ctx, input);
+  if (!seekerTgId) {
     return { success: false, error: 'Unauthorized' };
   }
-
-  const seekerTgId = Number(tgUser.id);
 
   try {
     const resume = await db.select()

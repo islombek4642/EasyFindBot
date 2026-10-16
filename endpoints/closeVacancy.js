@@ -1,10 +1,11 @@
 import { db } from 'sdk';
 import { eq, and, sql } from 'sdk/db';
 import { vacancies } from '../schema.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
-  const tgUser = ctx.initData?.user;
-  if (!tgUser?.id) {
+  const employerTgId = getAuthenticatedUserId(ctx, input);
+  if (!employerTgId) {
     return { success: false, error: 'Unauthorized' };
   }
 
@@ -12,8 +13,6 @@ export default async function (input, ctx) {
   if (!vacId) {
     return { success: false, error: 'Invalid vacancy ID' };
   }
-
-  const employerTgId = Number(tgUser.id);
 
   try {
     const vacancy = await db.select()

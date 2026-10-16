@@ -1,6 +1,7 @@
 import { db } from 'sdk';
 import { eq, sql } from 'sdk/db';
 import { vacancies, users } from '../schema.js';
+import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
 export default async function (input, ctx) {
   const vacId = parseInt(input?.id, 10);
@@ -8,7 +9,7 @@ export default async function (input, ctx) {
     return { success: false, error: 'Invalid vacancy ID' };
   }
 
-  const requesterTgId = ctx.initData?.user?.id ? Number(ctx.initData.user.id) : null;
+  const requesterTgId = getAuthenticatedUserId(ctx, input);
 
   try {
     const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
