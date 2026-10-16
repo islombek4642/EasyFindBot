@@ -260,6 +260,14 @@ a {
   padding-top: 10px;
   padding-bottom: max(12px, var(--safe-bottom));
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  transition: transform var(--transition-normal), opacity var(--transition-normal), visibility var(--transition-normal);
+}
+
+.floating-bottom-nav.keyboard-hidden {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .nav-inner {

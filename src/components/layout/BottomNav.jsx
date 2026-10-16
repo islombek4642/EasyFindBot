@@ -2,13 +2,71 @@
  * EasyFindBot — Floating Bottom Navigation Chrome
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { ROUTES } from '../../constants/routes.js';
 import { useTranslation } from '../../locales/index.jsx';
 
 export function BottomNav({ activeTab, onTabChange }) {
   const { t } = useTranslation();
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    const isInteractiveInput = (el) => {
+      if (!el || !el.tagName) return false;
+      const tag = el.tagName.toLowerCase();
+      if (tag === 'textarea') return true;
+      if (tag === 'input') {
+        const type = (el.type || 'text').toLowerCase();
+        return !['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'image'].includes(type);
+      }
+      return false;
+    };
+
+    const handleFocusIn = (e) => {
+      if (isInteractiveInput(e.target)) {
+        setIsKeyboardOpen(true);
+      }
+    };
+
+    const handleFocusOut = () => {
+      // Delay slightly in case focus shifts to another input element
+      setTimeout(() => {
+        if (!isInteractiveInput(document.activeElement)) {
+          setIsKeyboardOpen(false);
+        }
+      }, 100);
+    };
+
+    window.addEventListener('focusin', handleFocusIn);
+    window.addEventListener('focusout', handleFocusOut);
+
+    // Visual viewport resize listener for mobile WebView / Telegram client
+    const vv = window.visualViewport;
+    const handleViewportResize = () => {
+      if (vv && window.innerHeight) {
+        const heightDiff = window.innerHeight - vv.height;
+        // Viewport shrunk by more than 150px means keyboard is visible
+        if (heightDiff > 150) {
+          setIsKeyboardOpen(true);
+        } else if (!isInteractiveInput(document.activeElement)) {
+          setIsKeyboardOpen(false);
+        }
+      }
+    };
+
+    if (vv) {
+      vv.addEventListener('resize', handleViewportResize);
+    }
+
+    return () => {
+      window.removeEventListener('focusin', handleFocusIn);
+      window.removeEventListener('focusout', handleFocusOut);
+      if (vv) {
+        vv.removeEventListener('resize', handleViewportResize);
+      }
+    };
+  }, []);
 
   const tabs = [
     {
@@ -50,7 +108,7 @@ export function BottomNav({ activeTab, onTabChange }) {
   };
 
   return (
-    <nav className="floating-bottom-nav">
+    <nav className={`floating-bottom-nav ${isKeyboardOpen ? 'keyboard-hidden' : ''}`}>
       <div className="nav-inner">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
