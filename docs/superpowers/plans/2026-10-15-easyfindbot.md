@@ -131,54 +131,54 @@
   - Push notifier: `notifySubscribers(api, vacancy)`, `notifyEmployer(api, vacancy, status)`.
   - Structured console logger: `logger.info(source, msg, data)`, `logger.warn(source, msg, data)`, `logger.error(source, msg, data)` formatted for `tgcloud logs` terminal inspection.
 
-- [ ] **Step 1: Implement typed domain constants**
+- [x] **Step 1: Implement typed domain constants**
   - `tgcloud/lib/constants/roles.js`: `SEEKER: 'seeker'`, `EMPLOYER: 'employer'`, `ADMIN: 'admin'`.
   - `tgcloud/lib/constants/statuses.js`: `PENDING: 'pending'`, `APPROVED: 'approved'`, `REJECTED: 'rejected'`, `CLOSED: 'closed'`.
   - `tgcloud/lib/constants/categories.js`: Standard job categories (`it`, `design`, `marketing`, `sales`, `finance`, `management`, `education`, `other`).
   - `tgcloud/lib/constants/salaryTypes.js`: `RANGE: 'range'`, `FIXED: 'fixed'`, `NEGOTIABLE: 'negotiable'`.
 
-- [ ] **Step 2: Implement `tgcloud/lib/config.js`**
+- [x] **Step 2: Implement `tgcloud/lib/config.js`**
   - Export `config` containing `superAdminTgId`, fallback `moderationChannelId`, fallback `publicChannelId`, `botUsername`, `paginationLimit: 15`.
 
-- [ ] **Step 3: Implement `tgcloud/schema.js`**
+- [x] **Step 3: Implement `tgcloud/schema.js`**
   - Define `users`, `vacancies`, `resumes`, `applications`, `subscriptions`, and `settings` tables.
   - Enforce unified `tgId` integer fields (`tgId`, `employerTgId`, `seekerTgId`, `userTgId`).
   - Unique composite indexes for `applications(vacancyId, seekerTgId)` and `subscriptions(userTgId, category, region)`.
   - Zero SQLite foreign keys.
 
-- [ ] **Step 4: Implement `tgcloud/lib/bot/settings.js`**
+- [x] **Step 4: Implement `tgcloud/lib/bot/settings.js`**
   - `getSetting(key, defaultValue)`: Queries `settings` table, returns fallback if not found.
   - `setSetting(key, value)`: Inserts or updates key in `settings` table.
   - `getModerationChannelId()`: Checks `settings.moderation_channel_id`, falls back to `config.moderationChannelId`.
   - `getPublicChannelId()`: Checks `settings.public_channel_id`, falls back to `config.publicChannelId`.
 
-- [ ] **Step 5: Implement `tgcloud/lib/bot/auth.js`**
+- [x] **Step 5: Implement `tgcloud/lib/bot/auth.js`**
   - `isUserAdmin(tgId)`: Returns `true` if `tgId === config.superAdminTgId` OR exists in `users` with `role = 'admin'`.
   - `getAllAdminTgIds()`: Queries super admin ID + all `users` with `role = 'admin'`.
 
-- [ ] **Step 6: Implement `tgcloud/lib/bot/admin.js`**
+- [x] **Step 6: Implement `tgcloud/lib/bot/admin.js`**
   - `buildAdminPanelMenu()`: Generates inline keyboard for Pending Queue, System Stats, Admin Management, Channel Settings, and Broadcast.
   - `buildStatsReport(stats)`: Formats total users, active vacancies, submitted applications, and active resumes.
   - `buildChannelSettingsMenu(modChannel, pubChannel)`: Generates inline keyboard for editing channel usernames/IDs.
 
-- [ ] **Step 7: Implement `tgcloud/lib/bot/moderator.js`**
+- [x] **Step 7: Implement `tgcloud/lib/bot/moderator.js`**
   - `buildModerationCard(vacancy)`: Formats review message with title, company, salary, description, and action buttons (`Approve: mod_approve:<id>`, `Reject: mod_reject:<id>`).
   - `sendToModeration(api, vacancy)`: Dispatches review card to `getModerationChannelId()` with fallback to direct admin messaging if channel fails.
 
-- [ ] **Step 8: Implement `tgcloud/lib/bot/channel.js`**
+- [x] **Step 8: Implement `tgcloud/lib/bot/channel.js`**
   - `formatChannelPost(vacancy)`: Formats clean markdown post without emojis (using typographic bullet points and bold headers).
   - `publishToChannel(api, vacancy)`: Publishes to `getPublicChannelId()`.
   - **CRITICAL**: Use direct URL button `{ text: 'Ariza topshirish', url: 'https://t.me/' + config.botUsername + '/app?startapp=vac_' + vacancy.id }`.
   - Wrap in `try...catch` for fault-tolerant handling if bot permissions are incomplete.
 
-- [ ] **Step 9: Implement `tgcloud/lib/bot/notifier.js`**
+- [x] **Step 9: Implement `tgcloud/lib/bot/notifier.js`**
   - `notifyEmployer(api, employerTgId, vacancy, status, reason)`: Sends status notification when vacancy is approved or rejected.
   - `notifySubscribers(api, vacancy)`: Queries active subscribers matching vacancy category and region, sends notification in batches of 25 with 1-second delay and per-recipient `try...catch`.
 
-- [ ] **Step 10: Implement `tgcloud/lib/logger.js`**
+- [x] **Step 10: Implement `tgcloud/lib/logger.js`**
   - Implement structured console logging (`logger.info`, `logger.warn`, `logger.error`) outputting timestamped ISO entries formatted for real-time `npx tgcloud logs` inspection.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
   ```bash
   git add tgcloud/schema.js tgcloud/lib/
   git commit -m "feat(backend): implement db schema, settings table, two-tier admin auth, structured logger, and bot helper modules"
