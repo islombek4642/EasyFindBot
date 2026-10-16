@@ -379,18 +379,18 @@
   - AppHeader with brand, language switcher, role pill, and theme toggle.
   - BottomNav with 4 primary tabs and safe-area padding.
 
-- [ ] **Step 1: Implement `src/services/mockData.js`**
+- [x] **Step 1: Implement `src/services/mockData.js`**
   - Populate demo vacancies (range, fixed, negotiable), demo resumes, applications, and current user.
 
-- [ ] **Step 2: Implement `src/services/api.js`**
+- [x] **Step 2: Implement `src/services/api.js`**
   - Check if `window.Telegram?.WebApp?.Serverless?.call` is available.
   - If available, execute `window.Telegram.WebApp.Serverless.call(endpoint, data)`.
   - If unavailable (standalone browser dev `npm run dev`), route to `mockData.js` handlers with simulated latency.
 
-- [ ] **Step 3: Implement `src/context/AuthContext.jsx`**
+- [x] **Step 3: Implement `src/context/AuthContext.jsx`**
   - Call `getInitData` on mount; cache user, role (`seeker` / `employer`), and language.
 
-- [ ] **Step 4: Implement atomic building blocks**
+- [x] **Step 4: Implement atomic building blocks**
   - `Button.jsx`: variants (`primary`, `secondary`, `outline`, `danger`), sizes (`sm`, `md`, `lg`), `loading` spinner.
   - `Input.jsx`: Iconify prefix/suffix slot, label, error helper.
   - `Select.jsx`: Styled native select with custom chevron icon.
@@ -400,15 +400,15 @@
   - `EmptyState.jsx`: Centered Iconify icon, title, description, action button.
   - `Skeleton.jsx`: Shimmer placeholder for cards and lines.
 
-- [ ] **Step 5: Implement reusable entity cards**
+- [x] **Step 5: Implement reusable entity cards**
   - `VacancyCard.jsx`: Displays title, company, category badge, salary badge, region, and posted time. Used in search, my postings, and channel preview.
   - `ResumeCard.jsx`: Displays candidate name, title, experience, expected salary, and skills badges.
 
-- [ ] **Step 6: Implement layout components**
+- [x] **Step 6: Implement layout components**
   - `AppHeader.jsx`: Title, role switch indicator, language toggle, and theme switch.
   - `BottomNav.jsx`: 4 tabs with Iconify icons (`solar:suitcase-tag-linear`, `solar:add-circle-linear`, `solar:users-group-two-rounded-linear`, `solar:user-circle-linear`), active pill indicator, and safe-area inset padding.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
   ```bash
   git add src/services/ src/context/AuthContext.jsx src/components/
   git commit -m "feat(frontend): implement api transport with dev mock and atomic reusable ui components"
@@ -437,7 +437,7 @@
 - Consumes: Atomic components, `api.js`, `useTranslation()`, `useDeepLink()`.
 - Produces: 4 comprehensive application modules and entry point.
 
-- [ ] **Step 1: Implement `src/hooks/useDeepLink.js`**
+- [x] **Step 1: Implement `src/hooks/useDeepLink.js`**
   - Inspect `window.Telegram?.WebApp?.initDataUnsafe?.start_param` and query param `?startapp=`.
   - Route direct navigation:
     - `vac_<id>`: Open `VacancyDetailModal` for that ID.
@@ -446,11 +446,11 @@
     - `my_apps`: Open applications modal in profile.
     - `my_vacs`: Open employer vacancies modal in profile.
 
-- [ ] **Step 2: Implement `VacanciesView.jsx` and `VacancyDetailModal.jsx`**
+- [x] **Step 2: Implement `VacanciesView.jsx` and `VacancyDetailModal.jsx`**
   - `VacanciesView`: Search bar with debounce, horizontal scrollable category pills, salary type filters, paginated list of `VacancyCard`s with `Skeleton` loading.
   - `VacancyDetailModal`: Full job specification, company info, salary breakdown, contact action, and "Submit Application" button.
 
-- [ ] **Step 3: Implement `PostJobWizard.jsx`**
+- [x] **Step 3: Implement `PostJobWizard.jsx`**
   - Multi-step job posting wizard:
     - Step 1: Basic Info (Title, Category, Company, Region).
     - Step 2: Compensation (Salary Type: Range, Fixed, Negotiable; Currency).
@@ -458,26 +458,26 @@
     - Step 4: Contacts & Review.
   - Calls `createVacancy` endpoint on completion and displays confirmation state.
 
-- [ ] **Step 4: Implement `ResumesView.jsx` and `CreateResumeModal.jsx`**
+- [x] **Step 4: Implement `ResumesView.jsx` and `CreateResumeModal.jsx`**
   - `ResumesView`: Talent browsing for employers, filter by category and experience, `ResumeCard` grid.
   - `CreateResumeModal`: Candidate profile creator (headline, skills tag input, expected salary, bio).
 
-- [ ] **Step 5: Implement `ProfileView.jsx` and management modals**
+- [x] **Step 5: Implement `ProfileView.jsx` and management modals**
   - User header with role badge (`seeker` or `employer`).
   - Seeker section: "My Applications" modal (`SeekerApplicationsModal`), "Category Subscriptions" modal (`SubscriptionsModal`).
   - Employer section: "My Posted Vacancies" modal (`EmployerVacanciesModal`), "View Applicants" modal with status update actions (`VacancyApplicantsModal`).
   - Language selection dropdown and Telegram theme sync toggle.
 
-- [ ] **Step 6: Assemble `App.jsx` and `main.jsx`**
+- [x] **Step 6: Assemble `App.jsx` and `main.jsx`**
   - Wrap app with `ThemeProvider`, `TranslationProvider`, `AuthProvider`.
   - Call `Telegram.WebApp.ready()` and `Telegram.WebApp.expand()` immediately on mount.
   - Integrate `AppHeader`, active tab view rendering, and `BottomNav`.
 
-- [ ] **Step 7: Verify build output**
+- [x] **Step 7: Verify build output**
   - Run: `npm run build`
   - Expected: Zero compile or lint errors; production bundle emitted in `dist/`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
   ```bash
   git add src/hooks/ src/modules/ src/App.jsx src/main.jsx
   git commit -m "feat(frontend): implement feature views, deep link router, and application entry point"
@@ -494,17 +494,18 @@
 - Consumes: Built assets and tested endpoints.
 - Produces: Complete repository verification and pushed code on GitHub `main`.
 
-- [ ] **Step 1: Execute full production build**
+- [x] **Step 1: Execute full production build**
   - Run: `npm run build`
   - Verify `dist/index.html` and assets exist.
 
-- [ ] **Step 2: Validate Serverless configuration**
+- [x] **Step 2: Validate Serverless configuration**
   - Run dry-run checks on `tgcloud.jsonc`.
 
-- [ ] **Step 3: Create `README.md`**
+- [x] **Step 3: Create `README.md`**
   - Document setup, local development (`npm run dev`), Telegram Serverless deployment commands (`npx tgcloud login`, `npx tgcloud push`, `npx tgcloud migrate`).
 
-- [ ] **Step 4: Push all changes to GitHub**
+- [x] **Step 4: Push all changes to GitHub**
   ```bash
   git push origin main
   ```
+
