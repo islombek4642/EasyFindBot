@@ -45,8 +45,8 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
   };
 
   const displayName = user
-    ? `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Telegram Foydalanuvchi'
-    : 'Telegram Foydalanuvchi';
+    ? `${user.first_name || user.firstName || ''} ${user.last_name || user.lastName || ''}`.trim() || user.username || 'Foydalanuvchi'
+    : 'Foydalanuvchi';
 
   return (
     <div className="page-content">
@@ -60,24 +60,39 @@ export function ProfileView({ initialModal = null, onClearInitialModal = null })
           gap: '16px',
         }}
       >
-        <div
-          style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: 'var(--radius-full)',
-            background: 'var(--accent-gradient)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#ffffff',
-            fontSize: '1.4rem',
-            fontWeight: 800,
-            flexShrink: 0,
-            boxShadow: 'var(--shadow-glow)',
-          }}
-        >
-          {displayName.charAt(0).toUpperCase()}
-        </div>
+        {user?.photo_url ? (
+          <img
+            src={user.photo_url}
+            alt={displayName}
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: 'var(--radius-full)',
+              objectFit: 'cover',
+              flexShrink: 0,
+              boxShadow: 'var(--shadow-glow)',
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--accent-gradient)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontSize: '1.4rem',
+              fontWeight: 800,
+              flexShrink: 0,
+              boxShadow: 'var(--shadow-glow)',
+            }}
+          >
+            {displayName.charAt(0).toUpperCase()}
+          </div>
+        )}
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{ fontSize: '1.15rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

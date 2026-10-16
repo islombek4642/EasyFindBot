@@ -21,7 +21,14 @@ export function AuthProvider({ children }) {
       setError(null);
       const data = await api.getInitData();
       if (data && data.user) {
-        setUser(data.user);
+        const tgUser = (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) || {};
+        setUser({
+          ...data.user,
+          first_name: data.user.first_name || data.user.firstName || tgUser.first_name || '',
+          last_name: data.user.last_name || data.user.lastName || tgUser.last_name || '',
+          username: data.user.username || tgUser.username || '',
+          photo_url: data.user.photo_url || tgUser.photo_url || null,
+        });
         setResume(data.resume || null);
       }
     } catch (err) {
