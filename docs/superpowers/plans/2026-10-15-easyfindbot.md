@@ -2,35 +2,53 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build and deploy EasyFindBot — a production-grade Telegram Serverless job board platform featuring bot notifications, secure admin moderation, automatic day/night theme sync, and a premium React Mini App with strict i18n and Iconify icons.
+**Goal:** Build, verify, and deliver EasyFindBot — a production-grade Telegram Serverless job board and talent platform featuring secure bot moderation, dynamic channel publishing, two-tier admin hierarchy, automatic day/night theme sync, and a premium React Mini App with strict i18n and Iconify icons.
 
-**Architecture:** The project employs Telegram Serverless (`tgcloud/`) for update routing (`handlers/`), RPC endpoints (`endpoints/`), and native SQLite tables (`schema.js`), paired with a React Vite Mini App (`src/`) hosted on Telegram Serverless static CDN.
+**Architecture:** The solution leverages the new Telegram Serverless (`tgcloud/`) infrastructure running on an isolated V8 runtime with native SQLite (`sdk/db`), direct update handlers (`tgcloud/handlers/`), and RPC endpoints (`tgcloud/endpoints/`). The frontend is a high-performance React 18 SPA built with Vite (`src/`), deployed to Telegram Serverless static CDN, adhering to an atomic DRY design system.
 
-**Tech Stack:** Telegram Serverless (`@tgcloud/cli`, `sdk`, `sdk/db`, `sdk/api`), React 18, Vite, `@iconify/react`.
+**Tech Stack:** Telegram Serverless (`@tgcloud/cli`, `sdk`, `sdk/db`, `sdk/api`), React 18, Vite, `@iconify/react` (Solar & Lucide icons).
 
-**Spec:** [docs/superpowers/specs/2026-10-15-easyfindbot-design.md](file:///d:/EasyFindBot/docs/superpowers/specs/2026-10-15-easyfindbot-design.md)
+**Spec:** [docs/superpowers/specs/2026-10-15-easyfindbot-design.md](file:///c:/EasyFindBot/docs/superpowers/specs/2026-10-15-easyfindbot-design.md)
 
 ## Global Constraints
 
-- Zero Unicode emojis or stickers allowed anywhere in UI or backend; use `@iconify/react` exclusively.
-- All copy must reside in `src/locales/{uz,ru,en}.js` without hardcoded UI strings.
-- Strict Atomic Design System & Component Reusability (DRY):
-  - Zero duplicated inline card, button, modal, or input markup.
-  - All UI strictly composes atomic building blocks from `src/components/common/`.
-  - All styling strictly consumes CSS design tokens from `src/index.css`.
-- All modules inside `tgcloud/` must be pure ES modules using relative `.js` imports or `sdk`; no npm packages inside `tgcloud/`.
-- No foreign key declarations in `tgcloud/schema.js` (`PRAGMA foreign_keys = off`).
-- All relational associations strictly use Telegram ID (`tgId` / `employerTgId` / `seekerTgId` / `userTgId`).
-- Automatic Day / Night theme adaptation matching Telegram theme settings dynamically.
+- **Zero Unicode Emojis or Stickers**: Strictly prohibited in Mini App UI and backend templates; all iconography uses `@iconify/react` (Solar / Lucide icons).
+- **Zero Hardcoded Copy**: 100% of UI text, placeholders, tooltips, and alerts reside in `src/locales/{uz, ru, en}.js` accessed via `useTranslation()`.
+- **Strict Atomic UI Component Reusability (DRY)**:
+  - Zero duplicated inline cards, buttons, inputs, selects, or modals.
+  - All UI composed from `src/components/common/` (`<Button />`, `<Input />`, `<Select />`, `<Badge />`, `<Modal />`, `<ThemeToggle />`, `<VacancyCard />`, `<ResumeCard />`, `<EmptyState />`, `<Skeleton />`).
+  - Centralized CSS design tokens in `src/index.css`.
+- **Telegram Serverless Runtime Rules (`tgcloud/`)**:
+  - Zero NPM packages at runtime. Only import `sdk`, `sdk/db`, `sdk/api`, or relative `.js` files.
+  - Relative imports must explicitly include `.js` extension (e.g., `import { users } from '../schema.js';`).
+  - No SQLite foreign keys (`PRAGMA foreign_keys = off`). Never declare `.references()` or `foreignKey()`.
+  - All database queries must be awaited (`await db.select()...`).
+  - Relational foreign keys strictly use Telegram User IDs (`tgId`, `employerTgId`, `seekerTgId`, `userTgId`).
+  - Dynamic configuration stored in `settings` table; static root authority in `tgcloud/lib/config.js`. No `process.env`.
+- **Automatic Day / Night Theme Adaptation**:
+  - Automatic synchronization with `Telegram.WebApp.colorScheme` and `Telegram.WebApp.themeParams`.
+  - Listen for `themeChanged` event with instant theme updating.
 
 ## Review Focus
 
-1. `Telegram.WebApp.Serverless.call` missing outside Telegram environment: provide high-fidelity in-memory mock adapter in `src/services/api.js` and `src/services/mockData.js` for seamless local browser development (`npm run dev`).
-2. Telegram Channel inline button rule: Telegram Bot API explicitly rejects `web_app` buttons in channel messages (`BUTTON_TYPE_INVALID`); channel posts MUST use direct URL buttons: `url: 'https://t.me/' + config.botUsername + '/app?startapp=vac_' + id`.
-3. Channel broadcast fault tolerance: wrap channel publishing in `try...catch` so unexpected channel permission/ID errors do not fail the database approval transaction.
-4. Negotiable salary query logic: `getVacancies.js` must query `WHERE (salary_min >= :min OR salary_type = 'negotiable')` to prevent excluding competitive negotiable offers.
-5. Mobile viewport & safe-area insets: call `Telegram.WebApp.expand()` on mount and apply `env(safe-area-inset-bottom)` to `BottomNav` to avoid home-bar clipping.
-6. Broadcast rate-limiting: process recipients in chunks of 25 with 1-second delays and per-recipient `try...catch` to prevent Telegram 429 (`Too Many Requests`) and serverless execution timeouts.
+1. **Telegram Channel Inline Button Rejection (`BUTTON_TYPE_INVALID`):**
+   - In public broadcast channels, Telegram Bot API throws an error if an inline button contains `web_app`.
+   - **Requirement:** Channel posts MUST use direct URL buttons: `{ text: 'Ariza topshirish', url: 'https://t.me/' + config.botUsername + '/app?startapp=vac_' + id }`. Private bot chats retain native `web_app: { url }`.
+2. **Channel Permission Fault Tolerance:**
+   - If the bot has not yet been added as an administrator to the public channel or moderation channel, `api.sendMessage` throws `BotApiError: 403 Forbidden`.
+   - **Requirement:** Wrap channel publishing in `try...catch`; record errors on the moderation log without aborting the database approval status.
+3. **Local Dev Mock Adapter:**
+   - Outside Telegram (`npm run dev` on localhost:5173), `window.Telegram?.WebApp?.Serverless?.call` is `undefined`.
+   - **Requirement:** `src/services/api.js` must implement an in-memory mock adapter (`src/services/mockData.js`) providing demo vacancies, talent resumes, and applicant statuses for rapid standalone browser styling.
+4. **Negotiable Salary Query Logic:**
+   - Vacancies with `salaryType = 'negotiable'` store `NULL` in `salary_min` and `salary_max`.
+   - **Requirement:** `tgcloud/endpoints/getVacancies.js` must filter using `WHERE (salary_min >= :min OR salary_type = 'negotiable')` to prevent omitting negotiable offers during salary filtering.
+5. **Mobile Safe Area & Gesture Bar Padding:**
+   - iOS and Android gesture indicators overlap fixed bottom navigation bars if placed at `bottom: 0`.
+   - **Requirement:** Bottom navigation must apply `padding-bottom: max(12px, env(safe-area-inset-bottom, 12px))` and initialize `Telegram.WebApp.expand()` + `Telegram.WebApp.ready()` immediately upon app mount.
+6. **Two-Tier Admin Hierarchy & Dynamic Channel Management:**
+   - Super admin (`superAdminTgId`) is configured in `tgcloud/lib/config.js`. Regular administrators are stored in `users` (`role = 'admin'`).
+   - Moderation and public channel IDs are stored dynamically in the `settings` table (`moderation_channel_id`, `public_channel_id`) and modified via the Bot Admin Panel (`⚙️ Admin panel`).
 
 ---
 
@@ -43,20 +61,35 @@
 - Create: `index.html`
 
 **Interfaces:**
-- Consumes: Node.js 18+ environment.
-- Produces: Project root able to run `npm run dev` and `npm run build` targeting `dist/`.
+- Consumes: Node.js 18+ and npm.
+- Produces: Runnable development server (`npm run dev`) and static production build directory (`dist/`) configured for Telegram Serverless static CDN.
 
-- [ ] **Step 1: Create package.json with React 18, Vite, @iconify/react, and @tgcloud/cli**
-- [ ] **Step 2: Configure vite.config.js with base `/` and build outDir `dist`**
-- [ ] **Step 3: Create index.html loading Telegram WebApp script (`telegram-web-app.js`) and entry point**
-- [ ] **Step 4: Create tgcloud.jsonc configuring `"static": { "source": "dist", "spa": true }`**
-- [ ] **Step 5: Run `npm install` and verify dependencies install cleanly**
+- [ ] **Step 1: Create `package.json`**
+  - Add dependencies: `react: ^18.2.0`, `react-dom: ^18.2.0`, `@iconify/react: ^5.0.0`.
+  - Add devDependencies: `vite: ^5.2.0`, `@vitejs/plugin-react: ^4.2.0`, `@tgcloud/cli: ^0.1.0`.
+  - Define scripts: `"dev": "vite"`, `"build": "vite build"`, `"preview": "vite preview"`.
+
+- [ ] **Step 2: Create `vite.config.js`**
+  - Configure `@vitejs/plugin-react`.
+  - Set `base: '/'` and build destination to `dist/`.
+
+- [ ] **Step 3: Create `tgcloud.jsonc`**
+  - Set static configuration: `"static": { "source": "dist", "spa": true }`.
+
+- [ ] **Step 4: Create `index.html`**
+  - Set viewport meta with `viewport-fit=cover`.
+  - Include Telegram WebApp script: `<script src="https://telegram.org/js/telegram-web-app.js"></script>`.
+  - Mount root `#root` and load `/src/main.jsx`.
+
+- [ ] **Step 5: Verify build toolchain**
+  - Run: `npm install`
+  - Expected: Clean install with zero errors.
+
 - [ ] **Step 6: Commit**
-
-```bash
-git add package.json vite.config.js tgcloud.jsonc index.html
-git commit -m "chore: scaffold react mini app and tgcloud config"
-```
+  ```bash
+  git add package.json vite.config.js tgcloud.jsonc index.html
+  git commit -m "chore: scaffold react mini app toolchain and tgcloud config"
+  ```
 
 ---
 
@@ -65,36 +98,76 @@ git commit -m "chore: scaffold react mini app and tgcloud config"
 **Files:**
 - Create: `tgcloud/schema.js`
 - Create: `tgcloud/lib/config.js`
-- Create: `tgcloud/lib/bot/auth.js`
-- Create: `tgcloud/lib/bot/admin.js`
-- Create: `tgcloud/lib/bot/settings.js`
 - Create: `tgcloud/lib/constants/roles.js`
 - Create: `tgcloud/lib/constants/statuses.js`
 - Create: `tgcloud/lib/constants/categories.js`
 - Create: `tgcloud/lib/constants/salaryTypes.js`
+- Create: `tgcloud/lib/bot/settings.js`
+- Create: `tgcloud/lib/bot/auth.js`
+- Create: `tgcloud/lib/bot/admin.js`
 - Create: `tgcloud/lib/bot/moderator.js`
 - Create: `tgcloud/lib/bot/channel.js`
 - Create: `tgcloud/lib/bot/notifier.js`
 
 **Interfaces:**
-- Consumes: `sdk/db`, `sdk/api`.
-- Produces: Tables (`users`, `vacancies`, `resumes`, `applications`, `subscriptions`, `settings`) with unified `tgId` keys, dynamic settings persistence, two-tier admin auth helpers, admin panel formatters, and fault-tolerant bot publishing helpers.
+- Consumes: `sdk`, `sdk/db`, `sdk/api`.
+- Produces:
+  - SQLite schema: `users`, `vacancies`, `resumes`, `applications`, `subscriptions`, `settings`.
+  - Dynamic channel resolver: `getModerationChannelId()`, `getPublicChannelId()`, `setSetting(key, val)`.
+  - Two-tier auth check: `isUserAdmin(tgId) -> Promise<boolean>`.
+  - Moderation card builder: `buildModerationCard(vacancy)`.
+  - Channel publisher: `publishToChannel(api, vacancy) -> Promise<number>`.
+  - Push notifier: `notifySubscribers(api, vacancy)`, `notifyEmployer(api, vacancy, status)`.
 
-- [ ] **Step 1: Implement `tgcloud/lib/config.js` with superAdminTgId, moderationChannelId, publicChannelId, and defaults**
-- [ ] **Step 2: Implement `tgcloud/lib/bot/settings.js` (`getSetting`, `setSetting`, `getModerationChannelId`, `getPublicChannelId`)**
-- [ ] **Step 3: Implement `tgcloud/lib/bot/auth.js` (`isUserAdmin`, `getAllAdminTgIds`) for two-tier role management**
-- [ ] **Step 4: Implement `tgcloud/lib/bot/admin.js` (Admin panel dashboard, moderation queue card, metrics aggregation, channel settings)**
-- [ ] **Step 5: Implement `tgcloud/lib/constants/*.js` with typed constants (ROLES, STATUSES, CATEGORIES, REGIONS, SALARY_TYPES)**
-- [ ] **Step 6: Implement `tgcloud/schema.js` with unified `tgId` fields, salary types, unique application and subscription indexes, and `settings` table**
-- [ ] **Step 7: Implement `tgcloud/lib/bot/moderator.js` to construct review card for dedicated moderation channel (`getModerationChannelId()`) with fallback to direct messaging**
-- [ ] **Step 8: Implement `tgcloud/lib/bot/channel.js` to format and post approved vacancies to public channel (`getPublicChannelId()`) using Telegram direct URL button (`https://t.me/<bot>/app?startapp=vac_<id>`) and fault-tolerant `try...catch` error handling**
-- [ ] **Step 9: Implement `tgcloud/lib/bot/notifier.js` to dispatch push updates to matching subscribers and employers**
+- [ ] **Step 1: Implement typed domain constants**
+  - `tgcloud/lib/constants/roles.js`: `SEEKER: 'seeker'`, `EMPLOYER: 'employer'`, `ADMIN: 'admin'`.
+  - `tgcloud/lib/constants/statuses.js`: `PENDING: 'pending'`, `APPROVED: 'approved'`, `REJECTED: 'rejected'`, `CLOSED: 'closed'`.
+  - `tgcloud/lib/constants/categories.js`: Standard job categories (`it`, `design`, `marketing`, `sales`, `finance`, `management`, `education`, `other`).
+  - `tgcloud/lib/constants/salaryTypes.js`: `RANGE: 'range'`, `FIXED: 'fixed'`, `NEGOTIABLE: 'negotiable'`.
+
+- [ ] **Step 2: Implement `tgcloud/lib/config.js`**
+  - Export `config` containing `superAdminTgId`, fallback `moderationChannelId`, fallback `publicChannelId`, `botUsername`, `paginationLimit: 15`.
+
+- [ ] **Step 3: Implement `tgcloud/schema.js`**
+  - Define `users`, `vacancies`, `resumes`, `applications`, `subscriptions`, and `settings` tables.
+  - Enforce unified `tgId` integer fields (`tgId`, `employerTgId`, `seekerTgId`, `userTgId`).
+  - Unique composite indexes for `applications(vacancyId, seekerTgId)` and `subscriptions(userTgId, category, region)`.
+  - Zero SQLite foreign keys.
+
+- [ ] **Step 4: Implement `tgcloud/lib/bot/settings.js`**
+  - `getSetting(key, defaultValue)`: Queries `settings` table, returns fallback if not found.
+  - `setSetting(key, value)`: Inserts or updates key in `settings` table.
+  - `getModerationChannelId()`: Checks `settings.moderation_channel_id`, falls back to `config.moderationChannelId`.
+  - `getPublicChannelId()`: Checks `settings.public_channel_id`, falls back to `config.publicChannelId`.
+
+- [ ] **Step 5: Implement `tgcloud/lib/bot/auth.js`**
+  - `isUserAdmin(tgId)`: Returns `true` if `tgId === config.superAdminTgId` OR exists in `users` with `role = 'admin'`.
+  - `getAllAdminTgIds()`: Queries super admin ID + all `users` with `role = 'admin'`.
+
+- [ ] **Step 6: Implement `tgcloud/lib/bot/admin.js`**
+  - `buildAdminPanelMenu()`: Generates inline keyboard for Pending Queue, System Stats, Admin Management, Channel Settings, and Broadcast.
+  - `buildStatsReport(stats)`: Formats total users, active vacancies, submitted applications, and active resumes.
+  - `buildChannelSettingsMenu(modChannel, pubChannel)`: Generates inline keyboard for editing channel usernames/IDs.
+
+- [ ] **Step 7: Implement `tgcloud/lib/bot/moderator.js`**
+  - `buildModerationCard(vacancy)`: Formats review message with title, company, salary, description, and action buttons (`Approve: mod_approve:<id>`, `Reject: mod_reject:<id>`).
+  - `sendToModeration(api, vacancy)`: Dispatches review card to `getModerationChannelId()` with fallback to direct admin messaging if channel fails.
+
+- [ ] **Step 8: Implement `tgcloud/lib/bot/channel.js`**
+  - `formatChannelPost(vacancy)`: Formats clean markdown post without emojis (using typographic bullet points and bold headers).
+  - `publishToChannel(api, vacancy)`: Publishes to `getPublicChannelId()`.
+  - **CRITICAL**: Use direct URL button `{ text: 'Ariza topshirish', url: 'https://t.me/' + config.botUsername + '/app?startapp=vac_' + vacancy.id }`.
+  - Wrap in `try...catch` for fault-tolerant handling if bot permissions are incomplete.
+
+- [ ] **Step 9: Implement `tgcloud/lib/bot/notifier.js`**
+  - `notifyEmployer(api, employerTgId, vacancy, status, reason)`: Sends status notification when vacancy is approved or rejected.
+  - `notifySubscribers(api, vacancy)`: Queries active subscribers matching vacancy category and region, sends notification in batches of 25 with 1-second delay and per-recipient `try...catch`.
+
 - [ ] **Step 10: Commit**
-
-```bash
-git add tgcloud/schema.js tgcloud/lib/
-git commit -m "feat(backend): implement db schema, settings table, config, two-tier admin auth, and bot helper modules"
-```
+  ```bash
+  git add tgcloud/schema.js tgcloud/lib/
+  git commit -m "feat(backend): implement db schema, settings table, two-tier admin auth, and bot helper modules"
+  ```
 
 ---
 
@@ -105,24 +178,49 @@ git commit -m "feat(backend): implement db schema, settings table, config, two-t
 - Create: `tgcloud/handlers/callback_query.js`
 
 **Interfaces:**
-- Consumes: Telegram Update objects from `sdk/api`, DB tables from `tgcloud/schema.js`, admin helpers from `tgcloud/lib/bot/`.
-- Produces: Bot command responses (`/start`, `/app`, `/admin`, `/language`, `/help`, deep link `/start vac_<id>`), dynamic Reply Keyboard mounting with admin row, command menu registration (`setMyCommands`), secure admin moderation & admin panel callback handlers (including dynamic channel ID configuration).
+- Consumes: Telegram Update objects via `sdk/api`, DB tables via `tgcloud/schema.js`, helpers from `tgcloud/lib/bot/`.
+- Produces:
+  - Command routing: `/start`, `/app`, `/admin`, `/language`, `/help`, and deep link `/start vac_<id>`.
+  - Dynamic 3x2 Reply Keyboard (or 4th row `⚙️ Admin panel` for authorized admins).
+  - Secure moderation callback handling with race condition check.
+  - Bot Admin Panel callbacks for queue inspection, channel ID updates, and stats.
+  - Command menu registration with `api.setMyCommands`.
 
-- [ ] **Step 1: Implement `tgcloud/handlers/message.js` (Zero-friction `/start` onboarding with default `uz` language, dynamic Reply Keyboard check via `isUserAdmin` adding 4th row `⚙️ Admin panel` for authorized users, command routing for `/start`, `/app`, `/admin`, `/language`, `/help`, text handlers for `⚙️ Admin panel`, `🌐 Tilni o'zgartirish` and `ℹ️ Bot haqida`, channel ID input state handler, and deep link `/start vac_<id>`)**
-- [ ] **Step 2: Implement `tgcloud/handlers/callback_query.js` (moderation channel callback handling with `isUserAdmin` check, race condition lock, editing review card in moderation channel to show approved/rejected by moderator, broadcasting approved post to public channel, dispatching subscriber alerts and employer notification)**
-- [ ] **Step 3: Implement Bot Admin Panel callback routing in `callback_query.js` (`admin:queue`, `admin:stats`, `admin:manage_admins`, `admin:broadcast`, `admin:channels`, `admin:set_channel:*`)**
-- [ ] **Step 4: Implement command menu registration via `api.setMyCommands` across languages (`uz`, `ru`, `en`) including `/admin` command for administrators**
-- [ ] **Step 5: Test message handler execution with `npx tgcloud run handlers/message` payload**
-- [ ] **Step 6: Commit**
+- [ ] **Step 1: Implement `tgcloud/handlers/message.js`**
+  - Auto-register or fetch user in `users` table on `/start`. Default language `uz`.
+  - Check `isUserAdmin(tgId)`. If admin, append 4th row `[{ text: '⚙️ Admin panel' }]` to the persistent Reply Keyboard.
+  - Route `/start vac_<id>`: Send preview card with inline button to launch Mini App with deep link.
+  - Route `/admin` or text `'⚙️ Admin panel'`: Verify admin authorization; render admin panel inline menu.
+  - Handle channel ID text input states when an admin is updating moderation or public channel settings.
+  - Register commands on startup using `api.setMyCommands` across locales (`uz`, `ru`, `en`).
 
-```bash
-git add tgcloud/handlers/
-git commit -m "feat(backend): implement secure message and callback_query handlers with dynamic admin reply keyboard, admin panel, and channel management"
-```
+- [ ] **Step 2: Implement `tgcloud/handlers/callback_query.js`**
+  - Handle `mod_approve:<id>`:
+    - Check `isUserAdmin(userTgId)`.
+    - Check vacancy status is still `pending` (race condition lock).
+    - Update vacancy status to `approved`, set `moderatedByTgId`.
+    - Edit message in moderation channel to display `[Tasdiqlandi] Moderator: @username`.
+    - Publish to public broadcast channel via `publishToChannel()`.
+    - Trigger `notifySubscribers()` and `notifyEmployer()`.
+  - Handle `mod_reject:<id>`:
+    - Check `isUserAdmin(userTgId)`.
+    - Update status to `rejected`.
+    - Edit message in moderation channel to display `[Rad etildi] Moderator: @username`.
+    - Notify employer via `notifyEmployer()`.
+  - Handle `admin:queue`, `admin:stats`, `admin:channels`, `admin:set_channel:*` navigation callbacks.
+
+- [ ] **Step 3: Test message and callback query handlers**
+  - Verify syntax and run mock invocation via `npx tgcloud run handlers/message` with a `/start` update.
+
+- [ ] **Step 4: Commit**
+  ```bash
+  git add tgcloud/handlers/
+  git commit -m "feat(backend): implement secure message and callback handlers with dynamic admin reply keyboard and admin panel"
+  ```
 
 ---
 
-### Task 4: Mini App Serverless Endpoints
+### Task 4: Mini App Serverless RPC Endpoints
 
 **Files:**
 - Create: `tgcloud/endpoints/getInitData.js`
@@ -143,22 +241,47 @@ git commit -m "feat(backend): implement secure message and callback_query handle
 - Create: `tgcloud/endpoints/updateUser.js`
 
 **Interfaces:**
-- Consumes: `(input, ctx)` where `ctx.initData.user` is verified by Telegram platform.
-- Produces: Complete JSON RPC API for vacancies, talent search, application management, and subscriptions.
+- Consumes: `(input, ctx)` where `ctx.initData.user` contains verified Telegram user data.
+- Produces: 16 RPC endpoints returning JSON responses with `{ success: true, ... }` or `{ error: string }`.
 
-- [ ] **Step 1: Implement `getInitData.js` (retrieves/creates user record and returns initial profile)**
-- [ ] **Step 2: Implement `getVacancies.js` (keyword search, category/region filter, negotiable salary fallback `WHERE (salary_min >= :min OR salary_type = 'negotiable')`, pagination) and `getVacancyById.js`**
-- [ ] **Step 3: Implement `createVacancy.js`, `closeVacancy.js`, and `getMyVacancies.js`**
-- [ ] **Step 4: Implement `createResume.js`, `getResumes.js`, and `getMyResume.js`**
-- [ ] **Step 5: Implement `applyVacancy.js` (with duplicate check), `getMyApplications.js`, `getVacancyApplications.js`, and `updateApplicationStatus.js`**
-- [ ] **Step 6: Implement `getSubscriptions.js`, `toggleSubscription.js`, and `updateUser.js`**
-- [ ] **Step 7: Test endpoints offline using `npx tgcloud run`**
+- [ ] **Step 1: Implement user initialization & profile update**
+  - `getInitData.js`: Finds or creates user record; returns user profile, role, and language.
+  - `updateUser.js`: Updates user language, role (`seeker` / `employer`), phone.
+
+- [ ] **Step 2: Implement vacancy query endpoints**
+  - `getVacancies.js`: Supports filters (category, region, search keyword, salaryMin).
+  - **CRITICAL**: Use `WHERE (salary_min >= :min OR salary_type = 'negotiable')` to prevent excluding negotiable offers.
+  - Implement pagination with `limit` (default 15) and `offset`.
+  - `getVacancyById.js`: Returns vacancy details and increments `viewsCount`.
+
+- [ ] **Step 3: Implement vacancy creation & employer management**
+  - `createVacancy.js`: Validates required fields, inserts with `status: 'pending'`, notifies moderation channel via `sendToModeration()`.
+  - `closeVacancy.js`: Validates `employerTgId === ctx.initData.user.id`, updates `status: 'closed'`.
+  - `getMyVacancies.js`: Returns all vacancies posted by the authenticated employer.
+
+- [ ] **Step 4: Implement resume & talent endpoints**
+  - `createResume.js`: Upserts user resume (unique per `seekerTgId`).
+  - `getMyResume.js`: Retrieves active resume of authenticated user.
+  - `getResumes.js`: Filterable talent search for employers (category, region, experience).
+
+- [ ] **Step 5: Implement application workflow endpoints**
+  - `applyVacancy.js`: Inserts application record with duplicate prevention (`uniqueIndex` on `vacancyId, seekerTgId`).
+  - `getMyApplications.js`: Returns candidate's applied vacancies with current status.
+  - `getVacancyApplications.js`: Returns applicant list with resumes for an employer's vacancy.
+  - `updateApplicationStatus.js`: Updates applicant status (`viewed`, `accepted`, `rejected`), notifies applicant.
+
+- [ ] **Step 6: Implement notification subscription endpoints**
+  - `getSubscriptions.js`: Lists active category subscriptions for candidate.
+  - `toggleSubscription.js`: Adds or removes subscription.
+
+- [ ] **Step 7: Verify all endpoints compile cleanly**
+  - Execute syntax and dry-run check across `tgcloud/endpoints/*.js`.
+
 - [ ] **Step 8: Commit**
-
-```bash
-git add tgcloud/endpoints/
-git commit -m "feat(backend): implement comprehensive mini app rpc endpoints with negotiable salary logic"
-```
+  ```bash
+  git add tgcloud/endpoints/
+  git commit -m "feat(backend): implement complete 16 serverless rpc endpoints"
+  ```
 
 ---
 
@@ -178,20 +301,39 @@ git commit -m "feat(backend): implement comprehensive mini app rpc endpoints wit
 - Create: `src/constants/salaryTypes.js`
 
 **Interfaces:**
-- Consumes: `@iconify/react`, CSS custom properties, `Telegram.WebApp.colorScheme`.
-- Produces: Dynamic automatic Day/Night theme provider, `useTranslation()` hook, design system CSS with mobile safe-area insets.
+- Consumes: `Telegram.WebApp.colorScheme`, `Telegram.WebApp.themeParams`.
+- Produces:
+  - `useTranslation()` hook returning localized strings by dot-notation key.
+  - `ThemeProvider` synchronizing `data-theme="dark" | "light"` with Telegram client.
+  - Design tokens in `src/index.css` with CSS custom properties, glassmorphism card styles, and mobile safe-area paddings.
 
-- [ ] **Step 1: Write comprehensive translation dictionaries in `src/locales/uz.js`, `ru.js`, and `en.js`**
-- [ ] **Step 2: Implement `src/locales/index.jsx` TranslationProvider with state persistence**
-- [ ] **Step 3: Implement `src/context/ThemeContext.jsx` with automatic Telegram Day/Night synchronization and manual toggle**
-- [ ] **Step 4: Implement `src/index.css` design system with light/dark tokens, glassmorphism cards, typography, and mobile safe-area insets `env(safe-area-inset-bottom)`**
-- [ ] **Step 5: Implement `src/constants/*.js` matching backend domain models**
+- [ ] **Step 1: Implement translation dictionaries (`uz.js`, `ru.js`, `en.js`)**
+  - Complete dictionaries covering navigation, vacancy cards, filters, forms, error alerts, applicant statuses, and empty states.
+  - Strictly 0 emojis in strings.
+
+- [ ] **Step 2: Implement `src/locales/index.jsx`**
+  - Provide `TranslationContext` and `useTranslation()` hook with automatic fallback to Uzbek (`uz`).
+
+- [ ] **Step 3: Implement `src/context/ThemeContext.jsx` and `useTheme.js`**
+  - Detect `Telegram.WebApp.colorScheme` on mount.
+  - Listen for `Telegram.WebApp.onEvent('themeChanged', ...)`.
+  - Fallback to `window.matchMedia('(prefers-color-scheme: dark)')` when running in browser.
+  - Set `document.documentElement.setAttribute('data-theme', theme)`.
+
+- [ ] **Step 4: Implement `src/index.css` design system**
+  - Declare CSS variables: `--bg-primary`, `--bg-surface`, `--bg-card`, `--text-primary`, `--text-secondary`, `--text-muted`, `--border`, `--accent-primary`, `--accent-primary-hover`, `--success`, `--danger`, `--warning`.
+  - Include mobile safe-area utility classes: `padding-bottom: max(12px, env(safe-area-inset-bottom, 12px))`.
+  - Add smooth transitions, modern typography, and glassmorphic card borders.
+
+- [ ] **Step 5: Implement UI constants**
+  - `src/constants/routes.js`: `VACANCIES: 'vacancies'`, `POST_JOB: 'post_job'`, `RESUMES: 'resumes'`, `PROFILE: 'profile'`.
+  - Categories, regions, and salary type mappings.
+
 - [ ] **Step 6: Commit**
-
-```bash
-git add src/locales/ src/context/ThemeContext.jsx src/hooks/useTheme.js src/index.css src/constants/
-git commit -m "feat(frontend): setup auto day/night theme engine, safe-area design tokens, and i18n dictionaries"
-```
+  ```bash
+  git add src/locales/ src/context/ThemeContext.jsx src/hooks/useTheme.js src/index.css src/constants/
+  git commit -m "feat(frontend): setup auto theme engine, safe-area design tokens, and i18n dictionaries"
+  ```
 
 ---
 
@@ -215,21 +357,47 @@ git commit -m "feat(frontend): setup auto day/night theme engine, safe-area desi
 - Create: `src/components/layout/BottomNav.jsx`
 
 **Interfaces:**
-- Consumes: `@iconify/react`, `useTranslation()`, `Telegram.WebApp.Serverless.call`.
-- Produces: Reusable UI widgets, atomic cards, layout containers with safe-area support, and typed RPC calling service with in-memory mock adapter.
+- Consumes: `@iconify/react`, `useTranslation()`, `useTheme()`, `Telegram.WebApp.Serverless.call`.
+- Produces:
+  - `api.call(endpoint, data)`: Invokes Telegram Serverless RPC or routes to `mockData.js` in browser dev.
+  - Atomic UI library adhering to strict DRY principles.
+  - AppHeader with brand, language switcher, role pill, and theme toggle.
+  - BottomNav with 4 primary tabs and safe-area padding.
 
-- [ ] **Step 1: Implement `src/services/mockData.js` with realistic demo vacancies, resumes, and user states**
-- [ ] **Step 2: Implement `src/services/api.js` wrapping `Telegram.WebApp.Serverless.call` with automatic fallback to `mockData.js` when running in standalone browser dev (`npm run dev`)**
-- [ ] **Step 3: Implement `src/context/AuthContext.jsx` for cached user session and role management**
-- [ ] **Step 4: Implement atomic primitives (`Button`, `Input`, `Select`, `Badge`, `Modal`, `ThemeToggle`) using Iconify icons exclusively**
-- [ ] **Step 5: Implement reusable entity cards and feedback widgets (`VacancyCard`, `ResumeCard`, `EmptyState`, `Skeleton`)**
-- [ ] **Step 6: Implement AppHeader and BottomNav with active tab routing, mobile safe-area padding `env(safe-area-inset-bottom)`, and theme toggle**
+- [ ] **Step 1: Implement `src/services/mockData.js`**
+  - Populate demo vacancies (range, fixed, negotiable), demo resumes, applications, and current user.
+
+- [ ] **Step 2: Implement `src/services/api.js`**
+  - Check if `window.Telegram?.WebApp?.Serverless?.call` is available.
+  - If available, execute `window.Telegram.WebApp.Serverless.call(endpoint, data)`.
+  - If unavailable (standalone browser dev `npm run dev`), route to `mockData.js` handlers with simulated latency.
+
+- [ ] **Step 3: Implement `src/context/AuthContext.jsx`**
+  - Call `getInitData` on mount; cache user, role (`seeker` / `employer`), and language.
+
+- [ ] **Step 4: Implement atomic building blocks**
+  - `Button.jsx`: variants (`primary`, `secondary`, `outline`, `danger`), sizes (`sm`, `md`, `lg`), `loading` spinner.
+  - `Input.jsx`: Iconify prefix/suffix slot, label, error helper.
+  - `Select.jsx`: Styled native select with custom chevron icon.
+  - `Badge.jsx`: Variants (`primary`, `success`, `warning`, `danger`, `neutral`).
+  - `Modal.jsx`: Animated backdrop, close action, gesture dismissal.
+  - `ThemeToggle.jsx`: Solar sun/moon icon toggle.
+  - `EmptyState.jsx`: Centered Iconify icon, title, description, action button.
+  - `Skeleton.jsx`: Shimmer placeholder for cards and lines.
+
+- [ ] **Step 5: Implement reusable entity cards**
+  - `VacancyCard.jsx`: Displays title, company, category badge, salary badge, region, and posted time. Used in search, my postings, and channel preview.
+  - `ResumeCard.jsx`: Displays candidate name, title, experience, expected salary, and skills badges.
+
+- [ ] **Step 6: Implement layout components**
+  - `AppHeader.jsx`: Title, role switch indicator, language toggle, and theme switch.
+  - `BottomNav.jsx`: 4 tabs with Iconify icons (`solar:suitcase-tag-linear`, `solar:add-circle-linear`, `solar:users-group-two-rounded-linear`, `solar:user-circle-linear`), active pill indicator, and safe-area inset padding.
+
 - [ ] **Step 7: Commit**
-
-```bash
-git add src/services/ src/context/AuthContext.jsx src/components/
-git commit -m "feat(frontend): implement api transport service with dev mock adapter and atomic reusable ui components"
-```
+  ```bash
+  git add src/services/ src/context/AuthContext.jsx src/components/
+  git commit -m "feat(frontend): implement api transport with dev mock and atomic reusable ui components"
+  ```
 
 ---
 
@@ -251,35 +419,77 @@ git commit -m "feat(frontend): implement api transport service with dev mock ada
 - Create: `src/main.jsx`
 
 **Interfaces:**
-- Consumes: `api.js`, `useTranslation()`, `useTheme()`, Common components.
-- Produces: Interactive views for job search, job posting wizard, talent pool, and seeker/employer dashboards.
+- Consumes: Atomic components, `api.js`, `useTranslation()`, `useDeepLink()`.
+- Produces: 4 comprehensive application modules and entry point.
 
-- [ ] **Step 1: Implement `src/hooks/useDeepLink.js` for handling `startapp` routes (`jobs`, `post_job`, `my_apps`, `my_vacs`, `vac_<id>`) for direct modal/tab navigation on launch**
-- [ ] **Step 2: Implement `VacanciesView.jsx` (search, category chips, salary filter, pagination) and `VacancyDetailModal.jsx` (with apply action)**
-- [ ] **Step 3: Implement `PostJobWizard.jsx` multi-step form supporting salary types (Range, Fixed, Negotiable)**
-- [ ] **Step 4: Implement `ResumesView.jsx` talent search and `CreateResumeModal.jsx` resume editor**
-- [ ] **Step 5: Implement `ProfileView.jsx` with employer dashboard (my vacancies, view applicants, change status) and seeker dashboard (my applications, alert subscriptions)**
-- [ ] **Step 6: Assemble `App.jsx` and `main.jsx` with ThemeProvider, AuthProvider, TranslationProvider, and immediate `Telegram.WebApp.ready()` / `Telegram.WebApp.expand()` initialization**
-- [ ] **Step 7: Run `npm run build` and ensure build passes with zero errors**
+- [ ] **Step 1: Implement `src/hooks/useDeepLink.js`**
+  - Inspect `window.Telegram?.WebApp?.initDataUnsafe?.start_param` and query param `?startapp=`.
+  - Route direct navigation:
+    - `vac_<id>`: Open `VacancyDetailModal` for that ID.
+    - `jobs`: Navigate to `vacancies` tab.
+    - `post_job`: Navigate to `post_job` tab.
+    - `my_apps`: Open applications modal in profile.
+    - `my_vacs`: Open employer vacancies modal in profile.
+
+- [ ] **Step 2: Implement `VacanciesView.jsx` and `VacancyDetailModal.jsx`**
+  - `VacanciesView`: Search bar with debounce, horizontal scrollable category pills, salary type filters, paginated list of `VacancyCard`s with `Skeleton` loading.
+  - `VacancyDetailModal`: Full job specification, company info, salary breakdown, contact action, and "Submit Application" button.
+
+- [ ] **Step 3: Implement `PostJobWizard.jsx`**
+  - Multi-step job posting wizard:
+    - Step 1: Basic Info (Title, Category, Company, Region).
+    - Step 2: Compensation (Salary Type: Range, Fixed, Negotiable; Currency).
+    - Step 3: Job Description & Requirements.
+    - Step 4: Contacts & Review.
+  - Calls `createVacancy` endpoint on completion and displays confirmation state.
+
+- [ ] **Step 4: Implement `ResumesView.jsx` and `CreateResumeModal.jsx`**
+  - `ResumesView`: Talent browsing for employers, filter by category and experience, `ResumeCard` grid.
+  - `CreateResumeModal`: Candidate profile creator (headline, skills tag input, expected salary, bio).
+
+- [ ] **Step 5: Implement `ProfileView.jsx` and management modals**
+  - User header with role badge (`seeker` or `employer`).
+  - Seeker section: "My Applications" modal (`SeekerApplicationsModal`), "Category Subscriptions" modal (`SubscriptionsModal`).
+  - Employer section: "My Posted Vacancies" modal (`EmployerVacanciesModal`), "View Applicants" modal with status update actions (`VacancyApplicantsModal`).
+  - Language selection dropdown and Telegram theme sync toggle.
+
+- [ ] **Step 6: Assemble `App.jsx` and `main.jsx`**
+  - Wrap app with `ThemeProvider`, `TranslationProvider`, `AuthProvider`.
+  - Call `Telegram.WebApp.ready()` and `Telegram.WebApp.expand()` immediately on mount.
+  - Integrate `AppHeader`, active tab view rendering, and `BottomNav`.
+
+- [ ] **Step 7: Verify build output**
+  - Run: `npm run build`
+  - Expected: Zero compile or lint errors; production bundle emitted in `dist/`.
+
 - [ ] **Step 8: Commit**
-
-```bash
-git add src/hooks/ src/modules/ src/App.jsx src/main.jsx
-git commit -m "feat(frontend): implement full feature views, dashboards, and deep link navigation"
-```
+  ```bash
+  git add src/hooks/ src/modules/ src/App.jsx src/main.jsx
+  git commit -m "feat(frontend): implement feature views, deep link router, and application entry point"
+  ```
 
 ---
 
-### Task 8: Verification, Git Remote Push & Documentation
+### Task 8: Verification, Documentation & Remote Push
 
 **Files:**
 - Create: `README.md`
 
 **Interfaces:**
 - Consumes: Built assets and tested endpoints.
-- Produces: Production-ready codebase documented and pushed to GitHub repository.
+- Produces: Complete repository verification and pushed code on GitHub `main`.
 
-- [ ] **Step 1: Verify `npm run build` compiles static assets to `dist/` cleanly**
-- [ ] **Step 2: Run dry-run validation with `npx tgcloud status`**
-- [ ] **Step 3: Write comprehensive `README.md` with deployment instructions (`tgcloud login`, `tgcloud push`, `tgcloud migrate`)**
-- [ ] **Step 4: Push all commits to `https://github.com/islombek4642/EasyFindBot.git` on `main`**
+- [ ] **Step 1: Execute full production build**
+  - Run: `npm run build`
+  - Verify `dist/index.html` and assets exist.
+
+- [ ] **Step 2: Validate Serverless configuration**
+  - Run dry-run checks on `tgcloud.jsonc`.
+
+- [ ] **Step 3: Create `README.md`**
+  - Document setup, local development (`npm run dev`), Telegram Serverless deployment commands (`npx tgcloud login`, `npx tgcloud push`, `npx tgcloud migrate`).
+
+- [ ] **Step 4: Push all changes to GitHub**
+  ```bash
+  git push origin main
+  ```
