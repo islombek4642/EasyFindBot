@@ -231,7 +231,16 @@ export default async function (message, ctx) {
       chat_id: chatId,
       text: t(userLang, 'commands.help'),
       parse_mode: 'Markdown',
-      reply_markup: replyKeyboard,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: t(userLang, 'commands.btn_contact_admin'),
+              url: `tg://user?id=${config.superAdminTgId}`,
+            },
+          ],
+        ],
+      },
     });
     return;
   }

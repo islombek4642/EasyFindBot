@@ -16,7 +16,8 @@ export default {
   },
   commands: {
     welcome: "Hello, {name}!\n\nWelcome to EasyFindBot — your premier job search and recruiting platform.\nSelect a section from the menu below:",
-    help: "ℹ️ **EasyFindBot — User Guide**\n\n• **🔍 Search Jobs**: Browse and filter latest job openings.\n• **📢 Post Job**: Publish a new vacancy for candidates.\n• **💼 My Applications**: Track status of your submitted applications.\n• **🏢 My Postings**: Manage your vacancies and review applicants.\n• **🌐 Language**: Configure bot communication language.\n\nFor support and inquiries: @EasyFindSupport",
+    help: "ℹ️ **EasyFindBot — User Guide**\n\n• **🔍 Search Jobs**: Browse and filter latest job openings.\n• **📢 Post Job**: Publish a new vacancy for candidates.\n• **💼 My Applications**: Track status of your submitted applications.\n• **🏢 My Postings**: Manage your vacancies and review applicants.\n• **🌐 Language**: Configure bot communication language.",
+    btn_contact_admin: "👨‍💻 Contact Administrator",
     about: "ℹ️ **About EasyFindBot**\n\nModern recruitment platform built on Telegram Serverless infrastructure.\n\n📢 Official Channel: @EasyFindJobs\n🛠 Version: 1.0.0",
     language_select: "Tilni tanlang / Выберите язык / Select language:",
     language_updated: "Language changed successfully!",

@@ -16,7 +16,8 @@ export default {
   },
   commands: {
     welcome: "Assalomu alaykum, {name}!\n\nEasyFindBot — ish va xodim topish platformasiga xush kelibsiz.\nQuyidagi menyudan kerakli bo'limni tanlang:",
-    help: "ℹ️ **EasyFindBot — Foydalanish bo'yicha qo'llanma**\n\n• **🔍 Ish qidirish**: So'nggi vakansiyalarni ko'rish va filtrlash.\n• **📢 E'lon berish**: Ish o'rni e'lonini joylashtirish.\n• **💼 Mening arizalarim**: Yuborgan arizalaringiz holatini kuzatish.\n• **🏢 Mening e'lonlarim**: O'z e'lonlaringiz va nomzodlar ro'yxatini boshqarish.\n• **🌐 Til**: Bot muloqot tilini sozlash.\n\nSavollar va takliflar bo'yicha: @EasyFindSupport",
+    help: "ℹ️ **EasyFindBot — Foydalanish bo'yicha qo'llanma**\n\n• **🔍 Ish qidirish**: So'nggi vakansiyalarni ko'rish va filtrlash.\n• **📢 E'lon berish**: Ish o'rni e'lonini joylashtirish.\n• **💼 Mening arizalarim**: Yuborgan arizalaringiz holatini kuzatish.\n• **🏢 Mening e'lonlarim**: O'z e'lonlaringiz va nomzodlar ro'yxatini boshqarish.\n• **🌐 Til**: Bot muloqot tilini sozlash.",
+    btn_contact_admin: "👨‍💻 Administratorga yozish",
     about: "ℹ️ **EasyFindBot Haqida**\n\nTelegram Serverless platformasida yaratilgan zamonaviy ish va xodimlar topish xizmati.\n\n📢 Rasmiy kanal: @EasyFindJobs\n🛠 Versiya: 1.0.0",
     language_select: "Tilni tanlang / Выберите язык / Select language:",
     language_updated: "Til muvaffaqiyatli o'zgartirildi!",
