@@ -87,11 +87,21 @@ export function PostJobWizard({ onSuccess }) {
 
     try {
       setSubmitting(true);
-      await api.createVacancy(formData);
+      const payload = {
+        ...formData,
+        companyName: formData.company,
+        salaryCurrency: formData.currency,
+      };
+      const res = await api.createVacancy(payload);
+      if (res && res.success === false) {
+        setErrors({ submit: res.error || t('common.error') });
+        return;
+      }
       setSubmitted(true);
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error('Failed to create vacancy:', err);
+      setErrors({ submit: err.message || t('common.error') });
     } finally {
       setSubmitting(false);
     }
@@ -403,6 +413,24 @@ export function PostJobWizard({ onSuccess }) {
               </div>
             </div>
           </>
+        )}
+
+        {errors.submit && (
+          <div
+            style={{
+              padding: '10px 14px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(239, 68, 68, 0.1)',
+              color: 'var(--color-danger, #ef4444)',
+              fontSize: '0.88rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <Icon icon="solar:danger-triangle-bold" width="18" height="18" />
+            <span>{errors.submit}</span>
+          </div>
         )}
 
         {/* Nav Buttons */}

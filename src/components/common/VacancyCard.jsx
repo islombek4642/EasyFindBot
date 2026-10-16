@@ -24,17 +24,22 @@ export function VacancyCard({
   const {
     title,
     company,
+    companyName,
     category,
     region,
     employmentType,
     salaryType,
     salaryMin,
     salaryMax,
-    currency = 'UZS',
+    currency,
+    salaryCurrency,
     status,
     viewsCount = 0,
     createdAt,
   } = vacancy;
+
+  const displayCompany = companyName || company || '';
+  const displayCurrency = salaryCurrency || currency || 'UZS';
 
   // Format Salary Display
   const renderSalary = () => {
@@ -50,7 +55,7 @@ export function VacancyCard({
         <div className="card-salary-box">
           <span>{Number(salaryMin).toLocaleString()}</span>
           <span className="card-salary-unit">
-            {currency} {t('vacancies.per_month')}
+            {displayCurrency} {t('vacancies.per_month')}
           </span>
         </div>
       );
@@ -61,7 +66,7 @@ export function VacancyCard({
           {Number(salaryMin).toLocaleString()} - {Number(salaryMax).toLocaleString()}
         </span>
         <span className="card-salary-unit">
-          {currency} {t('vacancies.per_month')}
+          {displayCurrency} {t('vacancies.per_month')}
         </span>
       </div>
     );
@@ -88,7 +93,7 @@ export function VacancyCard({
           <h4 className="card-job-title">{title}</h4>
           <span className="card-company-name">
             <Icon icon="solar:buildings-2-bold" width="15" height="15" />
-            {company}
+            {displayCompany}
           </span>
         </div>
 

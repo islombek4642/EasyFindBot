@@ -10,34 +10,36 @@ export default async function (input, ctx) {
   if (!employerTgId) {
     return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
-  const userRow = await db.select({ language: users.language }).from(users).where(eq(users.tgId, employerTgId)).get();
+  const userRow = await db.select({ language: users.language, role: users.role }).from(users).where(eq(users.tgId, employerTgId)).get();
   const lang = userRow?.language || 'uz';
 
   const {
     title,
-    companyName,
+    companyName = input?.company,
     category,
     region,
     employmentType = 'full_time',
     salaryType = 'range',
     salaryMin,
     salaryMax,
-    salaryCurrency = 'USD',
+    salaryCurrency = input?.currency || 'USD',
     description,
     requirements,
     contacts,
   } = input || {};
 
   if (!title || !companyName || !category || !region || !description || !contacts) {
-    return { success: false, error: t(lang, 'errors.required_fields') };
+    return { success: false, ok: false, error: t(lang, 'errors.required_fields') };
   }
 
   try {
-    // Ensure employer role in users table
-    await db.update(users)
-      .set({ role: 'employer' })
-      .where(eq(users.tgId, employerTgId))
-      .run();
+    // Ensure employer role in users table without overriding admin
+    if (userRow?.role !== 'admin') {
+      await db.update(users)
+        .set({ role: 'employer' })
+        .where(eq(users.tgId, employerTgId))
+        .run();
+    }
 
     const [created] = await db.insert(vacancies)
       .values({
@@ -64,10 +66,11 @@ export default async function (input, ctx) {
 
     return {
       success: true,
+      ok: true,
       vacancyId: created.id,
       status: 'pending',
     };
   } catch (err) {
-    return { success: false, error: err.message };
+    return { success: false, ok: false, error: err.message };
   }
 }

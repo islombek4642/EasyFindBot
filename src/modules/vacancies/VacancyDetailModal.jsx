@@ -24,18 +24,23 @@ export function VacancyDetailModal({
   const {
     title,
     company,
+    companyName,
     category,
     region,
     employmentType,
     salaryType,
     salaryMin,
     salaryMax,
-    currency = 'UZS',
+    currency,
+    salaryCurrency,
     description,
     requirements,
     contacts,
     viewsCount = 0,
   } = vacancy;
+
+  const displayCompany = companyName || company || '';
+  const displayCurrency = salaryCurrency || currency || 'UZS';
 
   const renderSalary = () => {
     if (salaryType === 'negotiable') {
@@ -50,7 +55,7 @@ export function VacancyDetailModal({
         <div className="card-salary-box">
           <span>{Number(salaryMin).toLocaleString()}</span>
           <span className="card-salary-unit">
-            {currency} {t('vacancies.per_month')}
+            {displayCurrency} {t('vacancies.per_month')}
           </span>
         </div>
       );
@@ -61,7 +66,7 @@ export function VacancyDetailModal({
           {Number(salaryMin).toLocaleString()} - {Number(salaryMax).toLocaleString()}
         </span>
         <span className="card-salary-unit">
-          {currency} {t('vacancies.per_month')}
+          {displayCurrency} {t('vacancies.per_month')}
         </span>
       </div>
     );
@@ -87,7 +92,7 @@ export function VacancyDetailModal({
           <h2 style={{ fontSize: '1.25rem', marginBottom: '4px' }}>{title}</h2>
           <div className="card-company-name" style={{ fontSize: '0.95rem' }}>
             <Icon icon="solar:buildings-2-bold" width="16" height="16" />
-            {company}
+            {displayCompany}
           </div>
         </div>
 
