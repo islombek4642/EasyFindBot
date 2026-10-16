@@ -14,6 +14,10 @@
 
 - Zero Unicode emojis or stickers allowed anywhere in UI or backend; use `@iconify/react` exclusively.
 - All copy must reside in `src/locales/{uz,ru,en}.js` without hardcoded UI strings.
+- Strict Atomic Design System & Component Reusability (DRY):
+  - Zero duplicated inline card, button, modal, or input markup.
+  - All UI strictly composes atomic building blocks from `src/components/common/`.
+  - All styling strictly consumes CSS design tokens from `src/index.css`.
 - All modules inside `tgcloud/` must be pure ES modules using relative `.js` imports or `sdk`; no npm packages inside `tgcloud/`.
 - No foreign key declarations in `tgcloud/schema.js` (`PRAGMA foreign_keys = off`).
 - All relational associations strictly use Telegram ID (`tgId` / `employerTgId` / `seekerTgId` / `userTgId`).
@@ -184,7 +188,7 @@ git commit -m "feat(frontend): setup auto day/night theme engine, design tokens,
 
 ---
 
-### Task 6: Common UI Components & API Transport Layer
+### Task 6: Atomic Common UI Components & API Transport Layer
 
 **Files:**
 - Create: `src/services/api.js`
@@ -195,22 +199,27 @@ git commit -m "feat(frontend): setup auto day/night theme engine, design tokens,
 - Create: `src/components/common/Badge.jsx`
 - Create: `src/components/common/Modal.jsx`
 - Create: `src/components/common/ThemeToggle.jsx`
+- Create: `src/components/common/VacancyCard.jsx`
+- Create: `src/components/common/ResumeCard.jsx`
+- Create: `src/components/common/EmptyState.jsx`
+- Create: `src/components/common/Skeleton.jsx`
 - Create: `src/components/layout/AppHeader.jsx`
 - Create: `src/components/layout/BottomNav.jsx`
 
 **Interfaces:**
 - Consumes: `@iconify/react`, `useTranslation()`, `Telegram.WebApp.Serverless.call`.
-- Produces: Reusable UI widgets and typed RPC calling service with local dev mock adapter.
+- Produces: Reusable UI widgets, atomic cards, layout containers, and typed RPC calling service with local dev mock adapter.
 
 - [ ] **Step 1: Implement `src/services/api.js` wrapping `Telegram.WebApp.Serverless.call` with mock data adapter for local browser dev**
 - [ ] **Step 2: Implement `src/context/AuthContext.jsx` for cached user session and role management**
-- [ ] **Step 3: Implement common form and layout components using Iconify icons exclusively**
-- [ ] **Step 4: Implement AppHeader and BottomNav with active tab routing and theme toggle**
-- [ ] **Step 5: Commit**
+- [ ] **Step 3: Implement atomic primitives (`Button`, `Input`, `Select`, `Badge`, `Modal`, `ThemeToggle`) using Iconify icons exclusively**
+- [ ] **Step 4: Implement reusable entity cards and feedback widgets (`VacancyCard`, `ResumeCard`, `EmptyState`, `Skeleton`)**
+- [ ] **Step 5: Implement AppHeader and BottomNav with active tab routing and theme toggle**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add src/services/ src/context/AuthContext.jsx src/components/
-git commit -m "feat(frontend): implement api transport service with dev mock and common ui components"
+git commit -m "feat(frontend): implement api transport service with dev mock and atomic reusable ui components"
 ```
 
 ---

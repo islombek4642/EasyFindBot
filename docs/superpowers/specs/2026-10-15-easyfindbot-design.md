@@ -16,7 +16,21 @@
    - Standalone / browser dev fallback to `window.matchMedia('(prefers-color-scheme: dark)')`.
 4. **Unified User Identification (`tgId`)**:
    - All relations across all tables strictly use Telegram ID (`tgId` / `employerTgId` / `seekerTgId` / `userTgId`), matching `ctx.initData.user.id` from Telegram Serverless runtime.
-5. **Telegram Serverless Platform Constraints**:
+5. **Strict Reusable Design System & Atomic Architecture (DRY)**:
+   - Zero duplicated or ad-hoc styled buttons, inputs, cards, or modals.
+   - All UI views strictly compose pre-built atomic components from `src/components/common/`:
+     - `<Button />` (variants: primary, secondary, outline, danger; sizes: sm, md, lg; loading state)
+     - `<Input />` (icon slot, validation error, clear action)
+     - `<Select />` (custom styled dropdown)
+     - `<Badge />` (category, employment type, salary pills)
+     - `<Modal />` (accessible drawer/modal with backdrop and smooth transitions)
+     - `<VacancyCard />` (unified job card reused across Search, My Postings, and Channel preview)
+     - `<ResumeCard />` (unified candidate card reused in Talent pool and Profile)
+     - `<EmptyState />` (reusable empty placeholder with Iconify illustration and action button)
+     - `<Skeleton />` (shimmer loading state)
+   - Zero hardcoded colors, borders, or shadows; all styling consumes centralized CSS design tokens from `src/index.css`.
+   - Backend DRY: all shared formatters, response builders, and validation helpers live in `tgcloud/lib/`.
+6. **Telegram Serverless Platform Constraints**:
    - Zero npm packages at runtime inside `tgcloud/` modules.
    - All imports within `tgcloud/` are relative and must include the `.js` extension.
    - Native SQLite via `sdk/db` with **no foreign keys** (`PRAGMA foreign_keys = off`). Relational integrity is enforced in application code.
