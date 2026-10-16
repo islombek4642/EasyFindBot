@@ -1,25 +1,27 @@
-export function buildAdminPanelMenu() {
+import { t } from '../locales/index.js';
+
+export function buildAdminPanelMenu(lang = 'uz') {
   return {
-    text: "⚙️ **EasyFindBot Administrator Paneli**\n\nQuyidagi boshqaruv bo'limlaridan birini tanlang:",
+    text: t(lang, 'admin.menu_title'),
     reply_markup: {
       inline_keyboard: [
         [
-          { text: "⏳ Moderatsiya navbati", callback_data: "admin:queue" },
-          { text: "📊 Tizim statistikasi", callback_data: "admin:stats" },
+          { text: t(lang, 'admin.btn_queue'), callback_data: "admin:queue" },
+          { text: t(lang, 'admin.btn_stats'), callback_data: "admin:stats" },
         ],
         [
-          { text: "👥 Adminlar boshqaruvi", callback_data: "admin:manage_admins" },
-          { text: "📡 Kanallar sozlamalari", callback_data: "admin:channels" },
+          { text: t(lang, 'admin.btn_manage_admins'), callback_data: "admin:manage_admins" },
+          { text: t(lang, 'admin.btn_channels'), callback_data: "admin:channels" },
         ],
         [
-          { text: "📢 Xabar yuborish (Broadcast)", callback_data: "admin:broadcast" },
+          { text: t(lang, 'admin.btn_broadcast'), callback_data: "admin:broadcast" },
         ],
       ],
     },
   };
 }
 
-export function buildStatsReport(stats = {}) {
+export function buildStatsReport(stats = {}, lang = 'uz') {
   const {
     totalUsers = 0,
     seekers = 0,
@@ -32,48 +34,48 @@ export function buildStatsReport(stats = {}) {
   } = stats;
 
   const text =
-    "📊 **EasyFindBot — Tizim Statistikasi**\n\n" +
-    `👥 **Foydalanuvchilar:** ${totalUsers} ta\n` +
-    `   • Nomzodlar: ${seekers} ta\n` +
-    `   • Ish beruvchilar: ${employers} ta\n\n` +
-    `💼 **Vakansiyalar:** ${totalVacancies} ta\n` +
-    `   • Faol e'lonlar: ${activeVacancies} ta\n` +
-    `   • Tekshiruvda (navbatda): ${pendingVacancies} ta\n\n` +
-    `📄 **Arizalar:** ${totalApplications} ta yuborilgan\n` +
-    `📋 **Rezyumelar:** ${totalResumes} ta faol rezyume`;
+    `${t(lang, 'admin.stats_title')}\n\n` +
+    `${t(lang, 'admin.stats_users', { total: totalUsers })}\n` +
+    `   • ${t(lang, 'admin.stats_seekers')}: ${seekers}\n` +
+    `   • ${t(lang, 'admin.stats_employers')}: ${employers}\n\n` +
+    `${t(lang, 'admin.stats_vacancies', { total: totalVacancies })}\n` +
+    `   • ${t(lang, 'admin.stats_active')}: ${activeVacancies}\n` +
+    `   • ${t(lang, 'admin.stats_pending')}: ${pendingVacancies}\n\n` +
+    `${t(lang, 'admin.stats_applications', { total: totalApplications })}\n` +
+    `${t(lang, 'admin.stats_resumes', { total: totalResumes })}`;
 
   return {
     text,
     reply_markup: {
       inline_keyboard: [
         [
-          { text: "🔄 Yangilash", callback_data: "admin:stats" },
-          { text: "🔙 Asosiy menyu", callback_data: "admin:menu" },
+          { text: t(lang, 'common.refresh'), callback_data: "admin:stats" },
+          { text: t(lang, 'common.back'), callback_data: "admin:menu" },
         ],
       ],
     },
   };
 }
 
-export function buildChannelSettingsMenu(modChannel, pubChannel) {
+export function buildChannelSettingsMenu(modChannel, pubChannel, lang = 'uz') {
+  const notSpecified = t(lang, 'common.not_specified');
   const text =
-    "📡 **Kanallar Sozlamalari**\n\n" +
-    `📢 **E'lonlar chiqadigan kanal:** \`${pubChannel || "Kiritilmagan"}\`\n` +
-    `🛡️ **Moderatsiya kanali:** \`${modChannel || "Kiritilmagan"}\`\n\n` +
-    "O'zgartirmoqchi bo'lgan kanalingizni tanlang:";
+    `${t(lang, 'admin.channels_title')}\n\n` +
+    `${t(lang, 'admin.channels_public')} \`${pubChannel || notSpecified}\`\n` +
+    `${t(lang, 'admin.channels_moderation')} \`${modChannel || notSpecified}\``;
 
   return {
     text,
     reply_markup: {
       inline_keyboard: [
         [
-          { text: "📢 E'lonlar kanalini o'zgartirish", callback_data: "admin:set_channel:public" },
+          { text: t(lang, 'admin.channels_btn_set_public'), callback_data: "admin:set_channel:public" },
         ],
         [
-          { text: "🛡️ Moderatsiya kanalini o'zgartirish", callback_data: "admin:set_channel:moderation" },
+          { text: t(lang, 'admin.channels_btn_set_mod'), callback_data: "admin:set_channel:moderation" },
         ],
         [
-          { text: "🔙 Asosiy menyu", callback_data: "admin:menu" },
+          { text: t(lang, 'common.back'), callback_data: "admin:menu" },
         ],
       ],
     },

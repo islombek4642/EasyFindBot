@@ -1,9 +1,10 @@
 import { config } from '../config.js';
 import { getPublicChannelId } from './settings.js';
+import { t } from '../locales/index.js';
 
-function formatSalary(vacancy) {
+function formatSalary(vacancy, lang = 'uz') {
   if (vacancy.salaryType === 'negotiable') {
-    return "Kelishuv asosida";
+    return t(lang, 'common.negotiable');
   }
   if (vacancy.salaryType === 'fixed') {
     return `${vacancy.salaryMin?.toLocaleString() || 0} ${vacancy.salaryCurrency || 'USD'}`;
@@ -11,21 +12,21 @@ function formatSalary(vacancy) {
   return `${vacancy.salaryMin?.toLocaleString() || 0} - ${vacancy.salaryMax?.toLocaleString() || 0} ${vacancy.salaryCurrency || 'USD'}`;
 }
 
-export function formatChannelPost(vacancy) {
-  const salaryText = formatSalary(vacancy);
+export function formatChannelPost(vacancy, lang = 'uz') {
+  const salaryText = formatSalary(vacancy, lang);
 
   const text =
-    "📢 **YANGI VAKANSIYA!**\n\n" +
+    `${t(lang, 'channel.header')}\n\n` +
     `📌 **${vacancy.title}**\n` +
-    `🏢 **Kompaniya:** ${vacancy.companyName}\n` +
-    `📂 **Soha:** #${vacancy.category}\n` +
-    `📍 **Hudud:** ${vacancy.region}\n` +
-    `⏱️ **Ish turi:** ${vacancy.employmentType}\n` +
-    `💰 **Maosh:** ${salaryText}\n\n` +
-    `📝 **Tavsif:**\n${vacancy.description}\n\n` +
-    (vacancy.requirements ? `🎯 **Talablar:**\n${vacancy.requirements}\n\n` : "") +
-    `📞 **Aloqa:** ${vacancy.contacts}\n\n` +
-    "Ariza topshirish va batafsil ma'lumot olish uchun quyidagi tugmani bosing:";
+    `🏢 **${t(lang, 'channel.company')}:** ${vacancy.companyName}\n` +
+    `📂 **${t(lang, 'channel.category')}:** #${vacancy.category}\n` +
+    `📍 **${t(lang, 'channel.region')}:** ${vacancy.region}\n` +
+    `⏱️ **${t(lang, 'channel.employment_type')}:** ${vacancy.employmentType}\n` +
+    `💰 **${t(lang, 'channel.salary')}:** ${salaryText}\n\n` +
+    `📝 **${t(lang, 'channel.description')}:**\n${vacancy.description}\n\n` +
+    (vacancy.requirements ? `🎯 **${t(lang, 'channel.requirements')}:**\n${vacancy.requirements}\n\n` : "") +
+    `📞 **${t(lang, 'channel.contacts')}:** ${vacancy.contacts}\n\n` +
+    `${t(lang, 'channel.footer')}`;
 
   // CRITICAL TELEGRAM RULE: In channel posts, Telegram Bot API throws BUTTON_TYPE_INVALID if web_app button is used.
   // Standard URL button with startapp deep link parameter is mandatory.
@@ -33,7 +34,7 @@ export function formatChannelPost(vacancy) {
   const reply_markup = {
     inline_keyboard: [
       [
-        { text: "📄 Ariza topshirish", url: appUrl },
+        { text: t(lang, 'channel.btn_apply'), url: appUrl },
       ],
     ],
   };
@@ -41,13 +42,13 @@ export function formatChannelPost(vacancy) {
   return { text, reply_markup };
 }
 
-export async function publishToChannel(api, vacancy) {
+export async function publishToChannel(api, vacancy, lang = 'uz') {
   const channelId = await getPublicChannelId();
   if (!channelId) {
     return null;
   }
 
-  const { text, reply_markup } = formatChannelPost(vacancy);
+  const { text, reply_markup } = formatChannelPost(vacancy, lang);
 
   try {
     const sent = await api.sendMessage(channelId, text, {

@@ -1,9 +1,10 @@
 import { getModerationChannelId } from './settings.js';
 import { getAllAdminTgIds } from './auth.js';
+import { t } from '../locales/index.js';
 
-function formatSalary(vacancy) {
+function formatSalary(vacancy, lang = 'uz') {
   if (vacancy.salaryType === 'negotiable') {
-    return "Kelishuv asosida";
+    return t(lang, 'common.negotiable');
   }
   if (vacancy.salaryType === 'fixed') {
     return `${vacancy.salaryMin?.toLocaleString() || 0} ${vacancy.salaryCurrency || 'USD'}`;
@@ -11,28 +12,28 @@ function formatSalary(vacancy) {
   return `${vacancy.salaryMin?.toLocaleString() || 0} - ${vacancy.salaryMax?.toLocaleString() || 0} ${vacancy.salaryCurrency || 'USD'}`;
 }
 
-export function buildModerationCard(vacancy) {
-  const salaryText = formatSalary(vacancy);
+export function buildModerationCard(vacancy, lang = 'uz') {
+  const salaryText = formatSalary(vacancy, lang);
 
   const text =
-    "🔍 **Yangi Vakansiya — Moderatsiya**\n\n" +
-    `📌 **Sarlavha:** ${vacancy.title}\n` +
-    `🏢 **Kompaniya:** ${vacancy.companyName}\n` +
-    `📂 **Kategoriya:** ${vacancy.category}\n` +
-    `📍 **Hudud:** ${vacancy.region}\n` +
-    `⏱️ **Ish turi:** ${vacancy.employmentType}\n` +
-    `💰 **Maosh:** ${salaryText}\n\n` +
-    `📝 **Tavsif:**\n${vacancy.description}\n\n` +
-    (vacancy.requirements ? `🎯 **Talablar:**\n${vacancy.requirements}\n\n` : "") +
-    `📞 **Aloqa:** ${vacancy.contacts}\n` +
-    `👤 **Ish beruvchi ID:** \`${vacancy.employerTgId}\`\n` +
-    `🆔 **Vakansiya ID:** \`${vacancy.id}\``;
+    `${t(lang, 'moderation.card_title')}\n\n` +
+    `📌 **${t(lang, 'moderation.title')}:** ${vacancy.title}\n` +
+    `🏢 **${t(lang, 'moderation.company')}:** ${vacancy.companyName}\n` +
+    `📂 **${t(lang, 'moderation.category')}:** ${vacancy.category}\n` +
+    `📍 **${t(lang, 'moderation.region')}:** ${vacancy.region}\n` +
+    `⏱️ **${t(lang, 'moderation.employment_type')}:** ${vacancy.employmentType}\n` +
+    `💰 **${t(lang, 'moderation.salary')}:** ${salaryText}\n\n` +
+    `📝 **${t(lang, 'moderation.description')}:**\n${vacancy.description}\n\n` +
+    (vacancy.requirements ? `🎯 **${t(lang, 'moderation.requirements')}:**\n${vacancy.requirements}\n\n` : "") +
+    `📞 **${t(lang, 'moderation.contacts')}:** ${vacancy.contacts}\n` +
+    `👤 **${t(lang, 'moderation.employer_id')}:** \`${vacancy.employerTgId}\`\n` +
+    `🆔 **${t(lang, 'moderation.vacancy_id')}:** \`${vacancy.id}\``;
 
   const reply_markup = {
     inline_keyboard: [
       [
-        { text: "✅ Tasdiqlash", callback_data: `mod_approve:${vacancy.id}` },
-        { text: "❌ Rad etish", callback_data: `mod_reject:${vacancy.id}` },
+        { text: t(lang, 'moderation.btn_approve'), callback_data: `mod_approve:${vacancy.id}` },
+        { text: t(lang, 'moderation.btn_reject'), callback_data: `mod_reject:${vacancy.id}` },
       ],
     ],
   };
@@ -40,8 +41,8 @@ export function buildModerationCard(vacancy) {
   return { text, reply_markup };
 }
 
-export async function sendToModeration(api, vacancy) {
-  const { text, reply_markup } = buildModerationCard(vacancy);
+export async function sendToModeration(api, vacancy, lang = 'uz') {
+  const { text, reply_markup } = buildModerationCard(vacancy, lang);
   const channelId = await getModerationChannelId();
 
   let sent = false;
