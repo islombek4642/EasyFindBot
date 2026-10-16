@@ -1,8 +1,9 @@
 /**
- * EasyFindBot — Atomic Bottom Sheet / Modal Component
+ * EasyFindBot — Atomic Bottom Sheet / Modal Component (Portaled to document.body)
  */
 
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon } from '@iconify/react';
 
 export function Modal({
@@ -36,7 +37,7 @@ export function Modal({
 
   const isCenter = variant === 'center';
 
-  return (
+  const modalNode = (
     <div
       className={`modal-backdrop open ${isCenter ? 'modal-centered' : ''}`}
       onClick={handleBackdropClick}
@@ -66,4 +67,10 @@ export function Modal({
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalNode, document.body);
+  }
+
+  return modalNode;
 }
