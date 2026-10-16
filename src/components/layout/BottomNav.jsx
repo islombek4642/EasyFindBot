@@ -12,45 +12,73 @@ export function BottomNav({ activeTab, onTabChange }) {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   useEffect(() => {
-    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    // Record baseline height when keyboard is closed
+    let baseHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
 
-    // Viewport-based keyboard detection (reliable on mobile iOS / Android WebView)
-    const checkViewport = () => {
-      if (vv && window.innerHeight) {
-        const heightDiff = window.innerHeight - vv.height;
-        // Virtual keyboard takes at least 120px when open
-        if (heightDiff > 120) {
-          setIsKeyboardOpen(true);
-        } else {
-          setIsKeyboardOpen(false);
-        }
+    const isTextInput = (el) => {
+      if (!el || !el.tagName) return false;
+      const tag = el.tagName.toLowerCase();
+      if (tag === 'textarea') return true;
+      if (tag === 'input') {
+        const type = (el.type || 'text').toLowerCase();
+        return !['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'image'].includes(type);
+      }
+      return false;
+    };
+
+    const isTouch =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+    // 1. Focusin: as soon as user taps a text input on mobile, hide the bottom nav
+    const handleFocusIn = (e) => {
+      if (isTouch && isTextInput(e.target)) {
+        setIsKeyboardOpen(true);
       }
     };
 
-    if (vv) {
-      vv.addEventListener('resize', checkViewport);
-      vv.addEventListener('scroll', checkViewport);
-    }
-
-    // Safety fallback: when focus leaves input/textarea, always restore navigation
+    // 2. Focusout: when user leaves input, restore bottom nav
     const handleFocusOut = () => {
       setTimeout(() => {
         const active = document.activeElement;
-        const tag = active?.tagName?.toLowerCase();
-        if (tag !== 'input' && tag !== 'textarea') {
+        if (!isTextInput(active)) {
           setIsKeyboardOpen(false);
+          baseHeight = window.innerHeight;
         }
-      }, 50);
+      }, 60);
     };
 
+    // 3. Resize handler: accurately detects when keyboard opens/closes via height change
+    const handleResize = () => {
+      if (!isTouch) return;
+      const currentHeight = window.innerHeight;
+      const vvHeight = window.visualViewport ? window.visualViewport.height : currentHeight;
+      const effectiveHeight = Math.min(currentHeight, vvHeight);
+
+      // If viewport has expanded back to (or near) baseline height, keyboard is closed
+      if (effectiveHeight >= baseHeight - 60) {
+        setIsKeyboardOpen(false);
+        baseHeight = Math.max(baseHeight, currentHeight);
+      } else if (baseHeight - effectiveHeight > 100) {
+        // If viewport shrank significantly, keyboard is open
+        setIsKeyboardOpen(true);
+      }
+    };
+
+    window.addEventListener('focusin', handleFocusIn);
     window.addEventListener('focusout', handleFocusOut);
+    window.addEventListener('resize', handleResize);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+    }
 
     return () => {
-      if (vv) {
-        vv.removeEventListener('resize', checkViewport);
-        vv.removeEventListener('scroll', checkViewport);
-      }
+      window.removeEventListener('focusin', handleFocusIn);
       window.removeEventListener('focusout', handleFocusOut);
+      window.removeEventListener('resize', handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
     };
   }, []);
 
