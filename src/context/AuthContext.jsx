@@ -10,7 +10,24 @@ import { api } from '../services/api.js';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) {
+      const u = window.Telegram.WebApp.initDataUnsafe.user;
+      return {
+        id: u.id,
+        tgId: u.id,
+        first_name: u.first_name || '',
+        last_name: u.last_name || '',
+        firstName: u.first_name || '',
+        lastName: u.last_name || '',
+        username: u.username || '',
+        photo_url: u.photo_url || null,
+        role: 'seeker',
+        language: u.language_code || 'uz',
+      };
+    }
+    return null;
+  });
   const [resume, setResume] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,16 +37,23 @@ export function AuthProvider({ children }) {
       setLoading(true);
       setError(null);
       const data = await api.getInitData();
-      if (data && data.user) {
-        const tgUser = (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) || {};
-        setUser({
-          ...data.user,
-          first_name: data.user.first_name || data.user.firstName || tgUser.first_name || '',
-          last_name: data.user.last_name || data.user.lastName || tgUser.last_name || '',
-          username: data.user.username || tgUser.username || '',
-          photo_url: data.user.photo_url || tgUser.photo_url || null,
-        });
-        setResume(data.resume || null);
+      const tgUser = (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) || {};
+      const backendUser = (data && data.user) || {};
+
+      setUser((prev) => ({
+        ...(prev || {}),
+        ...backendUser,
+        first_name: backendUser.first_name || backendUser.firstName || tgUser.first_name || prev?.first_name || '',
+        last_name: backendUser.last_name || backendUser.lastName || tgUser.last_name || prev?.last_name || '',
+        firstName: backendUser.firstName || backendUser.first_name || tgUser.first_name || prev?.firstName || '',
+        lastName: backendUser.lastName || backendUser.last_name || tgUser.last_name || prev?.lastName || '',
+        username: backendUser.username || tgUser.username || prev?.username || '',
+        photo_url: backendUser.photo_url || tgUser.photo_url || prev?.photo_url || null,
+        role: backendUser.role || prev?.role || 'seeker',
+      }));
+
+      if (data && data.resume) {
+        setResume(data.resume);
       }
     } catch (err) {
       console.error('[AuthContext] Failed to load session:', err);

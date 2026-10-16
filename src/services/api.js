@@ -35,13 +35,21 @@ const isTelegramServerless = () => {
  */
 async function callServerless(endpoint, params = {}) {
   if (isTelegramServerless()) {
-    try {
-      const response = await window.Telegram.WebApp.Serverless.call(endpoint, params);
-      return response;
-    } catch (err) {
-      console.error(`[API Error] ${endpoint}:`, err);
-      throw err;
-    }
+    return new Promise((resolve, reject) => {
+      try {
+        window.Telegram.WebApp.Serverless.call(endpoint, params, (err, result) => {
+          if (err) {
+            console.error(`[API Error] ${endpoint}:`, err);
+            reject(err);
+          } else {
+            resolve(result);
+          }
+        });
+      } catch (err) {
+        console.error(`[API Call Exception] ${endpoint}:`, err);
+        reject(err);
+      }
+    });
   }
 
   // Standalone simulation mode
