@@ -135,6 +135,8 @@ export default {
     title: "Foydalanuvchi profili",
     role_seeker: "Nomzod (Ish qidiruvchi)",
     role_employer: "Ish beruvchi (HR / Kompaniya)",
+    role_seeker_short: "Nomzod",
+    role_employer_short: "Ish beruvchi",
     switch_role: "Rolni o'zgartirish",
     my_applications: "Mening arizalarim",
     my_vacancies: "Mening e'lonlarim",

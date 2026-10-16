@@ -135,6 +135,8 @@ export default {
     title: "Профиль пользователя",
     role_seeker: "Соискатель",
     role_employer: "Работодатель / HR",
+    role_seeker_short: "Соискатель",
+    role_employer_short: "Работодатель",
     switch_role: "Сменить роль",
     my_applications: "Мои отклики",
     my_vacancies: "Мои вакансии",

@@ -13,7 +13,7 @@ export function ThemeToggle({ className = '' }) {
   return (
     <button
       type="button"
-      className={`btn-icon-only modal-close-btn ${className}`}
+      className={`theme-toggle-btn ${className}`}
       onClick={toggleTheme}
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       aria-label="Toggle visual theme"

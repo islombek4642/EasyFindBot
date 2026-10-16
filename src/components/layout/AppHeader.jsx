@@ -33,10 +33,9 @@ export function AppHeader({ onSwitchRole }) {
     <header className="app-header">
       <div className="header-inner">
         <div className="header-brand">
-          <div className="brand-icon-box">
-            <Icon icon="solar:magnifer-bold" width="20" height="20" />
+          <div className="brand-icon-box" title="EasyFind">
+            <Icon icon="solar:magnifer-bold" width="18" height="18" />
           </div>
-          <span className="brand-title">EasyFind</span>
         </div>
 
         <div className="header-actions">
@@ -51,8 +50,10 @@ export function AppHeader({ onSwitchRole }) {
               width="14"
               height="14"
             />
-            <span>
-              {isEmployer ? t('profile.role_employer') : t('profile.role_seeker')}
+            <span className="role-badge-text">
+              {isEmployer
+                ? (t('profile.role_employer_short') || t('profile.role_employer'))
+                : (t('profile.role_seeker_short') || t('profile.role_seeker'))}
             </span>
           </button>
 

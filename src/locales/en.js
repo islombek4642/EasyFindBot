@@ -135,6 +135,8 @@ export default {
     title: "User Profile",
     role_seeker: "Job Seeker",
     role_employer: "Employer / Recruiter",
+    role_seeker_short: "Candidate",
+    role_employer_short: "Employer",
     switch_role: "Switch Active Role",
     my_applications: "My Applications",
     my_vacancies: "My Postings",
