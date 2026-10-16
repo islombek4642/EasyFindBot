@@ -8,7 +8,7 @@ export const config = {
 
   // Bot & Channel identities
   channelUsername: 'EasyFindJobs',
-  botUsername: 'EasyFindBot',
+  botUsername: 'EasyFind_UzBot',
 
   // App defaults
   defaultCurrency: 'USD',
