@@ -8,6 +8,8 @@ const dictionaries = { uz, ru, en };
 const TranslationContext = createContext({
   language: 'uz',
   setLanguage: () => {},
+  lang: 'uz',
+  setLang: () => {},
   t: () => '',
   dictionary: uz,
 });
@@ -72,6 +74,8 @@ export function TranslationProvider({ children, initialLanguage = 'uz' }) {
       value={{
         language,
         setLanguage,
+        lang: language,
+        setLang: setLanguage,
         t,
         dictionary: dictionaries[language] || dictionaries.uz,
       }}

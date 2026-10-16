@@ -754,8 +754,7 @@ a {
 
 .lang-btn {
   height: 32px;
-  min-width: 32px;
-  padding: 0 7px;
+  padding: 0 8px;
   border-radius: var(--radius-md);
   background: var(--bg-input);
   font-size: 0.74rem;
@@ -765,7 +764,7 @@ a {
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
   cursor: pointer;
   flex-shrink: 0;
   transition: all var(--transition-fast);

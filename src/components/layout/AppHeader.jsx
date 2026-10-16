@@ -9,7 +9,7 @@ import { useTranslation } from '../../locales/index.jsx';
 import { ThemeToggle } from '../common/ThemeToggle.jsx';
 
 export function AppHeader({ onSwitchRole }) {
-  const { role, switchRole } = useAuth();
+  const { role, switchRole, updateLanguage } = useAuth();
   const { lang, setLang, t } = useTranslation();
 
   const handleRoleToggle = () => {
@@ -23,8 +23,13 @@ export function AppHeader({ onSwitchRole }) {
 
   const cycleLanguage = () => {
     const langs = ['uz', 'ru', 'en'];
-    const nextIdx = (langs.indexOf(lang) + 1) % langs.length;
-    setLang(langs[nextIdx]);
+    const current = lang || 'uz';
+    const nextIdx = (langs.indexOf(current) + 1) % langs.length;
+    const nextLang = langs[nextIdx];
+    setLang(nextLang);
+    if (updateLanguage) {
+      updateLanguage(nextLang);
+    }
   };
 
   const isEmployer = role === 'employer';
@@ -61,9 +66,11 @@ export function AppHeader({ onSwitchRole }) {
             type="button"
             className="lang-btn"
             onClick={cycleLanguage}
-            title="Switch Language"
+            title={t('profile.language') || "Tilni o'zgartirish"}
+            aria-label="Switch Language"
           >
-            {lang}
+            <Icon icon="solar:global-bold" width="14" height="14" />
+            <span>{(lang || 'uz').toUpperCase()}</span>
           </button>
 
           <ThemeToggle />
