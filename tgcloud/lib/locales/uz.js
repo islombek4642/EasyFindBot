@@ -5,6 +5,15 @@ export default {
     not_specified: "Kiritilmagan",
     negotiable: "Kelishuv asosida",
   },
+  errors: {
+    unauthorized: "Tizimga kirish talab qilinadi",
+    not_found: "Ma'lumot topilmadi",
+    permission_denied: "Ruxsat berilmagan",
+    required_fields: "Barcha majburiy maydonlarni to'ldiring",
+    cannot_apply_own: "O'z vakansiyangizga ariza topshira olmaysiz",
+    duplicate_application: "Siz ushbu vakansiyaga allaqachon ariza topshirgansiz",
+    invalid_input: "Noto'g'ri ma'lumot kiritildi",
+  },
   commands: {
     welcome: "Assalomu alaykum, {name}!\n\nEasyFindBot — ish va xodim topish platformasiga xush kelibsiz.\nQuyidagi menyudan kerakli bo'limni tanlang:",
     help: "ℹ️ **EasyFindBot — Foydalanish bo'yicha qo'llanma**\n\n• **🔍 Ish qidirish**: So'nggi vakansiyalarni ko'rish va filtrlash.\n• **📢 E'lon berish**: Ish o'rni e'lonini joylashtirish.\n• **💼 Mening arizalarim**: Yuborgan arizalaringiz holatini kuzatish.\n• **🏢 Mening e'lonlarim**: O'z e'lonlaringiz va nomzodlar ro'yxatini boshqarish.\n• **🌐 Til**: Bot muloqot tilini sozlash.\n\nSavollar va takliflar bo'yicha: @EasyFindSupport",
@@ -91,5 +100,12 @@ export default {
     emp_rejected_desc: "Iltimos, e'lon ma'lumotlarini qoidalarga muvofiq to'g'rilab qayta yuboring.",
     sub_title: "🔔 **Siz obuna bo'lgan sohada yangi ish o'rni!**",
     sub_btn: "📄 E'lonni ko'rish",
+    new_application_title: "📬 **{title}** vakansiyangizga yangi ariza tushdi!",
+    new_application_candidate: "👤 **Nomzod:** {name}\n\nArizani ko'rish uchun ilovadagi kabinetingizga kiring:",
+    new_application_btn: "💼 Arizalarni ko'rish",
+    app_accepted_title: "🎉 **Arizangiz qabul qilindi!**",
+    app_accepted_desc: "🏢 **{company}** kompaniyasi **{title}** vakansiyasi bo'yicha arizangizni ma'qulladi.\n📞 Tez orada ish beruvchi siz bilan bog'lanadi (yoki aloqa: {contacts}).",
+    app_rejected_title: "ℹ️ **Ariza holati yangilandi**",
+    app_rejected_desc: "🏢 **{company}** kompaniyasi **{title}** vakansiyasi bo'yicha arizangizni ko'rib chiqdi, ammo bu safar boshqa nomzod ma'qul deb topildi.\nSizga keyingi takliflarimizda omad tilaymiz!",
   },
 };

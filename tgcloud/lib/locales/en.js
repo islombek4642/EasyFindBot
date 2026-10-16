@@ -5,6 +5,15 @@ export default {
     not_specified: "Not specified",
     negotiable: "Negotiable",
   },
+  errors: {
+    unauthorized: "Authentication required",
+    not_found: "Data not found",
+    permission_denied: "Permission denied",
+    required_fields: "Please fill in all required fields",
+    cannot_apply_own: "You cannot apply to your own vacancy",
+    duplicate_application: "You have already applied to this vacancy",
+    invalid_input: "Invalid input",
+  },
   commands: {
     welcome: "Hello, {name}!\n\nWelcome to EasyFindBot — your premier job search and recruiting platform.\nSelect a section from the menu below:",
     help: "ℹ️ **EasyFindBot — User Guide**\n\n• **🔍 Search Jobs**: Browse and filter latest job openings.\n• **📢 Post Job**: Publish a new vacancy for candidates.\n• **💼 My Applications**: Track status of your submitted applications.\n• **🏢 My Postings**: Manage your vacancies and review applicants.\n• **🌐 Language**: Configure bot communication language.\n\nFor support and inquiries: @EasyFindSupport",
@@ -91,5 +100,12 @@ export default {
     emp_rejected_desc: "Please review the guidelines, adjust your listing details, and submit again.",
     sub_title: "🔔 **New job in your subscribed category!**",
     sub_btn: "📄 View Vacancy",
+    new_application_title: "📬 New application received for **{title}**!",
+    new_application_candidate: "👤 **Candidate:** {name}\n\nTo view the application, visit your dashboard in the app:",
+    new_application_btn: "💼 View Applications",
+    app_accepted_title: "🎉 **Your application was accepted!**",
+    app_accepted_desc: "🏢 **{company}** approved your application for the **{title}** position.\n📞 The employer will contact you shortly (or contact: {contacts}).",
+    app_rejected_title: "ℹ️ **Application Status Updated**",
+    app_rejected_desc: "🏢 **{company}** reviewed your application for the **{title}** position, but selected another candidate this time.\nWe wish you best of luck with future openings!",
   },
 };

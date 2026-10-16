@@ -10,7 +10,7 @@ export default async function (input, ctx) {
 
   const { category, region = null } = input || {};
   if (!category) {
-    return { success: false, error: 'Category is required' };
+    return { success: false, error: 'ERR_CATEGORY_REQUIRED' };
   }
 
   const userTgId = Number(tgUser.id);

@@ -2,18 +2,19 @@ import { api, db } from 'sdk';
 import { eq, sql } from 'sdk/db';
 import { applications, vacancies, users } from '../schema.js';
 import { APPLICATION_STATUSES } from '../lib/constants/statuses.js';
+import { t } from '../lib/locales/index.js';
 
 export default async function (input, ctx) {
   const tgUser = ctx.initData?.user;
   if (!tgUser?.id) {
-    return { success: false, error: 'Unauthorized' };
+    return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
 
   const { applicationId, status } = input || {};
   const appId = parseInt(applicationId, 10);
 
   if (!appId || !Object.values(APPLICATION_STATUSES).includes(status)) {
-    return { success: false, error: 'Invalid application ID or status' };
+    return { success: false, error: 'ERR_INVALID_INPUT' };
   }
 
   const employerTgId = Number(tgUser.id);
@@ -21,13 +22,13 @@ export default async function (input, ctx) {
   try {
     const application = await db.select().from(applications).where(eq(applications.id, appId)).get();
     if (!application) {
-      return { success: false, error: 'Application not found' };
+      return { success: false, error: 'ERR_NOT_FOUND' };
     }
 
     // Verify vacancy ownership
     const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, application.vacancyId)).get();
     if (!vacancy || Number(vacancy.employerTgId) !== employerTgId) {
-      return { success: false, error: 'Permission denied' };
+      return { success: false, error: 'ERR_FORBIDDEN' };
     }
 
     await db.update(applications)
@@ -38,7 +39,7 @@ export default async function (input, ctx) {
       .where(eq(applications.id, appId))
       .run();
 
-    // If accepted or rejected, notify the applicant
+    // If accepted or rejected, notify the applicant in their preferred language
     if (status === 'accepted' || status === 'rejected') {
       try {
         const candidateUser = await db.select({ language: users.language })
@@ -50,15 +51,20 @@ export default async function (input, ctx) {
         let alertMsg = "";
 
         if (status === 'accepted') {
-          alertMsg =
-            `🎉 **Arizangiz qabul qilindi!**\n\n` +
-            `🏢 **${vacancy.companyName}** kompaniyasi **${vacancy.title}** vakansiyasi bo'yicha arizangizni ma'qulladi.\n` +
-            `📞 Tez orada ish beruvchi siz bilan bog'lanadi (yoki aloqa: ${vacancy.contacts}).`;
+          const title = t(lang, 'notifier.app_accepted_title');
+          const desc = t(lang, 'notifier.app_accepted_desc', {
+            company: vacancy.companyName,
+            title: vacancy.title,
+            contacts: vacancy.contacts,
+          });
+          alertMsg = `${title}\n\n${desc}`;
         } else if (status === 'rejected') {
-          alertMsg =
-            `ℹ️ **Ariza holati yangilandi**\n\n` +
-            `🏢 **${vacancy.companyName}** kompaniyasi **${vacancy.title}** vakansiyasi bo'yicha arizangizni ko'rib chiqdi, ammo bu safar boshqa nomzod ma'qul deb topildi.\n` +
-            `Sizga boshqa takliflarimizda omad tilaymiz!`;
+          const title = t(lang, 'notifier.app_rejected_title');
+          const desc = t(lang, 'notifier.app_rejected_desc', {
+            company: vacancy.companyName,
+            title: vacancy.title,
+          });
+          alertMsg = `${title}\n\n${desc}`;
         }
 
         if (alertMsg) {

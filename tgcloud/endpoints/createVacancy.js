@@ -2,12 +2,17 @@ import { api, db } from 'sdk';
 import { eq } from 'sdk/db';
 import { vacancies, users } from '../schema.js';
 import { sendToModeration } from '../lib/bot/moderator.js';
+import { t } from '../lib/locales/index.js';
 
 export default async function (input, ctx) {
   const tgUser = ctx.initData?.user;
   if (!tgUser?.id) {
-    return { success: false, error: 'Unauthorized' };
+    return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
+
+  const employerTgId = Number(tgUser.id);
+  const userRow = await db.select({ language: users.language }).from(users).where(eq(users.tgId, employerTgId)).get();
+  const lang = userRow?.language || 'uz';
 
   const {
     title,
@@ -25,10 +30,8 @@ export default async function (input, ctx) {
   } = input || {};
 
   if (!title || !companyName || !category || !region || !description || !contacts) {
-    return { success: false, error: 'Barcha majburiy maydonlarni to\'ldiring' };
+    return { success: false, error: t(lang, 'errors.required_fields') };
   }
-
-  const employerTgId = Number(tgUser.id);
 
   try {
     // Ensure employer role in users table
@@ -58,8 +61,6 @@ export default async function (input, ctx) {
       .run();
 
     // Notify moderation channel/admins
-    const userRow = await db.select({ language: users.language }).from(users).where(eq(users.tgId, employerTgId)).get();
-    const lang = userRow?.language || 'uz';
     await sendToModeration(api, created, lang);
 
     return {

@@ -22,7 +22,7 @@ export default async function (input, ctx) {
       .get();
 
     if (!vacancy) {
-      return { success: false, error: 'Vacancy not found or access denied' };
+      return { success: false, error: 'ERR_FORBIDDEN' };
     }
 
     const list = await db.select()

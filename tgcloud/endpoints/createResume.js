@@ -1,12 +1,17 @@
 import { db } from 'sdk';
 import { eq, sql } from 'sdk/db';
-import { resumes } from '../schema.js';
+import { resumes, users } from '../schema.js';
+import { t } from '../lib/locales/index.js';
 
 export default async function (input, ctx) {
   const tgUser = ctx.initData?.user;
   if (!tgUser?.id) {
-    return { success: false, error: 'Unauthorized' };
+    return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
+
+  const seekerTgId = Number(tgUser.id);
+  const userRow = await db.select({ language: users.language }).from(users).where(eq(users.tgId, seekerTgId)).get();
+  const lang = userRow?.language || 'uz';
 
   const {
     title,
@@ -21,10 +26,8 @@ export default async function (input, ctx) {
   } = input || {};
 
   if (!title || !category || !region || !contacts) {
-    return { success: false, error: 'Barcha majburiy maydonlarni to\'ldiring' };
+    return { success: false, error: t(lang, 'errors.required_fields') };
   }
-
-  const seekerTgId = Number(tgUser.id);
 
   try {
     const existing = await db.select({ id: resumes.id })

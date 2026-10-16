@@ -7,24 +7,30 @@ import { config } from '../lib/config.js';
 export default async function (input, ctx) {
   const tgUser = ctx.initData?.user;
   if (!tgUser?.id) {
-    return { success: false, error: 'Unauthorized' };
+    return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
 
   const vacId = parseInt(input?.vacancyId, 10);
   if (!vacId) {
-    return { success: false, error: 'Invalid vacancy ID' };
+    return { success: false, error: 'ERR_INVALID_INPUT' };
   }
 
   const seekerTgId = Number(tgUser.id);
 
   try {
+    const seekerUser = await db.select({ language: users.language })
+      .from(users)
+      .where(eq(users.tgId, seekerTgId))
+      .get();
+    const userLang = seekerUser?.language || 'uz';
+
     const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
     if (!vacancy || vacancy.status !== 'approved') {
-      return { success: false, error: 'Vakansiya topilmadi yoki qabul yopilgan' };
+      return { success: false, error: t(userLang, 'errors.not_found') };
     }
 
     if (Number(vacancy.employerTgId) === seekerTgId) {
-      return { success: false, error: 'O\'z vakansiyangizga ariza topshira olmaysiz' };
+      return { success: false, error: t(userLang, 'errors.cannot_apply_own') };
     }
 
     // Check duplicate application
@@ -34,7 +40,7 @@ export default async function (input, ctx) {
       .get();
 
     if (existing) {
-      return { success: false, error: 'Siz ushbu vakansiyaga allaqachon ariza topshirgansiz' };
+      return { success: false, error: t(userLang, 'errors.duplicate_application') };
     }
 
     // Fetch seeker active resume (if not passed explicitly)
@@ -66,20 +72,19 @@ export default async function (input, ctx) {
         .get();
       const empLang = employerRow?.language || 'uz';
 
-      const candidateName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') || 'Nomzod';
-      const notifText =
-        `📬 **${vacancy.title}** vakansiyangizga yangi ariza tushdi!\n\n` +
-        `👤 **Nomzod:** ${candidateName}\n\n` +
-        "Arizani ko'rish uchun ilovadagi kabinetingizga kiring:";
+      const candidateName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') || tgUser.username || String(seekerTgId);
+      const notifTitle = t(empLang, 'notifier.new_application_title', { title: vacancy.title });
+      const notifBody = t(empLang, 'notifier.new_application_candidate', { name: candidateName });
+      const btnText = t(empLang, 'notifier.new_application_btn');
 
       const appUrl = `https://t.me/${config.botUsername}/app?startapp=my_vacs`;
       await api.sendMessage({
         chat_id: vacancy.employerTgId,
-        text: notifText,
+        text: `${notifTitle}\n\n${notifBody}`,
         parse_mode: 'Markdown',
         reply_markup: {
           inline_keyboard: [
-            [{ text: "💼 Arizalarni ko'rish", url: appUrl }],
+            [{ text: btnText, url: appUrl }],
           ],
         },
       });

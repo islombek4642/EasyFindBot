@@ -22,7 +22,7 @@ export default async function (input, ctx) {
       .get();
 
     if (!vacancy) {
-      return { success: false, error: 'Vacancy not found or permission denied' };
+      return { success: false, error: 'ERR_FORBIDDEN' };
     }
 
     await db.update(vacancies)
