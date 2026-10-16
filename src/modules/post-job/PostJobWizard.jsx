@@ -176,7 +176,7 @@ export function PostJobWizard({ onSuccess }) {
     label: t(`employment_types.${et}`) || et,
   }));
 
-  const salaryTypeOptions = SALARY_TYPES.map((st) => ({
+  const salaryTypeOptions = (Array.isArray(SALARY_TYPES) ? SALARY_TYPES : Object.values(SALARY_TYPES)).map((st) => ({
     value: st,
     label: t(`salary_types.${st}`) || st,
   }));

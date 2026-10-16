@@ -35,7 +35,7 @@ export function buildMainReplyKeyboard(isAdmin, lang = 'uz') {
     ],
     [
       { text: t(lang, 'keyboard.change_language') },
-      { text: t(lang, 'keyboard.about_bot') },
+      { text: t(lang, 'keyboard.help') },
     ],
   ];
 
@@ -218,8 +218,15 @@ export default async function (message, ctx) {
     return;
   }
 
-  // 7. Command /help
-  if (text === '/help' || text === '/yordam') {
+  // 7. Command /help or Keyboard: Help
+  if (
+    text === '/help' ||
+    text === '/yordam' ||
+    text === t(userLang, 'keyboard.help') ||
+    text.includes('Yordam') ||
+    text.includes('Помощь') ||
+    text.includes('Help')
+  ) {
     await api.sendMessage({
       chat_id: chatId,
       text: t(userLang, 'commands.help'),

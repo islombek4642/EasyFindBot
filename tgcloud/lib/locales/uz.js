@@ -30,6 +30,7 @@ export default {
     my_vacancies: "🏢 Mening e'lonlarim",
     change_language: "🌐 Tilni o'zgartirish",
     about_bot: "ℹ️ Bot haqida",
+    help: "❓ Yordam",
     admin_panel: "⚙️ Admin panel",
   },
   admin: {
