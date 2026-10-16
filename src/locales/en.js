@@ -124,6 +124,8 @@ export default {
     empty_desc: "No candidates currently match the selected criteria",
     create_btn: "Create Resume",
     edit_btn: "Edit Resume",
+    title_label: "Specialization (Role)",
+    title_placeholder: "E.g. Frontend Developer",
     skills_label: "Key Skills",
     skills_placeholder: "Comma-separated skills (e.g. React, TypeScript, Redux)",
     bio_label: "About Yourself",

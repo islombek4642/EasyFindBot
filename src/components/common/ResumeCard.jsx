@@ -21,33 +21,37 @@ export function ResumeCard({
 
   const {
     fullName,
+    title,
     category,
     region,
     experienceYears = 0,
-    skills = '',
+    skills,
     expectedSalary,
+    salaryCurrency = 'USD',
     bio,
     contacts,
   } = resume;
 
-  const skillsList = skills
-    ? skills.split(',').map((s) => s.trim()).filter(Boolean)
-    : [];
+  const skillsList = Array.isArray(skills)
+    ? skills
+    : typeof skills === 'string' && skills.trim()
+      ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
 
   return (
     <div className={`glass-card resume-card ${className}`} onClick={onClick}>
       <div className="card-top">
         <div className="card-title-group">
-          <h4 className="card-job-title">{fullName}</h4>
+          <h4 className="card-job-title">{title || fullName || t('roles.seeker')}</h4>
           <span className="card-company-name">
-            <Icon icon="solar:briefcase-bold" width="15" height="15" />
-            {t(`categories.${category}`) || category}
+            <Icon icon="solar:user-bold" width="15" height="15" />
+            {fullName || t(`categories.${category}`) || category}
           </span>
         </div>
 
         {expectedSalary && (
           <div className="card-salary-box" style={{ fontSize: '0.95rem' }}>
-            {expectedSalary}
+            {Number(expectedSalary) ? `${Number(expectedSalary).toLocaleString()} ${salaryCurrency}` : expectedSalary}
           </div>
         )}
       </div>

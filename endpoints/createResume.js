@@ -24,8 +24,14 @@ export default async function (input, ctx) {
     contacts,
   } = input || {};
 
+  const parsedSkills = Array.isArray(skills)
+    ? skills
+    : typeof skills === 'string'
+      ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+
   if (!title || !category || !region || !contacts) {
-    return { success: false, error: t(lang, 'errors.required_fields') };
+    return { success: false, ok: false, error: t(lang, 'errors.required_fields') };
   }
 
   try {
@@ -43,7 +49,7 @@ export default async function (input, ctx) {
           experienceYears: Number(experienceYears) || 0,
           expectedSalary: expectedSalary ? Number(expectedSalary) : null,
           salaryCurrency: salaryCurrency || 'USD',
-          skills: Array.isArray(skills) ? skills : [],
+          skills: parsedSkills,
           bio: bio ? bio.trim() : null,
           contacts: contacts.trim(),
           isActive: true,
@@ -52,7 +58,7 @@ export default async function (input, ctx) {
         .where(eq(resumes.id, existing.id))
         .run();
 
-      return { success: true, resumeId: existing.id, isUpdated: true };
+      return { success: true, ok: true, resumeId: existing.id, isUpdated: true };
     }
 
     const [created] = await db.insert(resumes)
@@ -64,7 +70,7 @@ export default async function (input, ctx) {
         experienceYears: Number(experienceYears) || 0,
         expectedSalary: expectedSalary ? Number(expectedSalary) : null,
         salaryCurrency: salaryCurrency || 'USD',
-        skills: Array.isArray(skills) ? skills : [],
+        skills: parsedSkills,
         bio: bio ? bio.trim() : null,
         contacts: contacts.trim(),
         isActive: true,
@@ -72,8 +78,8 @@ export default async function (input, ctx) {
       .returning()
       .run();
 
-    return { success: true, resumeId: created.id, isCreated: true };
+    return { success: true, ok: true, resumeId: created.id, isCreated: true };
   } catch (err) {
-    return { success: false, error: err.message };
+    return { success: false, ok: false, error: err.message };
   }
 }

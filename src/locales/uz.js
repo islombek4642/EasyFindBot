@@ -124,6 +124,8 @@ export default {
     empty_desc: "Tanlangan parametrlar bo'yicha mutaxassislar mavjud emas",
     create_btn: "Rezyume yaratish",
     edit_btn: "Rezyumeni tahrirlash",
+    title_label: "Mutaxassislik (lavozim)",
+    title_placeholder: "Masalan: Frontend Developer",
     skills_label: "Asosiy ko'nikmalar",
     skills_placeholder: "Ko'nikmalarni vergul bilan kiriting (masalan: React, TypeScript, Redux)",
     bio_label: "O'zingiz haqingizda qisqacha",

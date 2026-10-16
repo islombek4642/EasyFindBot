@@ -124,6 +124,8 @@ export default {
     empty_desc: "По выбранным критериям анкеты отсутствуют",
     create_btn: "Создать резюме",
     edit_btn: "Редактировать резюме",
+    title_label: "Специальность (должность)",
+    title_placeholder: "Например: Frontend Developer",
     skills_label: "Ключевые навыки",
     skills_placeholder: "Укажите навыки через запятую (например: React, TypeScript, Redux)",
     bio_label: "О себе",

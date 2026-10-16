@@ -265,27 +265,35 @@ function handleMockCall(endpoint, params) {
     }
 
     case 'createResume': {
+      const parsedSkills = Array.isArray(params.skills)
+        ? params.skills
+        : typeof params.skills === 'string'
+          ? params.skills.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
+
       const existing = resumes.find((r) => r.userTgId === currentUser.id);
       if (existing) {
+        existing.title = params.title || existing.title || 'Mutaxassis';
         existing.category = params.category;
         existing.region = params.region;
         existing.experienceYears = Number(params.experienceYears) || 0;
-        existing.skills = params.skills;
+        existing.skills = parsedSkills;
         existing.expectedSalary = params.expectedSalary || '';
         existing.bio = params.bio || '';
         existing.contacts = params.contacts;
         existing.status = 'active';
-        return { ok: true, resumeId: existing.id };
+        return { ok: true, success: true, resumeId: existing.id };
       }
 
       const newResume = {
         id: Date.now(),
         userTgId: currentUser.id,
         fullName: `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'Foydalanuvchi',
+        title: params.title || 'Mutaxassis',
         category: params.category,
         region: params.region,
         experienceYears: Number(params.experienceYears) || 0,
-        skills: params.skills,
+        skills: parsedSkills,
         expectedSalary: params.expectedSalary || '',
         bio: params.bio || '',
         contacts: params.contacts,
@@ -293,7 +301,7 @@ function handleMockCall(endpoint, params) {
         createdAt: Date.now(),
       };
       resumes.unshift(newResume);
-      return { ok: true, resumeId: newResume.id };
+      return { ok: true, success: true, resumeId: newResume.id };
     }
 
     case 'getResumes': {
