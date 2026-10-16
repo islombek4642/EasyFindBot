@@ -80,11 +80,19 @@ export function ResumesView() {
   const filteredResumes = resumes.filter((r) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
+    const skillsStr = Array.isArray(r.skills) ? r.skills.join(' ') : (r.skills || '');
     return (
+      (r.title && r.title.toLowerCase().includes(q)) ||
       (r.fullName && r.fullName.toLowerCase().includes(q)) ||
-      (r.skills && r.skills.toLowerCase().includes(q))
+      skillsStr.toLowerCase().includes(q)
     );
   });
+
+  const hasActiveFilters = Boolean(
+    (selectedCategory && selectedCategory !== 'all') ||
+    (selectedRegion && selectedRegion !== 'all') ||
+    (searchQuery && searchQuery.trim().length > 0)
+  );
 
   return (
     <div className="page-content">
@@ -216,9 +224,17 @@ export function ResumesView() {
           icon="solar:user-cross-bold"
           title={t('resumes.empty_title')}
           description={t('resumes.empty_desc')}
-          actionLabel={t('resumes.create_btn')}
-          actionIcon="solar:add-circle-bold"
-          onAction={() => setShowCreateModal(true)}
+          actionLabel={hasActiveFilters ? t('common.clear_filters') : t('resumes.create_btn')}
+          actionIcon={hasActiveFilters ? 'solar:filter-remove-bold' : 'solar:add-circle-bold'}
+          onAction={() => {
+            if (hasActiveFilters) {
+              setSelectedCategory('all');
+              setSelectedRegion('all');
+              setSearchQuery('');
+            } else {
+              setShowCreateModal(true);
+            }
+          }}
         />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

@@ -469,7 +469,8 @@ a {
   color: var(--danger);
 }
 
-.input-wrapper {
+.input-wrapper,
+.select-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -479,19 +480,29 @@ a {
 .input-icon-left {
   position: absolute;
   left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text-muted);
   pointer-events: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  line-height: 0;
+  z-index: 2;
 }
 
 .input-icon-right {
   position: absolute;
   right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text-muted);
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  line-height: 0;
   cursor: pointer;
+  z-index: 2;
 }
 
 .input-field, .select-field, .textarea-field {
@@ -501,9 +512,16 @@ a {
   border-radius: var(--radius-md);
   padding: 12px 14px;
   font-size: 0.92rem;
+  line-height: 1.4;
   color: var(--text-primary);
   transition: all var(--transition-fast);
   outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.input-field, .select-field {
+  height: 48px;
 }
 
 .input-field.has-left-icon, .select-field.has-left-icon {
@@ -540,16 +558,12 @@ a {
   color: var(--text-muted);
 }
 
-.select-wrapper {
-  position: relative;
-  width: 100%;
-}
-
 .select-field {
   appearance: none;
   -webkit-appearance: none;
+  -moz-appearance: none;
   cursor: pointer;
-  padding-right: 38px;
+  padding-right: 42px;
 }
 
 .select-chevron {
@@ -559,6 +573,11 @@ a {
   transform: translateY(-50%);
   pointer-events: none;
   color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  z-index: 2;
 }
 
 .textarea-field {

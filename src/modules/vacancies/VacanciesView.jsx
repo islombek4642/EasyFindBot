@@ -134,6 +134,13 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
     );
   });
 
+  const hasActiveFilters = Boolean(
+    (selectedCategory && selectedCategory !== 'all') ||
+    (selectedRegion && selectedRegion !== 'all') ||
+    salaryMin ||
+    (searchQuery && searchQuery.trim().length > 0)
+  );
+
   return (
     <div className="page-content">
       {/* Search & Filter Bar */}
@@ -243,14 +250,19 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
         <EmptyState
           icon="solar:folder-open-bold"
           title={t('vacancies.empty_title')}
-          description={t('vacancies.empty_desc')}
-          actionLabel={t('common.clear')}
-          actionIcon="solar:restart-bold"
+          description={hasActiveFilters ? t('vacancies.empty_desc') : t('vacancies.empty_no_data')}
+          actionLabel={hasActiveFilters ? t('common.clear_filters') : t('common.refresh')}
+          actionIcon={hasActiveFilters ? 'solar:filter-remove-bold' : 'solar:restart-bold'}
           onAction={() => {
-            setSelectedCategory('all');
-            setSelectedRegion('all');
-            setSalaryMin('');
-            setSearchQuery('');
+            if (hasActiveFilters) {
+              setSelectedCategory('all');
+              setSelectedRegion('all');
+              setSalaryMin('');
+              setSearchQuery('');
+            } else {
+              setPage(1);
+              fetchVacancies(1, false);
+            }
           }}
         />
       ) : (
