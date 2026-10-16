@@ -222,10 +222,10 @@ export const subscriptions = table('subscriptions', {
 ## 4. Moderation, Configuration & Channel Broadcasting Workflow
 
 ### 4.1. Configuration (`tgcloud/lib/config.js`)
-Since the V8 sandbox has no Node `process.env`, configuration is centralized in `tgcloud/lib/config.js`:
+Since the V8 sandbox has no Node `process.env`, static owner credentials and environment configuration are centralized in `tgcloud/lib/config.js`:
 ```javascript
 export const config = {
-  adminTgIds: [/* Telegram IDs of authorized moderators */],
+  superAdminTgId: 0,                // Primary Owner / Super Admin Telegram ID (immutable root authority)
   channelId: '@EasyFindJobs',       // or -100xxxxxxxxxx numeric channel ID
   channelUsername: 'EasyFindJobs',
   botUsername: 'EasyFindBot',
@@ -234,23 +234,64 @@ export const config = {
 };
 ```
 
-### 4.2. Moderation Workflow
+### 4.2. Two-Tier Dynamic Admin Model & Authorization
+To enable team scaling without manual code redeployments, the system implements a two-tier administrative model:
+1. **Super Admin (Root Owner)**:
+   - Configured via `config.superAdminTgId`.
+   - Immutable root authority.
+   - Exclusively possesses rights to grant or revoke moderator privileges (`role = 'admin'`) directly via the Bot Admin Panel.
+2. **Moderators / Team Admins**:
+   - Stored and managed dynamically in the SQLite `users` table (`role = 'admin'`).
+   - Authorized to review pending vacancies (Approve / Reject), view moderation queues, and inspect system metrics.
+   - Cannot demote the Super Admin or modify other admin privileges.
+
+**Admin Authorization Helper (`tgcloud/lib/bot/auth.js`)**:
+```javascript
+import { db } from 'sdk';
+import { eq, and } from 'sdk/db';
+import { users } from '../../schema.js';
+import { config } from '../config.js';
+
+export async function isUserAdmin(tgId) {
+  if (tgId === config.superAdminTgId) return true;
+  const user = await db.select({ role: users.role })
+    .from(users)
+    .where(and(eq(users.tgId, tgId), eq(users.role, 'admin')))
+    .get();
+  return !!user;
+}
+
+export async function getAllAdminTgIds() {
+  const adminUsers = await db.select({ tgId: users.tgId })
+    .from(users)
+    .where(eq(users.role, 'admin'))
+    .all();
+  const ids = adminUsers.map(u => u.tgId);
+  if (config.superAdminTgId && !ids.includes(config.superAdminTgId)) {
+    ids.unshift(config.superAdminTgId);
+  }
+  return ids;
+}
+```
+
+### 4.3. Moderation Workflow
 1. **Submission**: Employer submits vacancy via Mini App -> `createVacancy` endpoint sets `status = 'pending'`.
-2. **Admin Alert**: Backend sends an admin review card to all configured `config.adminTgIds` via `api.sendMessage` with Inline Keyboard:
+2. **Admin Alert**: Backend fetches all active moderators via `getAllAdminTgIds()` and dispatches an admin review card via `api.sendMessage` with Inline Keyboard:
    - `[ Tasdiqlash / Approve ]` (`callback_data: "admin:approve:<id>"`)
    - `[ Rad etish / Reject ]` (`callback_data: "admin:reject:<id>"`)
-3. **Authorization Check (`callback_query.js`)**:
-   - Before processing approval/rejection, verifies `config.adminTgIds.includes(callbackQuery.from.id)`.
-   - If unauthorized: answers callback with alert `"Sizda administrator huquqi yo'q"`.
+3. **Authorization & Concurrency Check (`callback_query.js`)**:
+   - Verifies caller authority via `await isUserAdmin(callbackQuery.from.id)`.
+   - If unauthorized: answers callback query with alert `"Sizda administrator huquqi yo'q"`.
+   - Race condition protection: If another admin already approved/rejected the vacancy, edits the moderation card to indicate `"⚠️ Ushbu e'lon allaqachon ko'rib chiqilgan"` to prevent duplicate actions.
 4. **On Approve**:
    - Updates `vacancies.status = 'approved'`, records `moderatedByTgId`.
    - Formats a clean Telegram post with title, company, salary (range/fixed/negotiable), requirements, and inline button opening Mini App deep link (`t.me/EasyFindBot/app?startapp=vac_<id>`).
    - Dispatches post to channel with error handling (logging error without failing transaction).
    - Queries `subscriptions` matching vacancy category & region and dispatches push alerts.
-   - Dispatches notification to employer that vacancy is now live.
+   - Dispatches confirmation notification to employer that vacancy is now live.
 5. **On Reject**:
    - Updates `vacancies.status = 'rejected'`.
-   - Dispatches notification to employer.
+   - Dispatches notification to employer with optional reason.
 
 ---
 
@@ -282,8 +323,8 @@ When a user launches the bot with `/start`:
    > *"Assalomu alaykum, {firstName}!*  
    > *EasyFindBot — ish va xodim topish platformasiga xush kelibsiz.*  
    > *Quyidagi menyudan kerakli bo'limni tanlang:"*
-3. **Persistent Reply Keyboard (Chat pastki doimiy tugmalari)**:
-   The bot immediately delivers a clean 3x2 Reply Keyboard utilizing native `web_app` buttons:
+3. **Persistent Dynamic Reply Keyboard (Chat pastki doimiy tugmalari)**:
+   The bot checks `isUserAdmin(userTgId)`. For regular users, it delivers a clean 3x2 Reply Keyboard:
    ```text
    ┌──────────────────────────────┬──────────────────────────────┐
    │   🔍 Ish qidirish (Ilova)    │   📢 E'lon berish (Ilova)    │
@@ -293,12 +334,19 @@ When a user launches the bot with `/start`:
    │    🌐 Tilni o'zgartirish     │        ℹ️ Bot haqida         │
    └──────────────────────────────┴──────────────────────────────┘
    ```
+   **For Super Admin and Moderators (`isUserAdmin === true`)**, an additional 4th row is automatically appended:
+   ```text
+   ┌─────────────────────────────────────────────────────────────┐
+   │                      ⚙️ Admin panel                         │
+   └─────────────────────────────────────────────────────────────┘
+   ```
    - **`🔍 Ish qidirish (Ilova)`** (`web_app: { url: 'https://app<id>.tgcloud.ai?startapp=jobs' }`): Launches Mini App directly at the Vacancy Search view.
    - **`📢 E'lon berish (Ilova)`** (`web_app: { url: 'https://app<id>.tgcloud.ai?startapp=post_job' }`): Launches Mini App directly at the Post Job multi-step wizard.
    - **`💼 Mening arizalarim`** (`web_app: { url: 'https://app<id>.tgcloud.ai?startapp=my_apps' }`): Launches Mini App directly opening the user's submitted applications dashboard.
    - **`🏢 Mening e'lonlarim`** (`web_app: { url: 'https://app<id>.tgcloud.ai?startapp=my_vacs' }`): Launches Mini App directly opening employer's posted vacancies and applicant review modal.
    - **`🌐 Tilni o'zgartirish`**: Sends an inline message with 3 options: `[ 🇺🇿 O'zbekcha ]` `[ 🇷🇺 Русский ]` `[ 🇬🇧 English ]`. Upon click, updates user's language in SQLite and updates the Reply Keyboard in selected language.
    - **`ℹ️ Bot haqida`**: Sends a structured message explaining platform purpose, official channel link, and contact/support details.
+   - **`⚙️ Admin panel`**: Opens the administrative management control center.
 
 ### 6.2. Mini App Deep Linking Routes (`src/hooks/useDeepLink.js`)
 The Mini App parses `Telegram.WebApp.initDataUnsafe?.start_param`:
@@ -318,15 +366,31 @@ The Mini App parses `Telegram.WebApp.initDataUnsafe?.start_param`:
 The bot registers official slash commands appearing in Telegram's native command menu ("/" button):
 - `/start` — Botni qayta ishga tushirish va asosiy menyu
 - `/app` — Mini App platformasini ochish
+- `/admin` — Administrator boshqaruv paneli (faqat adminlar uchun)
 - `/language` — Muloqot tilini o'zgartirish (O'zbekcha / Русский / English)
 - `/help` — Qo'llanma va yordam
 
 In `handlers/message.js`:
-- `/start`: Initializes user record, sends welcome message, and mounts 3x2 Reply Keyboard.
+- `/start`: Initializes user record, sends welcome message, and mounts dynamic Reply Keyboard.
 - `/app`: Sends a direct inline WebApp button launching the Mini App.
+- `/admin`: Verifies `isUserAdmin(from.id)`. If authorized, opens the Admin Panel; otherwise responds `"Ruxsat berilmagan"`.
 - `/language`: Dispatches the inline language selection menu (`uz`, `ru`, `en`).
 - `/help`: Dispatches user guide, tips for seekers and employers, and official support contacts.
 - Bot initialization/startup registers these command sets across languages (`uz`, `ru`, `en`) via `api.setMyCommands`.
+
+### 6.5. Bot Admin Panel Architecture (`handlers/callback_query.js` & `lib/bot/admin.js`)
+When an authorized administrator triggers `⚙️ Admin panel` or `/admin`, the bot sends an interactive dashboard with Inline Keyboard options:
+1. **⏳ Moderatsiya navbati (`admin:queue`)**:
+   - Displays count of pending vacancies awaiting review.
+   - Allows navigating pending items one-by-one with inline `[ ✅ Tasdiqlash ]` and `[ ❌ Rad etish ]` actions.
+2. **📊 Tizim statistikasi (`admin:stats`)**:
+   - Real-time aggregation query: total users (seekers vs employers), active vacancies, closed vacancies, and total submitted applications.
+3. **👥 Adminlar boshqaruvi (`admin:manage_admins`, faqat Super Admin uchun)**:
+   - `📋 Ro'yxat`: Lists current moderators with their username and Telegram ID.
+   - `➕ Admin qo'shish`: Prompts for a target user's numeric `tgId` (or username) -> updates `users.role = 'admin'`.
+   - `➖ Adminni o'chirish`: Super Admin selects moderator from inline list -> sets `users.role = 'seeker'`.
+4. **📢 Hammaga xabar yuborish (`admin:broadcast`, faqat Super Admin uchun)**:
+   - Prompts for a broadcast message -> queries active `users` table -> safely iterates with rate-limiting and error handling.
 
 ---
 

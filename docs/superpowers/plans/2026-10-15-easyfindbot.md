@@ -65,6 +65,8 @@ git commit -m "chore: scaffold react mini app and tgcloud config"
 **Files:**
 - Create: `tgcloud/schema.js`
 - Create: `tgcloud/lib/config.js`
+- Create: `tgcloud/lib/bot/auth.js`
+- Create: `tgcloud/lib/bot/admin.js`
 - Create: `tgcloud/lib/constants/roles.js`
 - Create: `tgcloud/lib/constants/statuses.js`
 - Create: `tgcloud/lib/constants/categories.js`
@@ -75,19 +77,21 @@ git commit -m "chore: scaffold react mini app and tgcloud config"
 
 **Interfaces:**
 - Consumes: `sdk/db`, `sdk/api`.
-- Produces: Tables (`users`, `vacancies`, `resumes`, `applications`, `subscriptions`) with unified `tgId` keys and bot publishing helpers.
+- Produces: Tables (`users`, `vacancies`, `resumes`, `applications`, `subscriptions`) with unified `tgId` keys, two-tier admin auth helpers, admin panel formatters, and bot publishing helpers.
 
-- [ ] **Step 1: Implement `tgcloud/lib/config.js` with admin IDs, channel config, and defaults**
-- [ ] **Step 2: Implement `tgcloud/lib/constants/*.js` with typed constants (ROLES, STATUSES, CATEGORIES, REGIONS, SALARY_TYPES)**
-- [ ] **Step 3: Implement `tgcloud/schema.js` with unified `tgId` fields, salary types, unique application and subscription indexes**
-- [ ] **Step 4: Implement `tgcloud/lib/bot/moderator.js` to construct moderation message with InlineKeyboardMarkup**
-- [ ] **Step 5: Implement `tgcloud/lib/bot/channel.js` to format and post approved vacancies with error handling**
-- [ ] **Step 6: Implement `tgcloud/lib/bot/notifier.js` to dispatch push updates to matching subscribers and employers**
-- [ ] **Step 7: Commit**
+- [ ] **Step 1: Implement `tgcloud/lib/config.js` with superAdminTgId, channel config, and defaults**
+- [ ] **Step 2: Implement `tgcloud/lib/bot/auth.js` (`isUserAdmin`, `getAllAdminTgIds`) for two-tier role management**
+- [ ] **Step 3: Implement `tgcloud/lib/bot/admin.js` (Admin panel dashboard, moderation queue card, metrics aggregation)**
+- [ ] **Step 4: Implement `tgcloud/lib/constants/*.js` with typed constants (ROLES, STATUSES, CATEGORIES, REGIONS, SALARY_TYPES)**
+- [ ] **Step 5: Implement `tgcloud/schema.js` with unified `tgId` fields, salary types, unique application and subscription indexes**
+- [ ] **Step 6: Implement `tgcloud/lib/bot/moderator.js` to construct moderation message with InlineKeyboardMarkup**
+- [ ] **Step 7: Implement `tgcloud/lib/bot/channel.js` to format and post approved vacancies with error handling**
+- [ ] **Step 8: Implement `tgcloud/lib/bot/notifier.js` to dispatch push updates to matching subscribers and employers**
+- [ ] **Step 9: Commit**
 
 ```bash
 git add tgcloud/schema.js tgcloud/lib/
-git commit -m "feat(backend): implement db schema, config, and bot helper modules"
+git commit -m "feat(backend): implement db schema, config, two-tier admin auth, and bot helper modules"
 ```
 
 ---
@@ -99,18 +103,19 @@ git commit -m "feat(backend): implement db schema, config, and bot helper module
 - Create: `tgcloud/handlers/callback_query.js`
 
 **Interfaces:**
-- Consumes: Telegram Update objects from `sdk/api`, DB tables from `tgcloud/schema.js`.
-- Produces: Bot command responses (`/start`, `/app`, `/language`, `/help`, deep link `/start vac_<id>`), command menu registration (`setMyCommands`), secure admin moderation callback handlers.
+- Consumes: Telegram Update objects from `sdk/api`, DB tables from `tgcloud/schema.js`, admin helpers from `tgcloud/lib/bot/`.
+- Produces: Bot command responses (`/start`, `/app`, `/admin`, `/language`, `/help`, deep link `/start vac_<id>`), dynamic Reply Keyboard mounting with admin row, command menu registration (`setMyCommands`), secure admin moderation & admin panel callback handlers.
 
-- [ ] **Step 1: Implement `tgcloud/handlers/message.js` (Zero-friction `/start` onboarding with default `uz` language, command routing for `/start`, `/app`, `/language`, `/help`, persistent 3x2 Reply Keyboard with native WebApp buttons for `jobs`, `post_job`, `my_apps`, `my_vacs`, text handlers for `🌐 Tilni o'zgartirish` and `ℹ️ Bot haqida`, and deep link `/start vac_<id>`)**
-- [ ] **Step 2: Implement `tgcloud/handlers/callback_query.js` (language switcher callback `set_lang:uz|ru|en`, admin moderation auth check, `admin:approve:<id>` and `admin:reject:<id>` actions, channel post, and subscriber alerts)**
-- [ ] **Step 3: Implement command menu registration via `api.setMyCommands` across languages (`uz`, `ru`, `en`)**
-- [ ] **Step 4: Test message handler execution with `npx tgcloud run handlers/message` payload**
-- [ ] **Step 5: Commit**
+- [ ] **Step 1: Implement `tgcloud/handlers/message.js` (Zero-friction `/start` onboarding with default `uz` language, dynamic Reply Keyboard check via `isUserAdmin` adding 4th row `⚙️ Admin panel` for authorized users, command routing for `/start`, `/app`, `/admin`, `/language`, `/help`, text handlers for `⚙️ Admin panel`, `🌐 Tilni o'zgartirish` and `ℹ️ Bot haqida`, and deep link `/start vac_<id>`)**
+- [ ] **Step 2: Implement `tgcloud/handlers/callback_query.js` (language switcher callback `set_lang:uz|ru|en`, admin moderation auth check, `admin:approve:<id>` and `admin:reject:<id>` actions, race condition checks, channel post, and subscriber alerts)**
+- [ ] **Step 3: Implement Bot Admin Panel callback routing in `callback_query.js` (`admin:queue`, `admin:stats`, `admin:manage_admins`, `admin:broadcast`)**
+- [ ] **Step 4: Implement command menu registration via `api.setMyCommands` across languages (`uz`, `ru`, `en`) including `/admin` command for administrators**
+- [ ] **Step 5: Test message handler execution with `npx tgcloud run handlers/message` payload**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add tgcloud/handlers/
-git commit -m "feat(backend): implement secure message and callback_query handlers with persistent reply keyboard and command menu"
+git commit -m "feat(backend): implement secure message and callback_query handlers with dynamic admin reply keyboard and admin panel"
 ```
 
 ---
