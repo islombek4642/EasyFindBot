@@ -74,28 +74,28 @@
 - Consumes: Node.js 18+ and npm.
 - Produces: Runnable development server (`npm run dev`) and static production build directory (`dist/`) configured for Telegram Serverless static CDN.
 
-- [ ] **Step 1: Create `package.json`**
+- [x] **Step 1: Create `package.json`**
   - Add dependencies: `react: ^18.2.0`, `react-dom: ^18.2.0`, `@iconify/react: ^5.0.0`.
   - Add devDependencies: `vite: ^5.2.0`, `@vitejs/plugin-react: ^4.2.0`, `@tgcloud/cli: ^0.1.0`.
   - Define scripts: `"dev": "vite"`, `"build": "vite build"`, `"preview": "vite preview"`.
 
-- [ ] **Step 2: Create `vite.config.js`**
+- [x] **Step 2: Create `vite.config.js`**
   - Configure `@vitejs/plugin-react`.
   - Set `base: '/'` and build destination to `dist/`.
 
-- [ ] **Step 3: Create `tgcloud.jsonc`**
+- [x] **Step 3: Create `tgcloud.jsonc`**
   - Set static configuration: `"static": { "source": "dist", "spa": true }`.
 
-- [ ] **Step 4: Create `index.html`**
+- [x] **Step 4: Create `index.html`**
   - Set viewport meta with `viewport-fit=cover`.
   - Include Telegram WebApp script: `<script src="https://telegram.org/js/telegram-web-app.js"></script>`.
   - Mount root `#root` and load `/src/main.jsx`.
 
-- [ ] **Step 5: Verify build toolchain**
+- [x] **Step 5: Verify build toolchain**
   - Run: `npm install`
   - Expected: Clean install with zero errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
   ```bash
   git add package.json vite.config.js tgcloud.jsonc index.html
   git commit -m "chore: scaffold react mini app toolchain and tgcloud config"
