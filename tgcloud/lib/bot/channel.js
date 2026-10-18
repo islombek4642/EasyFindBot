@@ -75,7 +75,8 @@ export async function closeChannelPost(api, vacancy, lang = 'uz') {
 
   try {
     const salaryText = formatSalary(vacancy, lang);
-    const closedHeader = `🚫 <b>${escapeHtml(t(lang, 'channel.closed_header') || 'VAKANSIYA YOPILGAN')}</b>\n<i>${escapeHtml(t(lang, 'channel.closed_sub') || '(Qabul to\'xtatildi)')}</i>`;
+    const rawHeader = t(lang, 'channel.closed_header') || '🚫 VAKANSIYA YOPILGAN';
+    const closedHeader = `<b>${escapeHtml(rawHeader)}</b>\n<i>${escapeHtml(t(lang, 'channel.closed_sub') || '(Qabul to\'xtatildi)')}</i>`;
 
     const text =
       `${closedHeader}\n\n` +
@@ -84,8 +85,7 @@ export async function closeChannelPost(api, vacancy, lang = 'uz') {
       `📂 <b>${escapeHtml(t(lang, 'channel.category'))}:</b> #${escapeHtml(vacancy.category)}\n` +
       `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
       `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
-      `🔒 <i>${escapeHtml(t(lang, 'channel.closed_note') || 'Ushbu vakansiya bo\'yicha arizalar qabuli yakunlangan.')}</i>\n\n` +
-      `${escapeHtml(t(lang, 'channel.footer'))}`;
+      `🔒 <i>${escapeHtml(t(lang, 'channel.closed_note') || 'Ushbu vakansiya bo\'yicha arizalar qabuli yakunlangan.')}</i>`;
 
     await api.editMessageText({
       chat_id: channelId,
