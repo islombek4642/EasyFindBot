@@ -49,8 +49,24 @@ export default async function (input, ctx) {
           resumeData = await db.select().from(resumes).where(eq(resumes.seekerTgId, app.seekerTgId)).get();
         }
 
+        const createdMs =
+          app.createdAt instanceof Date
+            ? app.createdAt.getTime()
+            : (typeof app.createdAt === 'number'
+                ? (app.createdAt < 1e11 ? app.createdAt * 1000 : app.createdAt)
+                : Date.now());
+
+        const updatedMs =
+          app.updatedAt instanceof Date
+            ? app.updatedAt.getTime()
+            : (typeof app.updatedAt === 'number'
+                ? (app.updatedAt < 1e11 ? app.updatedAt * 1000 : app.updatedAt)
+                : createdMs);
+
         return {
           ...app,
+          createdAt: createdMs,
+          updatedAt: updatedMs,
           user: candidateUser || null,
           resume: resumeData || null,
         };

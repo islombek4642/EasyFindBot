@@ -10,13 +10,6 @@ export default async function (input, ctx) {
   }
 
   try {
-    try {
-      await db.update(applications)
-        .set({ createdAt: sql`(unixepoch())` })
-        .where(isNull(applications.createdAt))
-        .run();
-    } catch (_) {}
-
     const list = await db.select()
       .from(applications)
       .where(eq(applications.seekerTgId, seekerTgId))
@@ -40,9 +33,24 @@ export default async function (input, ctx) {
           .where(eq(vacancies.id, app.vacancyId))
           .get();
 
+        const createdMs =
+          app.createdAt instanceof Date
+            ? app.createdAt.getTime()
+            : (typeof app.createdAt === 'number'
+                ? (app.createdAt < 1e11 ? app.createdAt * 1000 : app.createdAt)
+                : Date.now());
+
+        const updatedMs =
+          app.updatedAt instanceof Date
+            ? app.updatedAt.getTime()
+            : (typeof app.updatedAt === 'number'
+                ? (app.updatedAt < 1e11 ? app.updatedAt * 1000 : app.updatedAt)
+                : createdMs);
+
         return {
           ...app,
-          createdAt: app.createdAt || app.updatedAt || Math.floor(Date.now() / 1000),
+          createdAt: createdMs,
+          updatedAt: updatedMs,
           vacancy: vac || null,
         };
       })

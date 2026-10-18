@@ -53,15 +53,21 @@ export function SeekerApplicationsModal({ isOpen, onClose }) {
   const formatDate = (val) => {
     if (!val) return '';
     try {
+      let d = null;
       const num = Number(val);
       if (!isNaN(num) && num > 0) {
         const ms = num < 1e11 ? num * 1000 : num;
-        const d = new Date(ms);
-        return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+        d = new Date(ms);
+      } else if (typeof val === 'string') {
+        d = new Date(val.replace(' ', 'T'));
       }
-      const iso = typeof val === 'string' ? val.replace(' ', 'T') : val;
-      const d = new Date(iso);
-      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+      if (!d || isNaN(d.getTime())) return '';
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      return `${day}.${month}.${year}, ${hours}:${minutes}`;
     } catch {
       return '';
     }
@@ -114,14 +120,14 @@ export function SeekerApplicationsModal({ isOpen, onClose }) {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '0.74rem',
-                    color: 'var(--text-muted)',
+                    gap: '5px',
+                    fontSize: '0.76rem',
+                    color: 'var(--text-tertiary)',
                     borderTop: '1px solid var(--border-card)',
                     paddingTop: '6px',
                   }}
                 >
-                  <Icon icon="solar:calendar-bold" width="13" height="13" />
+                  <Icon icon="solar:clock-circle-bold" width="13" height="13" style={{ color: 'var(--accent-primary)', opacity: 0.85 }} />
                   <span>{formatDate(app.createdAt)}</span>
                 </div>
               )}
