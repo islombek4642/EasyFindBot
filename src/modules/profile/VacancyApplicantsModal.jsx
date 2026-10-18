@@ -132,20 +132,21 @@ export function VacancyApplicantsModal({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div
                         style={{
-                          width: '32px',
-                          height: '32px',
+                          width: '36px',
+                          height: '36px',
                           borderRadius: '50%',
                           background: 'var(--accent-subtle)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           color: 'var(--accent-primary)',
+                          flexShrink: 0,
                         }}
                       >
-                        <Icon icon="solar:user-bold" width="18" height="18" />
+                        <Icon icon="solar:user-bold" width="20" height="20" />
                       </div>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{candidateName}</div>
+                        <div style={{ fontWeight: 600, fontSize: '1rem', lineHeight: 1.3 }}>{candidateName}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
                           ID: #{app.seekerTgId}
                         </div>
@@ -153,7 +154,7 @@ export function VacancyApplicantsModal({
                     </div>
 
                     {candidateUsername && (
-                      <div style={{ marginTop: '4px', marginLeft: '40px' }}>
+                      <div style={{ marginTop: '6px' }}>
                         <a
                           href={`https://t.me/${candidateUsername}`}
                           target="_blank"
@@ -161,24 +162,26 @@ export function VacancyApplicantsModal({
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            fontSize: '0.8rem',
+                            gap: '5px',
+                            fontSize: '0.82rem',
                             color: 'var(--accent-primary)',
                             textDecoration: 'none',
                             background: 'var(--accent-subtle)',
-                            padding: '3px 8px',
-                            borderRadius: '12px',
+                            padding: '4px 10px',
+                            borderRadius: '16px',
                             fontWeight: 500,
+                            border: '1px solid rgba(var(--accent-primary-rgb, 59, 130, 246), 0.25)',
                           }}
                         >
                           <Icon icon="solar:plain-bold" width="13" height="13" />
                           <span>@{candidateUsername}</span>
+                          <Icon icon="solar:arrow-right-up-linear" width="11" height="11" style={{ opacity: 0.7 }} />
                         </a>
                       </div>
                     )}
                   </div>
 
-                  <div>{getStatusBadge(app.status)}</div>
+                  <div style={{ flexShrink: 0 }}>{getStatusBadge(app.status)}</div>
                 </div>
 
                 {/* Resume information if attached */}
@@ -239,42 +242,25 @@ export function VacancyApplicantsModal({
                   </div>
                 )}
 
-                {/* Action Buttons */}
+                {/* Action Buttons: 2 equal-width buttons in one row */}
                 <div
                   style={{
                     display: 'flex',
-                    gap: '8px',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
+                    gap: '10px',
+                    width: '100%',
                     marginTop: '4px',
-                    paddingTop: '8px',
+                    paddingTop: '10px',
                     borderTop: '1px solid var(--border-subtle)',
                   }}
                 >
-                  {candidateUsername && (
-                    <a
-                      href={`https://t.me/${candidateUsername}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        icon="solar:chat-round-dots-bold"
-                      >
-                        {t('profile.contact_candidate')}
-                      </Button>
-                    </a>
-                  )}
-
                   {app.status !== 'rejected' && (
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="md"
                       icon="solar:close-circle-bold"
                       loading={updatingId === app.id}
                       onClick={() => handleUpdateStatus(app.id, 'rejected')}
+                      style={{ flex: 1, justifyContent: 'center' }}
                     >
                       {t('profile.status_reject_btn')}
                     </Button>
@@ -283,10 +269,11 @@ export function VacancyApplicantsModal({
                   {app.status !== 'accepted' && (
                     <Button
                       variant="primary"
-                      size="sm"
+                      size="md"
                       icon="solar:check-circle-bold"
                       loading={updatingId === app.id}
                       onClick={() => handleUpdateStatus(app.id, 'accepted')}
+                      style={{ flex: 1, justifyContent: 'center' }}
                     >
                       {t('profile.status_accept_btn')}
                     </Button>
