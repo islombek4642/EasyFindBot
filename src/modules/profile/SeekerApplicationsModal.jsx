@@ -50,6 +50,23 @@ export function SeekerApplicationsModal({ isOpen, onClose }) {
     }
   };
 
+  const formatDate = (val) => {
+    if (!val) return '';
+    try {
+      const num = Number(val);
+      if (!isNaN(num) && num > 0) {
+        const ms = num < 1e11 ? num * 1000 : num;
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+      }
+      const iso = typeof val === 'string' ? val.replace(' ', 'T') : val;
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+    } catch {
+      return '';
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={t('profile.my_applications')}>
       {loading ? (
@@ -92,20 +109,22 @@ export function SeekerApplicationsModal({ isOpen, onClose }) {
                 </p>
               )}
 
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  fontSize: '0.74rem',
-                  color: 'var(--text-muted)',
-                  borderTop: '1px solid var(--border-card)',
-                  paddingTop: '6px',
-                }}
-              >
-                <Icon icon="solar:calendar-bold" width="13" height="13" />
-                <span>{new Date(app.createdAt).toLocaleDateString()}</span>
-              </div>
+              {formatDate(app.createdAt) && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.74rem',
+                    color: 'var(--text-muted)',
+                    borderTop: '1px solid var(--border-card)',
+                    paddingTop: '6px',
+                  }}
+                >
+                  <Icon icon="solar:calendar-bold" width="13" height="13" />
+                  <span>{formatDate(app.createdAt)}</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

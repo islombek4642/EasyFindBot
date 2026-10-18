@@ -1,5 +1,5 @@
 import { api, db } from 'sdk';
-import { eq, and } from 'sdk/db';
+import { eq, and, sql } from 'sdk/db';
 import { applications, vacancies, users, resumes } from '../schema.js';
 import { t } from '../lib/locales/index.js';
 import { config } from '../lib/config.js';
@@ -90,6 +90,8 @@ export default async function (input, ctx) {
         resumeId,
         coverLetter: input?.coverLetter ? String(input.coverLetter).trim() : null,
         status: 'applied',
+        createdAt: sql`(unixepoch())`,
+        updatedAt: sql`(unixepoch())`,
       })
       .returning()
       .run();

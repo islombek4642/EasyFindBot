@@ -1,5 +1,5 @@
 import { db } from 'sdk';
-import { eq, desc } from 'sdk/db';
+import { eq, desc, isNull, sql } from 'sdk/db';
 import { applications, vacancies } from '../schema.js';
 import { getAuthenticatedUserId } from '../lib/bot/auth.js';
 
@@ -10,6 +10,13 @@ export default async function (input, ctx) {
   }
 
   try {
+    try {
+      await db.update(applications)
+        .set({ createdAt: sql`(unixepoch())` })
+        .where(isNull(applications.createdAt))
+        .run();
+    } catch (_) {}
+
     const list = await db.select()
       .from(applications)
       .where(eq(applications.seekerTgId, seekerTgId))
@@ -35,6 +42,7 @@ export default async function (input, ctx) {
 
         return {
           ...app,
+          createdAt: app.createdAt || app.updatedAt || Math.floor(Date.now() / 1000),
           vacancy: vac || null,
         };
       })
