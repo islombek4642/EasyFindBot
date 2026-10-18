@@ -93,6 +93,8 @@ export default {
     applied_btn: "Вы откликнулись",
     apply_success: "Ваш отклик успешно отправлен!",
     own_vacancy_notice: "Это ваше объявление (нельзя откликнуться самому себе)",
+    closed_notice: "Эта вакансия закрыта (прием новых заявок остановлен)",
+    closed_badge: "Вакансия закрыта",
     cover_letter_placeholder: "Вы можете написать сопроводительное сообщение (необязательно)...",
     details_title: "Детали вакансии",
     company: "Компания",
@@ -167,5 +169,6 @@ export default {
     contact_via_tg: "Написать в Telegram",
     candidate_contacts: "Контакты",
     candidate_message: "Сообщение кандидата",
+    vacancy_closed_applicants_hint: "Эта вакансия закрыта. Вы можете рассмотреть имеющихся кандидатов, принять или отклонить их.",
   },
 };

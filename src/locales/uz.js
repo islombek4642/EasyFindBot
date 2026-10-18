@@ -93,6 +93,8 @@ export default {
     applied_btn: "Ariza topshirilgan",
     apply_success: "Arizangiz muvaffaqiyatli yuborildi!",
     own_vacancy_notice: "Bu siz joylashtirgan e'lon (o'zingizga ariza bera olmaysiz)",
+    closed_notice: "Ushbu vakansiya yopilgan (yangi arizalar qabul qilinmaydi)",
+    closed_badge: "Vakansiya yopilgan",
     cover_letter_placeholder: "Qo'shimcha xabar yoki izoh yozishingiz mumkin (ixtiyoriy)...",
     details_title: "Vakansiya tafsilotlari",
     company: "Kompaniya",
@@ -167,5 +169,6 @@ export default {
     contact_via_tg: "Telegram orqali yozish",
     candidate_contacts: "Aloqa",
     candidate_message: "Nomzod izohi",
+    vacancy_closed_applicants_hint: "Ushbu vakansiya yopilgan. Siz mavjud arizachilarni ko'rib chiqishingiz, ularni qabul qilishingiz yoki rad etishingiz mumkin.",
   },
 };

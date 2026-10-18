@@ -66,3 +66,40 @@ export async function publishToChannel(api, vacancy, lang = 'uz') {
     return null;
   }
 }
+
+export async function closeChannelPost(api, vacancy, lang = 'uz') {
+  const channelId = await getPublicChannelId();
+  if (!channelId || !vacancy.channelMessageId) {
+    return false;
+  }
+
+  try {
+    const salaryText = formatSalary(vacancy, lang);
+    const closedHeader = `🚫 <b>${escapeHtml(t(lang, 'channel.closed_header') || 'VAKANSIYA YOPILGAN')}</b>\n<i>${escapeHtml(t(lang, 'channel.closed_sub') || '(Qabul to\'xtatildi)')}</i>`;
+
+    const text =
+      `${closedHeader}\n\n` +
+      `<s>📌 <b>${escapeHtml(vacancy.title)}</b></s>\n` +
+      `🏢 <b>${escapeHtml(t(lang, 'channel.company'))}:</b> ${escapeHtml(vacancy.companyName)}\n` +
+      `📂 <b>${escapeHtml(t(lang, 'channel.category'))}:</b> #${escapeHtml(vacancy.category)}\n` +
+      `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
+      `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
+      `🔒 <i>${escapeHtml(t(lang, 'channel.closed_note') || 'Ushbu vakansiya bo\'yicha arizalar qabuli yakunlangan.')}</i>\n\n` +
+      `${escapeHtml(t(lang, 'channel.footer'))}`;
+
+    await api.editMessageText({
+      chat_id: channelId,
+      message_id: vacancy.channelMessageId,
+      text,
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [],
+      },
+    });
+    logger.info('lib/bot/channel.js', `Closed vacancy post ${vacancy.channelMessageId} in channel ${channelId}`);
+    return true;
+  } catch (err) {
+    logger.warn('lib/bot/channel.js', `Failed to edit closed channel post ${vacancy.channelMessageId}:`, err);
+    return false;
+  }
+}

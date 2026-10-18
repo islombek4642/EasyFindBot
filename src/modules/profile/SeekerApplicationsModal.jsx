@@ -105,6 +105,21 @@ export function SeekerApplicationsModal({ isOpen, onClose }) {
                       {app.vacancy?.companyName || app.vacancy?.company || app.company}
                     </div>
                   )}
+                  {app.vacancy?.status === 'closed' && (
+                    <div
+                      style={{
+                        marginTop: '4px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.74rem',
+                        color: 'var(--text-tertiary)',
+                      }}
+                    >
+                      <Icon icon="solar:lock-bold" width="12" height="12" />
+                      <span>{t('vacancies.closed_badge')}</span>
+                    </div>
+                  )}
                 </div>
                 {getStatusBadge(app.status)}
               </div>

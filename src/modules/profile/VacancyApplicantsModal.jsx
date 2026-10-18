@@ -97,6 +97,27 @@ export function VacancyApplicantsModal({
       onClose={onClose}
       title={`${t('profile.applicants_title')} (${applicants.length})`}
     >
+      {vacancy?.status === 'closed' && (
+        <div
+          style={{
+            marginBottom: '12px',
+            padding: '10px 14px',
+            borderRadius: 'var(--radius-sm)',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '0.82rem',
+            color: 'var(--danger)',
+            lineHeight: 1.4,
+          }}
+        >
+          <Icon icon="solar:lock-bold" width="16" height="16" style={{ flexShrink: 0 }} />
+          <span>{t('profile.vacancy_closed_applicants_hint')}</span>
+        </div>
+      )}
+
       {loading ? (
         <Skeleton type="card" count={2} />
       ) : applicants.length === 0 ? (

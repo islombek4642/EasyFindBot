@@ -93,6 +93,8 @@ export default {
     applied_btn: "Applied",
     apply_success: "Your application was submitted successfully!",
     own_vacancy_notice: "This is your posting (you cannot apply to your own job)",
+    closed_notice: "This vacancy is closed (applications are no longer accepted)",
+    closed_badge: "Vacancy closed",
     cover_letter_placeholder: "You can write a brief note or message (optional)...",
     details_title: "Vacancy Details",
     company: "Company",
@@ -167,5 +169,6 @@ export default {
     contact_via_tg: "Message on Telegram",
     candidate_contacts: "Contact",
     candidate_message: "Candidate note",
+    vacancy_closed_applicants_hint: "This vacancy is closed. You can review existing applicants, accept or reject them.",
   },
 };

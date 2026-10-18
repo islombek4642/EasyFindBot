@@ -55,7 +55,13 @@ export default async function (input, ctx) {
     const userLang = existingUser?.language || 'uz';
 
     const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
-    if (!vacancy || vacancy.status !== 'approved') {
+    if (!vacancy) {
+      return { success: false, error: t(userLang, 'errors.not_found') };
+    }
+    if (vacancy.status === 'closed') {
+      return { success: false, error: t(userLang, 'errors.vacancy_closed') };
+    }
+    if (vacancy.status !== 'approved') {
       return { success: false, error: t(userLang, 'errors.not_found') };
     }
 

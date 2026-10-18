@@ -12,6 +12,7 @@ export default {
     required_fields: "Заполните все обязательные поля",
     cannot_apply_own: "Вы не можете откликнуться на собственную вакансию",
     duplicate_application: "Вы уже отправили заявку на эту вакансию",
+    vacancy_closed: "Эта вакансия закрыта, прием новых заявок остановлен",
     invalid_input: "Неверные входные данные",
   },
   commands: {
@@ -86,6 +87,9 @@ export default {
   },
   channel: {
     header: "📢 **НОВАЯ ВАКАНСИЯ!**",
+    closed_header: "🚫 ВАКАНСИЯ ЗАКРЫТА",
+    closed_sub: "(Прием заявок остановлен)",
+    closed_note: "Прием откликов на данную вакансию завершен.",
     title: "Должность",
     company: "Компания",
     category: "Сфера",

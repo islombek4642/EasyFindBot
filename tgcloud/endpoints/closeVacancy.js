@@ -1,7 +1,8 @@
-import { db } from 'sdk';
+import { api, db } from 'sdk';
 import { eq, and, sql } from 'sdk/db';
-import { vacancies } from '../schema.js';
+import { vacancies, users } from '../schema.js';
 import { getAuthenticatedUserId } from '../lib/bot/auth.js';
+import { closeChannelPost } from '../lib/bot/channel.js';
 
 export default async function (input, ctx) {
   const employerTgId = getAuthenticatedUserId(ctx, input);
@@ -31,6 +32,17 @@ export default async function (input, ctx) {
       })
       .where(eq(vacancies.id, vacId))
       .run();
+
+    // If published to channel, update channel post to mark as closed and remove apply button
+    if (vacancy.channelMessageId) {
+      try {
+        const empUser = await db.select({ language: users.language })
+          .from(users)
+          .where(eq(users.tgId, employerTgId))
+          .get();
+        await closeChannelPost(api, vacancy, empUser?.language || 'uz');
+      } catch (_) {}
+    }
 
     return { success: true };
   } catch (err) {

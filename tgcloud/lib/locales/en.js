@@ -12,6 +12,7 @@ export default {
     required_fields: "Please fill in all required fields",
     cannot_apply_own: "You cannot apply to your own vacancy",
     duplicate_application: "You have already applied to this vacancy",
+    vacancy_closed: "This vacancy is closed, applications are no longer accepted",
     invalid_input: "Invalid input",
   },
   commands: {
@@ -86,6 +87,9 @@ export default {
   },
   channel: {
     header: "📢 **NEW VACANCY!**",
+    closed_header: "🚫 VACANCY CLOSED",
+    closed_sub: "(Applications closed)",
+    closed_note: "Applications for this vacancy are no longer accepted.",
     title: "Position",
     company: "Company",
     category: "Field",

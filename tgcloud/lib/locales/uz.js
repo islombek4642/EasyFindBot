@@ -12,6 +12,7 @@ export default {
     required_fields: "Barcha majburiy maydonlarni to'ldiring",
     cannot_apply_own: "O'z vakansiyangizga ariza topshira olmaysiz",
     duplicate_application: "Siz ushbu vakansiyaga allaqachon ariza topshirgansiz",
+    vacancy_closed: "Ushbu vakansiya yopilgan, yangi arizalar qabul qilinmaydi",
     invalid_input: "Noto'g'ri ma'lumot kiritildi",
   },
   commands: {
@@ -86,6 +87,9 @@ export default {
   },
   channel: {
     header: "📢 **YANGI VAKANSIYA!**",
+    closed_header: "🚫 VAKANSIYA YOPILGAN",
+    closed_sub: "(Qabul to'xtatildi)",
+    closed_note: "Ushbu vakansiya bo'yicha arizalar qabuli yakunlangan.",
     title: "Lavozim",
     company: "Kompaniya",
     category: "Soha",

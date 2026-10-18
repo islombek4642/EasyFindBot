@@ -115,6 +115,11 @@ export function VacancyDetailModal({
         </div>
 
         <div className="card-meta-row">
+          {vacancy.status === 'closed' && (
+            <Badge variant="danger" icon="solar:lock-bold">
+              {t('statuses.closed')}
+            </Badge>
+          )}
           <Badge variant="primary" icon="solar:widget-bold">
             {t(`categories.${category}`) || category}
           </Badge>
@@ -195,6 +200,26 @@ export function VacancyDetailModal({
             >
               <Icon icon="solar:user-check-bold" width="20" height="20" style={{ color: 'var(--accent-primary)' }} />
               <span>{t('vacancies.own_vacancy_notice')}</span>
+            </div>
+          ) : vacancy.status === 'closed' ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-input)',
+                color: 'var(--text-tertiary)',
+                fontSize: '0.88rem',
+                fontWeight: 500,
+                textAlign: 'center',
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <Icon icon="solar:lock-bold" width="18" height="18" style={{ color: 'var(--text-tertiary)' }} />
+              <span>{t('vacancies.closed_notice')}</span>
             </div>
           ) : hasApplied ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--success)' }}>
