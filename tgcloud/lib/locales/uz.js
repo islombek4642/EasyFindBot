@@ -24,6 +24,7 @@ export default {
     language_updated: "Til muvaffaqiyatli o'zgartirildi!",
     unauthorized: "Sizda ushbu amalni bajarish uchun ruxsat yo'q.",
     already_reviewed: "Ushbu e'lon allaqachon ko'rib chiqilgan.",
+    back: "⬅️ Orqaga",
   },
   keyboard: {
     search_jobs: "🔍 Ish qidirish (Ilova)",

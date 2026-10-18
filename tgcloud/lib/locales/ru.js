@@ -24,6 +24,7 @@ export default {
     language_updated: "Язык успешно изменен!",
     unauthorized: "У вас нет прав для выполнения этого действия.",
     already_reviewed: "Эта вакансия уже была рассмотрена.",
+    back: "⬅️ Назад",
   },
   keyboard: {
     search_jobs: "🔍 Поиск работы (App)",

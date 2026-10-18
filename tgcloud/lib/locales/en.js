@@ -24,6 +24,7 @@ export default {
     language_updated: "Language changed successfully!",
     unauthorized: "You do not have permission to perform this action.",
     already_reviewed: "This vacancy has already been reviewed.",
+    back: "⬅️ Back",
   },
   keyboard: {
     search_jobs: "🔍 Search Jobs (App)",
