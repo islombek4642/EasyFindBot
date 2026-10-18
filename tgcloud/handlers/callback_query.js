@@ -404,23 +404,39 @@ export default async function (callbackQuery, ctx) {
     // 4.2. Admin Stats
     if (data === 'admin:stats') {
       try {
+        const nowSec = Math.floor(Date.now() / 1000);
+        const dayAgoSec = nowSec - 86400;
+        const weekAgoSec = nowSec - 7 * 86400;
+
         const [totalU] = await db.select({ value: count() }).from(users);
+        const [dayU] = await db.select({ value: count() }).from(users).where(sql`(${users.createdAt} >= ${dayAgoSec} OR ${users.createdAt} >= ${dayAgoSec * 1000})`);
+        const [weekU] = await db.select({ value: count() }).from(users).where(sql`(${users.createdAt} >= ${weekAgoSec} OR ${users.createdAt} >= ${weekAgoSec * 1000})`);
         const [seekersU] = await db.select({ value: count() }).from(users).where(eq(users.role, 'seeker'));
         const [employersU] = await db.select({ value: count() }).from(users).where(eq(users.role, 'employer'));
+
         const [totalV] = await db.select({ value: count() }).from(vacancies);
+        const [dayV] = await db.select({ value: count() }).from(vacancies).where(sql`(${vacancies.createdAt} >= ${dayAgoSec} OR ${vacancies.createdAt} >= ${dayAgoSec * 1000})`);
+        const [weekV] = await db.select({ value: count() }).from(vacancies).where(sql`(${vacancies.createdAt} >= ${weekAgoSec} OR ${vacancies.createdAt} >= ${weekAgoSec * 1000})`);
         const [activeV] = await db.select({ value: count() }).from(vacancies).where(eq(vacancies.status, 'approved'));
         const [pendingV] = await db.select({ value: count() }).from(vacancies).where(eq(vacancies.status, 'pending'));
+
         const [totalA] = await db.select({ value: count() }).from(applications);
+        const [dayA] = await db.select({ value: count() }).from(applications).where(sql`(${applications.createdAt} >= ${dayAgoSec} OR ${applications.createdAt} >= ${dayAgoSec * 1000})`);
         const [totalR] = await db.select({ value: count() }).from(resumes);
 
         const statsData = {
           totalUsers: totalU?.value || 0,
+          newUsers24h: dayU?.value || 0,
+          newUsers7d: weekU?.value || 0,
           seekers: seekersU?.value || 0,
           employers: employersU?.value || 0,
           totalVacancies: totalV?.value || 0,
+          newVacancies24h: dayV?.value || 0,
+          newVacancies7d: weekV?.value || 0,
           activeVacancies: activeV?.value || 0,
           pendingVacancies: pendingV?.value || 0,
           totalApplications: totalA?.value || 0,
+          newApplications24h: dayA?.value || 0,
           totalResumes: totalR?.value || 0,
         };
 
@@ -462,6 +478,42 @@ export default async function (callbackQuery, ctx) {
         } catch (err) {
           logger.error('handlers/callback_query.js', 'Error editing admin:channels', err);
         }
+      }
+      return;
+    }
+
+    // 4.31. Test Channel connection (SuperAdmin only)
+    if (data === 'admin:test_channel:public' || data === 'admin:test_channel:moderation') {
+      if (!isUserSuperAdmin(fromId)) {
+        await ack(t(userLang, 'admin.unauthorized_action'), true);
+        return;
+      }
+      const isPublic = data === 'admin:test_channel:public';
+      const channelId = isPublic ? await getPublicChannelId() : await getModerationChannelId();
+
+      if (!channelId) {
+        await ack(t(userLang, 'admin.channels_not_configured'), true);
+        return;
+      }
+
+      try {
+        const testMsg = await api.sendMessage({
+          chat_id: channelId,
+          text: `🧪 <b>${escapeHtml(t(userLang, 'admin.channels_test_msg'))}</b>`,
+          parse_mode: 'HTML',
+        });
+        if (testMsg?.message_id) {
+          try {
+            await api.deleteMessage({ chat_id: channelId, message_id: testMsg.message_id });
+          } catch (e) {
+            // Ignore delete error
+          }
+        }
+        await ack(t(userLang, 'admin.channels_test_success'), true);
+      } catch (err) {
+        logger.warn('handlers/callback_query.js', `Channel test failed for ${channelId}:`, err);
+        const errMsg = err?.description || err?.message || '';
+        await ack(t(userLang, 'admin.channels_test_failed') + (errMsg ? `\n\n(${errMsg})` : ''), true);
       }
       return;
     }

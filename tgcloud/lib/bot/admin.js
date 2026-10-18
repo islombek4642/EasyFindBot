@@ -95,24 +95,31 @@ export function buildRemoveAdminMenu(regularAdmins = [], lang = 'uz') {
 export function buildStatsReport(stats = {}, lang = 'uz') {
   const {
     totalUsers = 0,
+    newUsers24h = 0,
+    newUsers7d = 0,
     seekers = 0,
     employers = 0,
     totalVacancies = 0,
+    newVacancies24h = 0,
+    newVacancies7d = 0,
     activeVacancies = 0,
     pendingVacancies = 0,
     totalApplications = 0,
+    newApplications24h = 0,
     totalResumes = 0,
   } = stats;
 
   const text =
     `${t(lang, 'admin.stats_title')}\n\n` +
     `${t(lang, 'admin.stats_users', { total: totalUsers })}\n` +
+    `${t(lang, 'admin.stats_users_growth', { day: newUsers24h, week: newUsers7d })}\n` +
     `   • ${t(lang, 'admin.stats_seekers')}: ${seekers}\n` +
     `   • ${t(lang, 'admin.stats_employers')}: ${employers}\n\n` +
     `${t(lang, 'admin.stats_vacancies', { total: totalVacancies })}\n` +
+    `${t(lang, 'admin.stats_vacancies_growth', { day: newVacancies24h, week: newVacancies7d })}\n` +
     `   • ${t(lang, 'admin.stats_active')}: ${activeVacancies}\n` +
     `   • ${t(lang, 'admin.stats_pending')}: ${pendingVacancies}\n\n` +
-    `${t(lang, 'admin.stats_applications', { total: totalApplications })}\n` +
+    `${t(lang, 'admin.stats_applications', { total: totalApplications, day: newApplications24h })}\n` +
     `${t(lang, 'admin.stats_resumes', { total: totalResumes })}`;
 
   return {
@@ -135,20 +142,34 @@ export function buildChannelSettingsMenu(modChannel, pubChannel, lang = 'uz') {
     `${t(lang, 'admin.channels_public')} \`${pubChannel || notSpecified}\`\n` +
     `${t(lang, 'admin.channels_moderation')} \`${modChannel || notSpecified}\``;
 
+  const buttons = [
+    [
+      { text: t(lang, 'admin.channels_btn_set_public'), callback_data: "admin:set_channel:public" },
+    ],
+    [
+      { text: t(lang, 'admin.channels_btn_set_mod'), callback_data: "admin:set_channel:moderation" },
+    ],
+  ];
+
+  const testRow = [];
+  if (pubChannel) {
+    testRow.push({ text: t(lang, 'admin.channels_btn_test_public'), callback_data: "admin:test_channel:public" });
+  }
+  if (modChannel) {
+    testRow.push({ text: t(lang, 'admin.channels_btn_test_mod'), callback_data: "admin:test_channel:moderation" });
+  }
+  if (testRow.length > 0) {
+    buttons.push(testRow);
+  }
+
+  buttons.push([
+    { text: t(lang, 'common.back'), callback_data: "admin:menu" },
+  ]);
+
   return {
     text,
     reply_markup: {
-      inline_keyboard: [
-        [
-          { text: t(lang, 'admin.channels_btn_set_public'), callback_data: "admin:set_channel:public" },
-        ],
-        [
-          { text: t(lang, 'admin.channels_btn_set_mod'), callback_data: "admin:set_channel:moderation" },
-        ],
-        [
-          { text: t(lang, 'common.back'), callback_data: "admin:menu" },
-        ],
-      ],
+      inline_keyboard: buttons,
     },
   };
 }
