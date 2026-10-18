@@ -163,5 +163,7 @@ export default {
     no_subscriptions: "Sizda faol obunalar mavjud emas",
     status_accept_btn: "Qabul qilish",
     status_reject_btn: "Rad etish",
+    contact_candidate: "Bog'lanish",
+    candidate_message: "Nomzod izohi",
   },
 };

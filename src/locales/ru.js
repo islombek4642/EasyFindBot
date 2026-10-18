@@ -163,5 +163,7 @@ export default {
     no_subscriptions: "У вас нет активных подписок",
     status_accept_btn: "Принять",
     status_reject_btn: "Отклонить",
+    contact_candidate: "Связаться",
+    candidate_message: "Сообщение кандидата",
   },
 };

@@ -163,5 +163,7 @@ export default {
     no_subscriptions: "No active alert subscriptions",
     status_accept_btn: "Accept",
     status_reject_btn: "Reject",
+    contact_candidate: "Contact",
+    candidate_message: "Candidate note",
   },
 };

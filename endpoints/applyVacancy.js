@@ -4,6 +4,7 @@ import { applications, vacancies, users, resumes } from '../schema.js';
 import { t } from '../lib/locales/index.js';
 import { config } from '../lib/config.js';
 import { getAuthenticatedUserId } from '../lib/bot/auth.js';
+import { escapeHtml } from '../lib/bot/html.js';
 
 export default async function (input, ctx) {
   const tgUser = ctx?.initData?.user;
@@ -18,11 +19,40 @@ export default async function (input, ctx) {
   }
 
   try {
-    const seekerUser = await db.select({ language: users.language })
-      .from(users)
-      .where(eq(users.tgId, seekerTgId))
-      .get();
-    const userLang = seekerUser?.language || 'uz';
+    const existingUser = await db.select().from(users).where(eq(users.tgId, seekerTgId)).get();
+    const candidateFirstName = input?.firstName || tgUser?.first_name || existingUser?.firstName || null;
+    const candidateLastName = input?.lastName || tgUser?.last_name || existingUser?.lastName || null;
+    const candidateUsername = input?.username || tgUser?.username || existingUser?.username || null;
+
+    if (existingUser) {
+      if (
+        (candidateFirstName && candidateFirstName !== existingUser.firstName) ||
+        (candidateLastName && candidateLastName !== existingUser.lastName) ||
+        (candidateUsername && candidateUsername !== existingUser.username)
+      ) {
+        await db.update(users)
+          .set({
+            firstName: candidateFirstName || existingUser.firstName,
+            lastName: candidateLastName || existingUser.lastName,
+            username: candidateUsername || existingUser.username,
+          })
+          .where(eq(users.tgId, seekerTgId))
+          .run();
+      }
+    } else {
+      await db.insert(users)
+        .values({
+          tgId: seekerTgId,
+          firstName: candidateFirstName,
+          lastName: candidateLastName,
+          username: candidateUsername,
+          role: 'seeker',
+          language: 'uz',
+        })
+        .run();
+    }
+
+    const userLang = existingUser?.language || 'uz';
 
     const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
     if (!vacancy || vacancy.status !== 'approved') {
@@ -72,16 +102,16 @@ export default async function (input, ctx) {
         .get();
       const empLang = employerRow?.language || 'uz';
 
-      const candidateName = [input?.firstName || tgUser?.first_name, input?.lastName || tgUser?.last_name].filter(Boolean).join(' ') || input?.username || tgUser?.username || String(seekerTgId);
-      const notifTitle = t(empLang, 'notifier.new_application_title', { title: vacancy.title });
-      const notifBody = t(empLang, 'notifier.new_application_candidate', { name: candidateName });
+      const candidateName = [candidateFirstName, candidateLastName].filter(Boolean).join(' ') || (candidateUsername ? `@${candidateUsername}` : String(seekerTgId));
+      const notifTitle = t(empLang, 'notifier.new_application_title', { title: vacancy.title }).replace(/\*\*/g, '').trim();
+      const notifBody = t(empLang, 'notifier.new_application_candidate', { name: candidateName }).replace(/\*\*/g, '').trim();
       const btnText = t(empLang, 'notifier.new_application_btn');
 
       const appUrl = `https://t.me/${config.botUsername}/app?startapp=my_vacs`;
       await api.sendMessage({
         chat_id: vacancy.employerTgId,
-        text: `${notifTitle}\n\n${notifBody}`,
-        parse_mode: 'Markdown',
+        text: `<b>${escapeHtml(notifTitle)}</b>\n\n${escapeHtml(notifBody)}`,
+        parse_mode: 'HTML',
         reply_markup: {
           inline_keyboard: [
             [{ text: btnText, url: appUrl }],

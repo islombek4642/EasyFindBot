@@ -22,6 +22,7 @@ export function VacancyApplicantsModal({
   const { t } = useTranslation();
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
 
   const fetchApplicants = useCallback(async () => {
     if (!vacancy) return;
@@ -45,12 +46,35 @@ export function VacancyApplicantsModal({
 
   const handleUpdateStatus = async (appId, newStatus) => {
     try {
-      await api.updateApplicationStatus({ id: appId, status: newStatus });
-      setApplicants((prev) =>
-        prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
-      );
+      setUpdatingId(appId);
+      const res = await api.updateApplicationStatus({
+        id: appId,
+        applicationId: appId,
+        status: newStatus,
+      });
+
+      if (res && (res.success || res.ok)) {
+        setApplicants((prev) =>
+          prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
+        );
+      } else {
+        const errorMsg = res?.error || t('common.error');
+        if (typeof window !== 'undefined' && window.Telegram?.WebApp?.showAlert) {
+          window.Telegram.WebApp.showAlert(errorMsg);
+        } else {
+          alert(errorMsg);
+        }
+      }
     } catch (err) {
       console.error('Failed to update applicant status:', err);
+      const errorMsg = err.message || t('common.error');
+      if (typeof window !== 'undefined' && window.Telegram?.WebApp?.showAlert) {
+        window.Telegram.WebApp.showAlert(errorMsg);
+      } else {
+        alert(errorMsg);
+      }
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -81,64 +105,196 @@ export function VacancyApplicantsModal({
           title={t('profile.no_applicants')}
         />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {applicants.map((app) => (
-            <div
-              key={app.id}
-              className="glass-card"
-              style={{
-                padding: '14px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Icon icon="solar:user-bold" width="18" height="18" style={{ color: 'var(--accent-primary)' }} />
-                  <span style={{ fontWeight: 600 }}>Nomzod #{app.seekerTgId}</span>
-                </div>
-                {getStatusBadge(app.status)}
-              </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {applicants.map((app) => {
+            const candidateName =
+              [app.user?.firstName, app.user?.lastName].filter(Boolean).join(' ') ||
+              `Nomzod #${app.seekerTgId}`;
+            const candidateUsername = app.user?.username;
 
-              {app.coverLetter && (
+            return (
+              <div
+                key={app.id}
+                className="glass-card"
+                style={{
+                  padding: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-card)',
+                }}
+              >
+                {/* Candidate Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: 'var(--accent-subtle)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'var(--accent-primary)',
+                        }}
+                      >
+                        <Icon icon="solar:user-bold" width="18" height="18" />
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{candidateName}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                          ID: #{app.seekerTgId}
+                        </div>
+                      </div>
+                    </div>
+
+                    {candidateUsername && (
+                      <div style={{ marginTop: '4px', marginLeft: '40px' }}>
+                        <a
+                          href={`https://t.me/${candidateUsername}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '0.8rem',
+                            color: 'var(--accent-primary)',
+                            textDecoration: 'none',
+                            background: 'var(--accent-subtle)',
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            fontWeight: 500,
+                          }}
+                        >
+                          <Icon icon="solar:plain-bold" width="13" height="13" />
+                          <span>@{candidateUsername}</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>{getStatusBadge(app.status)}</div>
+                </div>
+
+                {/* Resume information if attached */}
+                {app.resume && (
+                  <div
+                    style={{
+                      background: 'var(--bg-input)',
+                      padding: '10px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      fontSize: '0.85rem',
+                      borderLeft: '3px solid var(--accent-primary)',
+                    }}
+                  >
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                      {app.resume.title}
+                    </div>
+                    {app.resume.skills && (
+                      <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                        {app.resume.skills}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Candidate Cover Letter / Note */}
+                {app.coverLetter && (
+                  <div
+                    style={{
+                      background: 'var(--bg-input)',
+                      padding: '10px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.85rem',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        color: 'var(--text-tertiary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      <Icon icon="solar:chat-round-line-bold" width="14" height="14" />
+                      <span>{t('profile.candidate_message')}</span>
+                    </div>
+                    <div style={{ lineHeight: 1.4 }}>{app.coverLetter}</div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
                 <div
                   style={{
-                    background: 'var(--bg-input)',
-                    padding: '10px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.85rem',
-                    color: 'var(--text-secondary)',
+                    display: 'flex',
+                    gap: '8px',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                    marginTop: '4px',
+                    paddingTop: '8px',
+                    borderTop: '1px solid var(--border-subtle)',
                   }}
                 >
-                  {app.coverLetter}
-                </div>
-              )}
+                  {candidateUsername && (
+                    <a
+                      href={`https://t.me/${candidateUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        icon="solar:chat-round-dots-bold"
+                      >
+                        {t('profile.contact_candidate')}
+                      </Button>
+                    </a>
+                  )}
 
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
-                {app.status !== 'rejected' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    icon="solar:close-circle-bold"
-                    onClick={() => handleUpdateStatus(app.id, 'rejected')}
-                  >
-                    {t('profile.status_reject_btn')}
-                  </Button>
-                )}
-                {app.status !== 'accepted' && (
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    icon="solar:check-circle-bold"
-                    onClick={() => handleUpdateStatus(app.id, 'accepted')}
-                  >
-                    {t('profile.status_accept_btn')}
-                  </Button>
-                )}
+                  {app.status !== 'rejected' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      icon="solar:close-circle-bold"
+                      loading={updatingId === app.id}
+                      onClick={() => handleUpdateStatus(app.id, 'rejected')}
+                    >
+                      {t('profile.status_reject_btn')}
+                    </Button>
+                  )}
+
+                  {app.status !== 'accepted' && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      icon="solar:check-circle-bold"
+                      loading={updatingId === app.id}
+                      onClick={() => handleUpdateStatus(app.id, 'accepted')}
+                    >
+                      {t('profile.status_accept_btn')}
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </Modal>

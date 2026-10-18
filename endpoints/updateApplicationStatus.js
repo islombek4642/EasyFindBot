@@ -4,6 +4,8 @@ import { applications, vacancies, users } from '../schema.js';
 import { APPLICATION_STATUSES } from '../lib/constants/statuses.js';
 import { t } from '../lib/locales/index.js';
 import { getAuthenticatedUserId } from '../lib/bot/auth.js';
+import { escapeHtml } from '../lib/bot/html.js';
+import { logger } from '../lib/logger.js';
 
 export default async function (input, ctx) {
   const employerTgId = getAuthenticatedUserId(ctx, input);
@@ -11,8 +13,8 @@ export default async function (input, ctx) {
     return { success: false, error: 'ERR_UNAUTHORIZED' };
   }
 
-  const { applicationId, status } = input || {};
-  const appId = parseInt(applicationId, 10);
+  const { status } = input || {};
+  const appId = parseInt(input?.applicationId || input?.id, 10);
 
   if (!appId || !Object.values(APPLICATION_STATUSES).includes(status)) {
     return { success: false, error: 'ERR_INVALID_INPUT' };
@@ -47,39 +49,43 @@ export default async function (input, ctx) {
           .get();
 
         const lang = candidateUser?.language || 'uz';
-        let alertMsg = "";
+        let alertMsg = '';
 
         if (status === 'accepted') {
-          const title = t(lang, 'notifier.app_accepted_title');
+          const title = t(lang, 'notifier.app_accepted_title').replace(/\*\*/g, '').trim();
           const desc = t(lang, 'notifier.app_accepted_desc', {
             company: vacancy.companyName,
             title: vacancy.title,
             contacts: vacancy.contacts,
-          });
-          alertMsg = `${title}\n\n${desc}`;
+          }).replace(/\*\*/g, '');
+
+          alertMsg = `<b>${escapeHtml(title)}</b>\n\n${escapeHtml(desc)}`;
         } else if (status === 'rejected') {
-          const title = t(lang, 'notifier.app_rejected_title');
+          const title = t(lang, 'notifier.app_rejected_title').replace(/\*\*/g, '').trim();
           const desc = t(lang, 'notifier.app_rejected_desc', {
             company: vacancy.companyName,
             title: vacancy.title,
-          });
-          alertMsg = `${title}\n\n${desc}`;
+          }).replace(/\*\*/g, '');
+
+          alertMsg = `<b>${escapeHtml(title)}</b>\n\n${escapeHtml(desc)}`;
         }
 
         if (alertMsg) {
           await api.sendMessage({
             chat_id: application.seekerTgId,
             text: alertMsg,
-            parse_mode: 'Markdown',
+            parse_mode: 'HTML',
           });
+          logger.info('endpoints/updateApplicationStatus.js', `Sent status ${status} notification to seeker ${application.seekerTgId}`);
         }
       } catch (e) {
-        // Ignore candidate notification error
+        logger.warn('endpoints/updateApplicationStatus.js', 'Candidate notification error', e);
       }
     }
 
     return { success: true };
   } catch (err) {
+    logger.error('endpoints/updateApplicationStatus.js', 'Error updating application status', err);
     return { success: false, error: err.message };
   }
 }
