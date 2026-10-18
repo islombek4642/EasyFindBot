@@ -1,5 +1,5 @@
 import { api, db } from 'sdk';
-import { eq, sql, count } from 'sdk/db';
+import { eq, sql, count, asc } from 'sdk/db';
 import { users, vacancies, applications, resumes } from '../schema.js';
 import { isUserAdmin, isUserSuperAdmin } from '../lib/bot/auth.js';
 import { config } from '../lib/config.js';
@@ -10,7 +10,7 @@ import {
   buildManageAdminsMenu,
   buildRemoveAdminMenu,
 } from '../lib/bot/admin.js';
-import { buildModerationCard } from '../lib/bot/moderator.js';
+import { buildModerationCard, buildRejectReasonsMenu } from '../lib/bot/moderator.js';
 import { publishToChannel } from '../lib/bot/channel.js';
 import { notifyEmployer, notifySubscribers } from '../lib/bot/notifier.js';
 import { getModerationChannelId, getPublicChannelId, setSetting, deleteSetting } from '../lib/bot/settings.js';
@@ -55,6 +55,49 @@ export default async function (callbackQuery, ctx) {
     }
   };
 
+  // Helper to render moderation queue step in-place
+  const renderQueueStep = async (targetIdx = 0, isEmptyInitial = false) => {
+    const remaining = await db.select()
+      .from(vacancies)
+      .where(eq(vacancies.status, 'pending'))
+      .orderBy(asc(vacancies.createdAt))
+      .all();
+
+    if (!remaining || remaining.length === 0) {
+      if (chatId && messageId) {
+        const emptyMsg = isEmptyInitial ? t(userLang, 'admin.queue_empty') : t(userLang, 'admin.queue_all_done');
+        await api.editMessageText({
+          chat_id: chatId,
+          message_id: messageId,
+          text: mdToHtml(emptyMsg),
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: t(userLang, 'commands.back'), callback_data: 'admin:menu' }],
+            ],
+          },
+        });
+      }
+      return;
+    }
+
+    const safeIdx = Math.max(0, Math.min(targetIdx, remaining.length - 1));
+    const card = buildModerationCard(remaining[safeIdx], userLang, { index: safeIdx, total: remaining.length });
+    if (chatId && messageId) {
+      try {
+        await api.editMessageText({
+          chat_id: chatId,
+          message_id: messageId,
+          text: card.text,
+          parse_mode: 'HTML',
+          reply_markup: card.reply_markup,
+        });
+      } catch (err) {
+        logger.error('handlers/callback_query.js', 'Error editing message in renderQueueStep', err);
+      }
+    }
+  };
+
   // 2. Language Switch: set_lang:<lang>
   if (data.startsWith('set_lang:')) {
     const newLang = data.split(':')[1] || 'uz';
@@ -83,10 +126,182 @@ export default async function (callbackQuery, ctx) {
     return;
   }
 
-  // 3. Moderation Actions: mod_approve:<id> or mod_reject:<id>
-  if (data.startsWith('mod_approve:') || data.startsWith('mod_reject:')) {
-    const isApproved = data.startsWith('mod_approve:');
+  // 2.1 Noop pagination callback
+  if (data === 'noop') {
+    await ack();
+    return;
+  }
+
+  // 2.2 Cancel channel reject prompt
+  if (data.startsWith('mod_cancel_reject:')) {
     const vacId = parseInt(data.split(':')[1], 10);
+    const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
+    if (vacancy && vacancy.status === 'pending') {
+      const card = buildModerationCard(vacancy, userLang);
+      if (chatId && messageId) {
+        await api.editMessageText({
+          chat_id: chatId,
+          message_id: messageId,
+          text: card.text,
+          parse_mode: 'HTML',
+          reply_markup: card.reply_markup,
+        });
+      }
+    }
+    await ack();
+    return;
+  }
+
+  // 2.3 Reject reasons prompt in queue
+  if (data.startsWith('mod_reject_prompt:')) {
+    const isAdmin = await isUserAdmin(fromId);
+    if (!isAdmin) {
+      await ack(t(userLang, 'commands.unauthorized'), true);
+      return;
+    }
+    const parts = data.split(':');
+    const vacId = parseInt(parts[1], 10);
+    const queueIdx = parseInt(parts[2] || '0', 10);
+    const menu = buildRejectReasonsMenu(vacId, queueIdx, userLang);
+    if (chatId && messageId) {
+      await api.editMessageText({
+        chat_id: chatId,
+        message_id: messageId,
+        text: mdToHtml(menu.text),
+        parse_mode: 'HTML',
+        reply_markup: menu.reply_markup,
+      });
+    }
+    await ack();
+    return;
+  }
+
+  // 2.4 Prompt for custom rejection reason
+  if (data.startsWith('mod_reject_custom:')) {
+    const isAdmin = await isUserAdmin(fromId);
+    if (!isAdmin) {
+      await ack(t(userLang, 'commands.unauthorized'), true);
+      return;
+    }
+    const parts = data.split(':');
+    const vacId = parseInt(parts[1], 10);
+    const queueIdx = parseInt(parts[2] || '0', 10);
+    await setSetting(`pending_action_${fromId}`, `custom_reject:${vacId}:${queueIdx}`);
+    if (chatId && messageId) {
+      await api.editMessageText({
+        chat_id: chatId,
+        message_id: messageId,
+        text: mdToHtml(t(userLang, 'moderation.prompt_custom_reason')),
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: t(userLang, 'admin.btn_cancel'), callback_data: `admin:queue:${queueIdx}` }],
+          ],
+        },
+      });
+    }
+    await ack();
+    return;
+  }
+
+  // 2.5 Submit selected rejection reason
+  if (data.startsWith('mod_reject_reason:')) {
+    const isAdmin = await isUserAdmin(fromId);
+    if (!isAdmin) {
+      await ack(t(userLang, 'commands.unauthorized'), true);
+      return;
+    }
+    const parts = data.split(':');
+    const vacId = parseInt(parts[1], 10);
+    const queueCtx = parts[2];
+    const reasonKey = parts[3];
+
+    const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
+    if (!vacancy || vacancy.status !== 'pending') {
+      await ack(t(userLang, 'commands.already_reviewed'), true);
+      if (queueCtx !== 'channel') {
+        await renderQueueStep(parseInt(queueCtx, 10) || 0);
+      }
+      return;
+    }
+
+    let employerLang = 'uz';
+    try {
+      const empUser = await db.select({ language: users.language }).from(users).where(eq(users.tgId, vacancy.employerTgId)).get();
+      if (empUser?.language) employerLang = empUser.language;
+    } catch (e) {}
+
+    const reasonText = t(employerLang, `moderation.reason_${reasonKey}`);
+
+    await db.update(vacancies)
+      .set({
+        status: 'rejected',
+        rejectionReason: reasonText,
+        moderatedByTgId: Number(fromId),
+        updatedAt: sql`(unixepoch())`,
+      })
+      .where(eq(vacancies.id, vacId))
+      .run();
+
+    await ack(t(userLang, 'moderation.status_rejected'));
+
+    const moderatorUsername = callbackQuery.from?.username || fromId;
+    const nowIso = new Date().toISOString();
+
+    await notifyEmployer(api, vacancy.employerTgId, vacancy, 'rejected', reasonText);
+
+    if (queueCtx === 'channel') {
+      if (chatId && messageId) {
+        const rejectedTag =
+          `\n\n<b>${escapeHtml(t(userLang, 'moderation.status_rejected'))}</b>\n` +
+          `👤 ${escapeHtml(t(userLang, 'moderation.moderator'))}: @${escapeHtml(moderatorUsername)}\n` +
+          `⏰ ${escapeHtml(t(userLang, 'moderation.time'))}: ${nowIso}\n` +
+          `⚠️ <b>${escapeHtml(t(userLang, 'notifier.emp_rejected_reason').replace(/\*\*/g, '').replace(/⚠️\s*/g, ''))}</b> ${escapeHtml(reasonText)}`;
+
+        try {
+          await api.editMessageText({
+            chat_id: chatId,
+            message_id: messageId,
+            text: (msg?.text || '') + rejectedTag,
+            parse_mode: 'HTML',
+          });
+        } catch (e) {
+          logger.warn('handlers/callback_query.js', 'Could not edit channel message on reject', e);
+        }
+      }
+    } else {
+      await renderQueueStep(parseInt(queueCtx, 10) || 0);
+    }
+    return;
+  }
+
+  // 2.6 Reject triggered from channel without reason yet
+  if (data.startsWith('mod_reject:')) {
+    const isAdmin = await isUserAdmin(fromId);
+    if (!isAdmin) {
+      await ack(t(userLang, 'commands.unauthorized'), true);
+      return;
+    }
+    const vacId = parseInt(data.split(':')[1], 10);
+    const menu = buildRejectReasonsMenu(vacId, 'channel', userLang);
+    if (chatId && messageId) {
+      await api.editMessageText({
+        chat_id: chatId,
+        message_id: messageId,
+        text: mdToHtml(menu.text),
+        parse_mode: 'HTML',
+        reply_markup: menu.reply_markup,
+      });
+    }
+    await ack();
+    return;
+  }
+
+  // 3. Moderation Approval: mod_approve:<id> or mod_approve:<id>:<idx>
+  if (data.startsWith('mod_approve:')) {
+    const parts = data.split(':');
+    const vacId = parseInt(parts[1], 10);
+    const queueIdxStr = parts[2];
 
     const isAdmin = await isUserAdmin(fromId);
     if (!isAdmin) {
@@ -98,25 +313,28 @@ export default async function (callbackQuery, ctx) {
     const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
     if (!vacancy || vacancy.status !== 'pending') {
       await ack(t(userLang, 'commands.already_reviewed'), true);
+      if (queueIdxStr !== undefined) {
+        await renderQueueStep(parseInt(queueIdxStr, 10) || 0);
+      }
       return;
     }
 
     const moderatorUsername = callbackQuery.from?.username || fromId;
     const nowIso = new Date().toISOString();
 
-    if (isApproved) {
-      await db.update(vacancies)
-        .set({
-          status: 'approved',
-          moderatedByTgId: Number(fromId),
-          updatedAt: sql`(unixepoch())`,
-        })
-        .where(eq(vacancies.id, vacId))
-        .run();
+    await db.update(vacancies)
+      .set({
+        status: 'approved',
+        moderatedByTgId: Number(fromId),
+        updatedAt: sql`(unixepoch())`,
+      })
+      .where(eq(vacancies.id, vacId))
+      .run();
 
-      await ack(t(userLang, 'moderation.status_approved'));
+    await ack(t(userLang, 'moderation.status_approved'));
 
-      // Edit moderation message in place (removes buttons, appends approval record)
+    if (queueIdxStr === undefined) {
+      // Edit moderation message in channel (removes buttons, appends approval record)
       if (chatId && messageId) {
         const approvedTag =
           `\n\n<b>${escapeHtml(t(userLang, 'moderation.status_approved'))}</b>\n` +
@@ -134,51 +352,22 @@ export default async function (callbackQuery, ctx) {
           logger.warn('handlers/callback_query.js', 'Could not edit moderation message', e);
         }
       }
-
-      // Publish to public channel & send notifications
-      const channelMsgId = await publishToChannel(api, vacancy, userLang);
-      if (channelMsgId) {
-        await db.update(vacancies)
-          .set({ channelMessageId: channelMsgId })
-          .where(eq(vacancies.id, vacId))
-          .run();
-      }
-
-      await notifyEmployer(api, vacancy.employerTgId, vacancy, 'approved');
-      await notifySubscribers(api, vacancy);
     } else {
+      // In bot admin queue: automatically advance to next pending vacancy
+      await renderQueueStep(parseInt(queueIdxStr, 10) || 0);
+    }
+
+    // Publish to public channel & send notifications
+    const channelMsgId = await publishToChannel(api, vacancy, userLang);
+    if (channelMsgId) {
       await db.update(vacancies)
-        .set({
-          status: 'rejected',
-          moderatedByTgId: Number(fromId),
-          updatedAt: sql`(unixepoch())`,
-        })
+        .set({ channelMessageId: channelMsgId })
         .where(eq(vacancies.id, vacId))
         .run();
-
-      await ack(t(userLang, 'moderation.status_rejected'));
-
-      // Edit moderation message in place
-      if (chatId && messageId) {
-        const rejectedTag =
-          `\n\n<b>${escapeHtml(t(userLang, 'moderation.status_rejected'))}</b>\n` +
-          `👤 ${escapeHtml(t(userLang, 'moderation.moderator'))}: @${escapeHtml(moderatorUsername)}\n` +
-          `⏰ ${escapeHtml(t(userLang, 'moderation.time'))}: ${nowIso}`;
-
-        try {
-          await api.editMessageText({
-            chat_id: chatId,
-            message_id: messageId,
-            text: (msg?.text || '') + rejectedTag,
-            parse_mode: 'HTML',
-          });
-        } catch (e) {
-          logger.warn('handlers/callback_query.js', 'Could not edit moderation message', e);
-        }
-      }
-
-      await notifyEmployer(api, vacancy.employerTgId, vacancy, 'rejected');
     }
+
+    await notifyEmployer(api, vacancy.employerTgId, vacancy, 'approved');
+    await notifySubscribers(api, vacancy);
     return;
   }
 
@@ -313,49 +502,13 @@ export default async function (callbackQuery, ctx) {
     }
 
     // 4.5. Moderation Queue from Bot Admin Panel
-    if (data === 'admin:queue') {
-      const pendingList = await db.select()
-        .from(vacancies)
-        .where(eq(vacancies.status, 'pending'))
-        .all();
-
-      if (!pendingList || pendingList.length === 0) {
-        if (chatId && messageId) {
-          await api.editMessageText({
-            chat_id: chatId,
-            message_id: messageId,
-            text: escapeHtml(t(userLang, 'admin.queue_empty')),
-            parse_mode: 'HTML',
-            reply_markup: {
-              inline_keyboard: [
-                [{ text: t(userLang, 'common.back'), callback_data: 'admin:menu' }],
-              ],
-            },
-          });
-        }
-        return;
+    if (data === 'admin:queue' || data.startsWith('admin:queue:')) {
+      let idx = 0;
+      const isInitial = data === 'admin:queue';
+      if (data.startsWith('admin:queue:')) {
+        idx = parseInt(data.split(':')[2], 10) || 0;
       }
-
-      // Display the first pending vacancy card with review buttons
-      const firstVacancy = pendingList[0];
-      const card = buildModerationCard(firstVacancy, userLang);
-      card.reply_markup.inline_keyboard.push([
-        { text: t(userLang, 'common.back'), callback_data: 'admin:menu' },
-      ]);
-
-      if (chatId && messageId) {
-        try {
-          await api.editMessageText({
-            chat_id: chatId,
-            message_id: messageId,
-            text: card.text,
-            parse_mode: 'HTML',
-            reply_markup: card.reply_markup,
-          });
-        } catch (err) {
-          logger.error('handlers/callback_query.js', 'Error editing message for admin queue', err);
-        }
-      }
+      await renderQueueStep(idx, isInitial);
       return;
     }
 

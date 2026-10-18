@@ -1,9 +1,11 @@
 import { api, db } from 'sdk';
-import { eq, sql } from 'sdk/db';
+import { eq, sql, asc } from 'sdk/db';
 import { users, vacancies } from '../schema.js';
 import { config } from '../lib/config.js';
 import { isUserAdmin, isUserSuperAdmin } from '../lib/bot/auth.js';
 import { buildAdminPanelMenu } from '../lib/bot/admin.js';
+import { buildModerationCard } from '../lib/bot/moderator.js';
+import { notifyEmployer } from '../lib/bot/notifier.js';
 import { getSetting, setSetting, normalizeChannelId } from '../lib/bot/settings.js';
 import { mdToHtml } from '../lib/bot/html.js';
 import { t } from '../lib/locales/index.js';
@@ -159,6 +161,93 @@ export default async function (message, ctx) {
           text: t(userLang, 'admin.channel_updated'),
           reply_markup: replyKeyboard,
         });
+        return;
+      } else if (pendingAction.startsWith('custom_reject:')) {
+        const parts = pendingAction.split(':');
+        const vacId = parseInt(parts[1], 10);
+        const queueIdx = parseInt(parts[2] || '0', 10);
+        await setSetting(`pending_action_${userId}`, '');
+
+        const raw = text.trim();
+        // Check cancel
+        if (
+          raw.toLowerCase() === 'bekor qilish' ||
+          raw.toLowerCase() === 'cancel' ||
+          raw.toLowerCase() === 'отмена' ||
+          raw.includes('Bekor') ||
+          raw.includes('Отмена')
+        ) {
+          const remaining = await db.select()
+            .from(vacancies)
+            .where(eq(vacancies.status, 'pending'))
+            .orderBy(asc(vacancies.createdAt))
+            .all();
+          if (!remaining || remaining.length === 0) {
+            await api.sendMessage({
+              chat_id: chatId,
+              text: mdToHtml(t(userLang, 'admin.queue_empty')),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: [
+                  [{ text: t(userLang, 'commands.back'), callback_data: 'admin:menu' }],
+                ],
+              },
+            });
+          } else {
+            const safeIdx = Math.max(0, Math.min(queueIdx, remaining.length - 1));
+            const card = buildModerationCard(remaining[safeIdx], userLang, { index: safeIdx, total: remaining.length });
+            await api.sendMessage({
+              chat_id: chatId,
+              text: card.text,
+              parse_mode: 'HTML',
+              reply_markup: card.reply_markup,
+            });
+          }
+          return;
+        }
+
+        const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
+        if (vacancy && vacancy.status === 'pending') {
+          await db.update(vacancies)
+            .set({
+              status: 'rejected',
+              rejectionReason: raw,
+              moderatedByTgId: Number(userId),
+              updatedAt: sql`(unixepoch())`,
+            })
+            .where(eq(vacancies.id, vacId))
+            .run();
+
+          await notifyEmployer(api, vacancy.employerTgId, vacancy, 'rejected', raw);
+        }
+
+        const remaining = await db.select()
+          .from(vacancies)
+          .where(eq(vacancies.status, 'pending'))
+          .orderBy(asc(vacancies.createdAt))
+          .all();
+
+        if (!remaining || remaining.length === 0) {
+          await api.sendMessage({
+            chat_id: chatId,
+            text: mdToHtml(t(userLang, 'admin.queue_all_done')),
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: t(userLang, 'commands.back'), callback_data: 'admin:menu' }],
+              ],
+            },
+          });
+        } else {
+          const safeIdx = Math.max(0, Math.min(queueIdx, remaining.length - 1));
+          const card = buildModerationCard(remaining[safeIdx], userLang, { index: safeIdx, total: remaining.length });
+          await api.sendMessage({
+            chat_id: chatId,
+            text: card.text,
+            parse_mode: 'HTML',
+            reply_markup: card.reply_markup,
+          });
+        }
         return;
       } else if (pendingAction === 'add_admin') {
         const isSuper = isUserSuperAdmin(userId);
