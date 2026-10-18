@@ -26,8 +26,8 @@ export function buildModerationCard(vacancy, lang = 'uz') {
     `📍 <b>${escapeHtml(t(lang, 'moderation.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
     `⏱️ <b>${escapeHtml(t(lang, 'moderation.employment_type'))}:</b> ${escapeHtml(vacancy.employmentType)}\n` +
     `💰 <b>${escapeHtml(t(lang, 'moderation.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
-    `📝 <b>${escapeHtml(t(lang, 'moderation.description'))}:</b>\n${escapeHtml(vacancy.description)}\n\n` +
-    (vacancy.requirements ? `🎯 <b>${escapeHtml(t(lang, 'moderation.requirements'))}:</b>\n${escapeHtml(vacancy.requirements)}\n\n` : '') +
+    `📝 <b>${escapeHtml(t(lang, 'moderation.description'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.description)}</blockquote>\n\n` +
+    (vacancy.requirements ? `🎯 <b>${escapeHtml(t(lang, 'moderation.requirements'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.requirements)}</blockquote>\n\n` : '') +
     `📞 <b>${escapeHtml(t(lang, 'moderation.contacts'))}:</b> ${escapeHtml(vacancy.contacts)}\n` +
     `👤 <b>${escapeHtml(t(lang, 'moderation.employer_id'))}:</b> <code>${escapeHtml(vacancy.employerTgId)}</code>\n` +
     `🆔 <b>${escapeHtml(t(lang, 'moderation.vacancy_id'))}:</b> <code>${escapeHtml(vacancy.id)}</code>`;

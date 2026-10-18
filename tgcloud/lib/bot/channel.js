@@ -26,8 +26,8 @@ export function formatChannelPost(vacancy, lang = 'uz') {
     `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
     `⏱️ <b>${escapeHtml(t(lang, 'channel.employment_type'))}:</b> ${escapeHtml(vacancy.employmentType)}\n` +
     `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
-    `📝 <b>${escapeHtml(t(lang, 'channel.description'))}:</b>\n${escapeHtml(vacancy.description)}\n\n` +
-    (vacancy.requirements ? `🎯 <b>${escapeHtml(t(lang, 'channel.requirements'))}:</b>\n${escapeHtml(vacancy.requirements)}\n\n` : '') +
+    `📝 <b>${escapeHtml(t(lang, 'channel.description'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.description)}</blockquote>\n\n` +
+    (vacancy.requirements ? `🎯 <b>${escapeHtml(t(lang, 'channel.requirements'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.requirements)}</blockquote>\n\n` : '') +
     `📞 <b>${escapeHtml(t(lang, 'channel.contacts'))}:</b> ${escapeHtml(vacancy.contacts)}\n\n` +
     `${escapeHtml(t(lang, 'channel.footer'))}`;
 
