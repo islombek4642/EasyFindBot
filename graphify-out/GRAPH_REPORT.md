@@ -1,17 +1,17 @@
-# Graph Report - EasyFindBot  (2026-10-18)
+# Graph Report - EasyFindBot  (2026-10-19)
 
 ## Corpus Check
-- 414 files · ~419,403 words
+- 414 files · ~423,688 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 96 file(s) not represented in the graph (top: .ttf 54, .csv 37, .zip 1)
 
 ## Summary
-- 3120 nodes · 4359 edges · 312 communities (190 shown, 122 thin omitted)
+- 3127 nodes · 4394 edges · 316 communities (192 shown, 124 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 142 edges (avg confidence: 0.92)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4a97cf34`
+- Built from commit: `2d10e2a1`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,8 +19,8 @@
 - ref_sdk
 - tgcloud/handlers/callback_query.js
 - validate_data.py
-- parse_decision_rules
-- csv
+- codex-tools.md
+- Gemini CLI Tool Mapping
 - search_stack
 - Subagent-Driven Development
 - Testing Skills With Subagents
@@ -59,7 +59,7 @@
 - Telegram Serverless (`tgcloud`) Development Skill
 - Session diagnosis: <session-id>
 - prisma migrate dev
-- Prisma ORM 7 CLI reference
+- .generate
 - common/index.js
 - prisma db seed
 - Environment Variables
@@ -87,7 +87,7 @@
 - Finishing a Development Branch
 - Transactions
 - Condition-Based Waiting
-- _palette_is_dark
+- _select_palette_for_mode
 - CatalogRefreshTest
 - Using Git Worktrees
 - 7. JavaScript Performance
@@ -160,7 +160,7 @@
 - SDK and API Automation
 - client-api-mapping
 - Prisma MongoDB Upgrade Path
-- _select_palette_for_mode
+- test_core_data_quality.py
 - render-graphs.js
 - test_design_system_mode.py
 - stop-server.sh
@@ -180,8 +180,8 @@
 - detect_framework
 - Prisma Client Setup
 - CatalogSummaryLineEndingsTest
-- _style_is_dark_primary
-- test_core_data_quality.py
+- REFACTOR Phase: Close Loopholes (Stay Green)
+- split_values
 - using-superpowers/SKILL.md
 - Sections
 - React Best Practices
@@ -204,7 +204,7 @@
 - GitHub issues
 - AI safety checkpoint for destructive commands
 - Critical Rules
-- TestMetricMath
+- detect_domain
 - Pi Tool Mapping
 - async-cheap-condition-before-await.md
 - Prefer Statically Analyzable Paths
@@ -307,9 +307,12 @@
 - tgcloud/lib/constants/roles.js
 - tgcloud/lib/constants/salaryTypes.js
 - _filter_anti_patterns_for_mode
-- detect_domain
-- test_skill_script_paths.py
+- csv
+- Prisma Postgres setup
+- VERIFY GREEN: Pressure Testing
+- Example: TDD Skill Bulletproofing
 - Muse Tool Mapping
+- TestMetricMath
 
 ## God Nodes (most connected - your core abstractions)
 1. `search()` - 45 edges
@@ -318,8 +321,8 @@
 4. `search_stack()` - 35 edges
 5. `Button()` - 32 edges
 6. `react` - 30 edges
-7. `Badge()` - 24 edges
-8. `t()` - 23 edges
+7. `t()` - 28 edges
+8. `Badge()` - 24 edges
 9. `Troubleshooting Prisma Compute` - 23 edges
 10. `t()` - 22 edges
 
@@ -338,7 +341,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (312 total, 122 thin omitted)
+## Communities (316 total, 124 thin omitted)
 
 ### Community 0 - "ref_sdk"
 Cohesion: 0.11
@@ -346,39 +349,39 @@ Nodes (36): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPa
 
 ### Community 1 - "tgcloud/handlers/callback_query.js"
 Cohesion: 0.09
-Nodes (37): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildChannelSettingsMenu(), buildStatsReport(), getAllAdminTgIds(), getAuthenticatedUserId(), isUserAdmin() (+29 more)
+Nodes (44): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildBroadcastAudienceMenu(), buildBroadcastPreview(), buildChannelSettingsMenu(), buildManageAdminsMenu(), buildRemoveAdminMenu() (+36 more)
 
 ### Community 2 - "validate_data.py"
-Cohesion: 0.11
-Nodes (32): _catalog_date(), _check_app_interface_contract(), _check_catalog_contract(), _check_catalog_summary(), _check_chart_contract(), _check_color_contract(), _check_core_data_contract(), _check_file() (+24 more)
+Cohesion: 0.10
+Nodes (33): _catalog_date(), _check_app_interface_contract(), _check_catalog_contract(), _check_catalog_summary(), _check_chart_contract(), _check_color_contract(), _check_core_data_contract(), _check_file() (+25 more)
 
-### Community 3 - "parse_decision_rules"
-Cohesion: 0.24
-Nodes (4): apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), _validate_action()
+### Community 3 - "codex-tools.md"
+Cohesion: 0.22
+Nodes (5): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children
 
-### Community 4 - "csv"
-Cohesion: 0.16
-Nodes (4): read_rows(), read_rows(), TestTextLayoutDataContracts, TestTextLayoutRetrieval
+### Community 4 - "Gemini CLI Tool Mapping"
+Cohesion: 0.29
+Nodes (7): Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file, Parallel dispatch, Personal skills directory, Prompt filling, Subagent support
 
 ### Community 5 - "search_stack"
-Cohesion: 0.09
-Nodes (7): _exact_stack_identifier(), _project_row(), search_stack(), _rows(), TestNativeDesktopStackFreshness, _rows(), TestWebStackFreshness
+Cohesion: 0.10
+Nodes (6): _exact_stack_identifier(), search_stack(), _rows(), TestNativeDesktopStackFreshness, _rows(), TestWebStackFreshness
 
 ### Community 6 - "Subagent-Driven Development"
 Cohesion: 0.04
 Nodes (39): 1. Take the task, 2. Work the steps, 3. The completion contract, 4. Complete the task, Common Rationalizations, Example Workflow, Executing Plans, Final Review (+31 more)
 
 ### Community 7 - "Testing Skills With Subagents"
-Cohesion: 0.04
-Nodes (41): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children, Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file (+33 more)
+Cohesion: 0.15
+Nodes (13): Common Mistakes (Same as TDD), GREEN Phase: Write Minimal Skill (Make It Pass), Meta-Testing (When GREEN Isn't Working), Overview, Quick Reference (TDD Cycle), Real-World Impact, RED Phase: Baseline Testing (Watch It Fail), TDD Mapping for Skill Testing (+5 more)
 
 ### Community 8 - "core.py"
-Cohesion: 0.08
-Nodes (21): _contains_phrase(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _file_signature(), _legacy_successor_guidance(), _load_csv(), _load_csv_snapshot() (+13 more)
+Cohesion: 0.07
+Nodes (23): _contains_phrase(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _file_signature(), _legacy_successor_guidance(), _load_csv(), _load_csv_snapshot() (+15 more)
 
 ### Community 9 - "design_system.py"
-Cohesion: 0.07
-Nodes (9): _detect_page_type(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system(), safe_slug(), _write_persisted_file(), format_output() (+1 more)
+Cohesion: 0.06
+Nodes (15): _detect_page_type(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system(), safe_slug(), _write_persisted_file(), apply_decision_rules() (+7 more)
 
 ### Community 10 - "Test-Driven Development (TDD)"
 Cohesion: 0.06
@@ -386,7 +389,7 @@ Nodes (29): Common Rationalizations, Debugging Integration, Example: Bug Fix, Fi
 
 ### Community 11 - "search"
 Cohesion: 0.10
-Nodes (6): search(), _style_search_destination(), _valid_max_results(), TestDiagnosticsContracts, TestSearchDomains, TestStyleTaxonomy
+Nodes (5): search(), _style_search_destination(), TestSearchDomains, TestStyleTaxonomy, TestTextLayoutRetrieval
 
 ### Community 12 - "server.cjs"
 Cohesion: 0.08
@@ -460,10 +463,6 @@ Nodes (20): AND (explicit), AND (implicit), Array Field Filters, Combined, Compa
 Cohesion: 0.10
 Nodes (20): cursor, distinct, Filtered include, include, Include relation count, Multiple distinct fields, Negative take (reverse), Nested include (+12 more)
 
-### Community 30 - "DesignSystemGenerator"
-Cohesion: 0.10
-Nodes (4): DesignSystemGenerator, _resolve_dial(), TestReasoningMatch, TestReasoningContract
-
 ### Community 31 - "Visual Companion Guide"
 Cohesion: 0.10
 Nodes (19): Browser Events Format, Cards (visual designs), Cleaning Up, CSS Classes Available, Design Tips, File Naming, How It Works, Mock elements (wireframe building blocks) (+11 more)
@@ -512,9 +511,9 @@ Nodes (18): 1. Problem statement (REQUIRED), 2. Triage verdict (REQUIRED), 3. En
 Cohesion: 0.11
 Nodes (18): After schema changes, Command, Common Patterns, Create and apply migration, Create without applying, Examples, Follow-up Commands, Full workflow (+10 more)
 
-### Community 43 - "Prisma ORM 7 CLI reference"
-Cohesion: 0.15
-Nodes (12): AI Safety Checkpoint, Boundary: Platform and Compute, Command Categories, Current Command Behavior, Current Prisma CLI Setup, Environment Variables, How to Use, New Configuration File (+4 more)
+### Community 43 - ".generate"
+Cohesion: 0.11
+Nodes (13): AI Safety Checkpoint, Boundary: Platform and Compute, Command Categories, Current Command Behavior, Current Prisma CLI Setup, Environment Variables, How to Use, New Configuration File (+5 more)
 
 ### Community 45 - "prisma db seed"
 Cohesion: 0.11
@@ -590,7 +589,7 @@ Nodes (15): Common Rationalizations, Overview, Phase 1: Root Cause Investigation
 
 ### Community 63 - "read_rows"
 Cohesion: 0.16
-Nodes (6): read_rows(), split_values(), style_identities(), TestGeneratedCatalogContract, TestLandingAndStackContract, TestStyleIdentityContract
+Nodes (4): read_rows(), TestGeneratedCatalogContract, TestLandingAndStackContract, TestReasoningContract
 
 ### Community 64 - "5. Re-render Optimization"
 Cohesion: 0.12
@@ -620,9 +619,9 @@ Nodes (14): All or nothing, Best Practices, Handle errors, Interactive Transacti
 Cohesion: 0.15
 Nodes (12): Common Mistakes, Condition-Based Waiting, Core Pattern, waitForEvent(), waitForEventCount(), waitForEventMatch(), Implementation, Overview (+4 more)
 
-### Community 71 - "_palette_is_dark"
-Cohesion: 0.18
-Nodes (4): _palette_is_dark(), _relative_luminance(), TestEndToEndCoherence, TestLuminance
+### Community 71 - "_select_palette_for_mode"
+Cohesion: 0.13
+Nodes (6): _palette_is_dark(), _relative_luminance(), _select_palette_for_mode(), TestEndToEndCoherence, TestLuminance, TestPaletteSelection
 
 ### Community 73 - "Using Git Worktrees"
 Cohesion: 0.13
@@ -689,8 +688,8 @@ Cohesion: 0.15
 Nodes (12): 1. Schema Configuration, 2. Config Configuration, 3. Environment Variable, Common Issues, Connection String Format, "Database file not found", Driver Adapter, Limitations (+4 more)
 
 ### Community 89 - "prisma-postgres-setup/SKILL.md"
-Cohesion: 0.12
-Nodes (14): Console and database operations, Console and programmatic operations, Management API SDK, Authentication and errors, Persistent databases, Standalone provisioning, Temporary databases with create-db, v0 and Vercel Marketplace (+6 more)
+Cohesion: 0.18
+Nodes (9): Console and database operations, Console and programmatic operations, Management API SDK, Authentication and errors, Persistent databases, Standalone provisioning, Temporary databases with create-db, v0 and Vercel Marketplace (+1 more)
 
 ### Community 90 - "Component Composition"
 Cohesion: 0.15
@@ -908,17 +907,17 @@ Nodes (7): Bad, client-api-mapping, Good, Priority, References, The mapping, Why
 Cohesion: 0.25
 Nodes (8): Decision table, Hand-off rule, If staying on v6: hygiene (a deliberate stay, not neglect), Prisma MongoDB Upgrade Path, Reference files, The decision, up front, The version landscape, Verified against
 
-### Community 144 - "_select_palette_for_mode"
-Cohesion: 0.15
-Nodes (6): _button_outline_text_color(), _contrast_ratio(), _derive_dark_palette(), format_master_md(), _select_palette_for_mode(), TestPaletteSelection
+### Community 144 - "test_core_data_quality.py"
+Cohesion: 0.17
+Nodes (9): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _check_typography_contract(), _configured_font_names(), _font_families() (+1 more)
 
 ### Community 145 - "render-graphs.js"
 Cohesion: 0.39
 Nodes (5): combineGraphs(), extractDotBlocks(), extractGraphBody(), main(), renderToSvg()
 
 ### Community 146 - "test_design_system_mode.py"
-Cohesion: 0.13
-Nodes (9): ansi_ljust(), format_ascii_box(), add_wrapped(), wrap_text(), format_markdown(), hex_to_ansi(), _mode_support_labels(), section_header() (+1 more)
+Cohesion: 0.06
+Nodes (17): ansi_ljust(), _button_outline_text_color(), _contrast_ratio(), _derive_dark_palette(), format_ascii_box(), add_wrapped(), wrap_text(), format_markdown() (+9 more)
 
 ### Community 147 - "stop-server.sh"
 Cohesion: 0.52
@@ -972,13 +971,13 @@ Nodes (5): 2. Telegram Serverless Backend (`tgcloud/`), 3. Frontend & Atomic Des
 Cohesion: 0.33
 Nodes (6): 1. Install dependencies, 2. Add generator block, 3. Generate Prisma Client, 4. Instantiate Prisma Client, 5. Use a single instance, Prisma Client Setup
 
-### Community 165 - "_style_is_dark_primary"
-Cohesion: 0.21
-Nodes (4): _query_wants_dark(), _resolve_color_mode(), _style_is_dark_primary(), TestModeResolution
+### Community 165 - "REFACTOR Phase: Close Loopholes (Stay Green)"
+Cohesion: 0.29
+Nodes (7): 1. Explicit Negation in Rules, 2. Entry in Rationalization Table, 3. Red Flag Entry, 4. Update description, Plugging Each Hole, Re-verify After Refactoring, REFACTOR Phase: Close Loopholes (Stay Green)
 
-### Community 166 - "test_core_data_quality.py"
-Cohesion: 0.14
-Nodes (11): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _check_typography_contract(), _configured_font_names(), contrast_ratio() (+3 more)
+### Community 166 - "split_values"
+Cohesion: 0.47
+Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
 
 ### Community 167 - "using-superpowers/SKILL.md"
 Cohesion: 0.33
@@ -1092,24 +1091,36 @@ Nodes (4): File Organization, Self-Contained Skill, Skill with Heavy Reference, 
 Cohesion: 0.50
 Nodes (4): Pattern, Reference, Skill Types, Technique
 
-### Community 310 - "test_skill_script_paths.py"
-Cohesion: 0.38
-Nodes (3): resolve(), shipped_invocations(), SkillScriptPathsTest
+### Community 309 - "csv"
+Cohesion: 0.08
+Nodes (7): TestFixtureValidation, resolve(), shipped_invocations(), SkillScriptPathsTest, read_rows(), read_rows(), TestTextLayoutDataContracts
 
-### Community 311 - "Muse Tool Mapping"
+### Community 310 - "Prisma Postgres setup"
+Cohesion: 0.40
+Nodes (5): 1. Inspect the project, 2. Reuse or obtain a database, 3. Connect the application, 4. Configure the ORM and verify, Prisma Postgres setup
+
+### Community 311 - "VERIFY GREEN: Pressure Testing"
+Cohesion: 0.40
+Nodes (5): Key Elements of Good Scenarios, Pressure Types, Testing Setup, VERIFY GREEN: Pressure Testing, Writing Pressure Scenarios
+
+### Community 313 - "Example: TDD Skill Bulletproofing"
+Cohesion: 0.50
+Nodes (4): Example: TDD Skill Bulletproofing, Initial Test (Failed), Iteration 1 - Add Counter, Iteration 2 - Add Foundational Principle
+
+### Community 314 - "Muse Tool Mapping"
 Cohesion: 0.33
 Nodes (5): Instructions file, Muse Tool Mapping, Skill invocation, Subagent dispatch, Task tracking
 
 ## Knowledge Gaps
 - **2 isolated node(s):** `RFC-6455`, `@tgcloud/cli`
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2012 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **122 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **124 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `search()` connect `search` to `Commands`, `csv`, `search_stack`, `test_core_data_quality.py`, `core.py`, `design_system.py`, `BM25`, `detect_domain`, `Muse Tool Mapping`, `DesignSystemGenerator`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Why does `search()` connect `search` to `Commands`, `core.py`, `design_system.py`, `.generate`, `test_core_data_quality.py`, `BM25`, `csv`, `._multi_domain_search`, `Muse Tool Mapping`, `detect_domain`?**
+  _High betweenness centrality (0.054) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `search()` (e.g. with ``search` — Search registries` and `Muse Tool Mapping`) actually correct?**
   _`search()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `RFC-6455`, `@tgcloud/cli` to the rest of the system?**
@@ -1117,8 +1128,8 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `ref_sdk` be split into smaller, more focused modules?**
   _Cohesion score 0.10730593607305935 - nodes in this community are weakly interconnected._
 - **Why does `Commands` connect `Commands` to `shadcn CLI Reference`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+  _High betweenness centrality (0.048) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `useTranslation()` (e.g. with `3. Frontend & Atomic Design System (`src/`)` and `3. Strict Reusable Design System & Frontend Architecture (`src/`)`) actually correct?**
   _`useTranslation()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Should `tgcloud/handlers/callback_query.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.09057609057609058 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08599439775910364 - nodes in this community are weakly interconnected._
