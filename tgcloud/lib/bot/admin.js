@@ -1,22 +1,93 @@
 import { t } from '../locales/index.js';
+import { escapeHtml } from './html.js';
+import { config } from '../config.js';
 
-export function buildAdminPanelMenu(lang = 'uz') {
+export function buildAdminPanelMenu(lang = 'uz', isSuperAdmin = false) {
+  const keyboard = [
+    [
+      { text: t(lang, 'admin.btn_queue'), callback_data: "admin:queue" },
+      { text: t(lang, 'admin.btn_stats'), callback_data: "admin:stats" },
+    ],
+  ];
+
+  if (isSuperAdmin) {
+    keyboard.push([
+      { text: t(lang, 'admin.btn_manage_admins'), callback_data: "admin:manage_admins" },
+      { text: t(lang, 'admin.btn_channels'), callback_data: "admin:channels" },
+    ]);
+    keyboard.push([
+      { text: t(lang, 'admin.btn_broadcast'), callback_data: "admin:broadcast" },
+    ]);
+  }
+
   return {
-    text: t(lang, 'admin.menu_title'),
+    text: isSuperAdmin ? t(lang, 'admin.menu_title_super') : t(lang, 'admin.menu_title'),
     reply_markup: {
-      inline_keyboard: [
-        [
-          { text: t(lang, 'admin.btn_queue'), callback_data: "admin:queue" },
-          { text: t(lang, 'admin.btn_stats'), callback_data: "admin:stats" },
-        ],
-        [
-          { text: t(lang, 'admin.btn_manage_admins'), callback_data: "admin:manage_admins" },
-          { text: t(lang, 'admin.btn_channels'), callback_data: "admin:channels" },
-        ],
-        [
-          { text: t(lang, 'admin.btn_broadcast'), callback_data: "admin:broadcast" },
-        ],
-      ],
+      inline_keyboard: keyboard,
+    },
+  };
+}
+
+export function buildManageAdminsMenu(currentAdmins = [], superAdminUser = null, lang = 'uz') {
+  let text = `👥 <b>${escapeHtml(t(lang, 'admin.manage_admins_title'))}</b>\n\n`;
+
+  text += `👑 <b>${escapeHtml(t(lang, 'admin.super_admin_title'))}:</b>\n`;
+  if (superAdminUser) {
+    const handle = superAdminUser.username ? `@${escapeHtml(superAdminUser.username)}` : escapeHtml(superAdminUser.firstName || 'Bosh Admin');
+    text += `• ${handle} (<code>${superAdminUser.tgId}</code>)\n\n`;
+  } else {
+    text += `• <code>${config.superAdminTgId}</code>\n\n`;
+  }
+
+  text += `🛡 <b>${escapeHtml(t(lang, 'admin.regular_admins_title'))}:</b>\n`;
+  const regularAdmins = currentAdmins.filter((a) => Number(a.tgId) !== Number(config.superAdminTgId));
+  if (regularAdmins.length === 0) {
+    text += `<i>${escapeHtml(t(lang, 'admin.no_regular_admins'))}</i>\n`;
+  } else {
+    regularAdmins.forEach((a, idx) => {
+      const handle = a.username ? `@${escapeHtml(a.username)}` : escapeHtml(a.firstName || a.tgId);
+      text += `${idx + 1}. ${handle} (<code>${a.tgId}</code>)\n`;
+    });
+  }
+
+  const buttons = [
+    [
+      { text: t(lang, 'admin.btn_add_admin'), callback_data: "admin:add_admin" },
+    ],
+  ];
+
+  if (regularAdmins.length > 0) {
+    buttons.push([
+      { text: t(lang, 'admin.btn_remove_admin'), callback_data: "admin:remove_admin_list" },
+    ]);
+  }
+
+  buttons.push([
+    { text: t(lang, 'common.back'), callback_data: "admin:menu" },
+  ]);
+
+  return {
+    text,
+    reply_markup: {
+      inline_keyboard: buttons,
+    },
+  };
+}
+
+export function buildRemoveAdminMenu(regularAdmins = [], lang = 'uz') {
+  const buttons = regularAdmins.map((a) => {
+    const label = `❌ ${a.username ? '@' + a.username : (a.firstName || a.tgId)}`;
+    return [{ text: label, callback_data: `admin:remove:${a.tgId}` }];
+  });
+
+  buttons.push([
+    { text: t(lang, 'common.back'), callback_data: "admin:manage_admins" },
+  ]);
+
+  return {
+    text: `⚠️ <b>${escapeHtml(t(lang, 'admin.remove_admin_select'))}</b>`,
+    reply_markup: {
+      inline_keyboard: buttons,
     },
   };
 }
@@ -81,3 +152,4 @@ export function buildChannelSettingsMenu(modChannel, pubChannel, lang = 'uz') {
     },
   };
 }
+

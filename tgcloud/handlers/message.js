@@ -1,8 +1,8 @@
 import { api, db } from 'sdk';
-import { eq } from 'sdk/db';
+import { eq, sql } from 'sdk/db';
 import { users, vacancies } from '../schema.js';
 import { config } from '../lib/config.js';
-import { isUserAdmin } from '../lib/bot/auth.js';
+import { isUserAdmin, isUserSuperAdmin } from '../lib/bot/auth.js';
 import { buildAdminPanelMenu } from '../lib/bot/admin.js';
 import { getSetting, setSetting, normalizeChannelId } from '../lib/bot/settings.js';
 import { mdToHtml } from '../lib/bot/html.js';
@@ -136,7 +136,7 @@ export default async function (message, ctx) {
     resize_keyboard: true,
   };
 
-  // 2. Check if admin has pending action (e.g. setting channel ID)
+  // 2. Check if admin has pending action (e.g. setting channel ID, adding admin)
   if (isAdmin && text && !text.startsWith('/')) {
     const pendingAction = await getSetting(`pending_action_${userId}`);
     if (pendingAction) {
@@ -160,6 +160,132 @@ export default async function (message, ctx) {
           reply_markup: replyKeyboard,
         });
         return;
+      } else if (pendingAction === 'add_admin') {
+        const isSuper = isUserSuperAdmin(userId);
+        if (!isSuper) {
+          await setSetting(`pending_action_${userId}`, '');
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.unauthorized_action'),
+            reply_markup: replyKeyboard,
+          });
+          return;
+        }
+
+        const raw = text.trim();
+        // Check cancel
+        if (
+          raw.toLowerCase() === 'bekor qilish' ||
+          raw.toLowerCase() === 'cancel' ||
+          raw.toLowerCase() === 'отмена' ||
+          raw.includes('Bekor') ||
+          raw.includes('Отмена')
+        ) {
+          await setSetting(`pending_action_${userId}`, '');
+          const menu = buildAdminPanelMenu(userLang, true);
+          await api.sendMessage({
+            chat_id: chatId,
+            text: mdToHtml(menu.text),
+            parse_mode: 'HTML',
+            reply_markup: menu.reply_markup,
+          });
+          return;
+        }
+
+        let targetTgId = null;
+        let targetUsername = null;
+
+        const cleanStr = raw.replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '').trim();
+
+        if (/^\d+$/.test(cleanStr)) {
+          targetTgId = Number(cleanStr);
+        } else {
+          targetUsername = cleanStr.toLowerCase();
+        }
+
+        let targetUser = null;
+        if (targetTgId) {
+          targetUser = await db.select().from(users).where(eq(users.tgId, targetTgId)).get();
+        } else if (targetUsername) {
+          targetUser = await db.select().from(users).where(eq(sql`lower(${users.username})`, targetUsername)).get();
+        }
+
+        if (targetUser) {
+          if (targetUser.role === 'admin' || Number(targetUser.tgId) === Number(config.superAdminTgId)) {
+            await api.sendMessage({
+              chat_id: chatId,
+              text: t(userLang, 'admin.admin_already_exists'),
+              reply_markup: replyKeyboard,
+            });
+            return;
+          }
+
+          await db.update(users)
+            .set({ role: 'admin' })
+            .where(eq(users.tgId, targetUser.tgId))
+            .run();
+
+          await setSetting(`pending_action_${userId}`, '');
+
+          const handle = targetUser.username ? `@${targetUser.username}` : (targetUser.firstName || String(targetUser.tgId));
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.admin_added_success', { tgId: targetUser.tgId, handle }),
+            parse_mode: 'HTML',
+            reply_markup: replyKeyboard,
+          });
+
+          // Notify newly appointed admin
+          try {
+            await api.sendMessage({
+              chat_id: targetUser.tgId,
+              text: t(targetUser.language || 'uz', 'admin.admin_notify_granted'),
+              parse_mode: 'Markdown',
+            });
+          } catch (e) {
+            logger.warn('handlers/message.js', 'Could not notify newly appointed admin', e);
+          }
+          return;
+        } else {
+          // If purely numeric ID was given, insert new user record
+          if (targetTgId) {
+            await db.insert(users)
+              .values({
+                tgId: targetTgId,
+                role: 'admin',
+                language: 'uz',
+              })
+              .run();
+
+            await setSetting(`pending_action_${userId}`, '');
+
+            await api.sendMessage({
+              chat_id: chatId,
+              text: t(userLang, 'admin.admin_added_success', { tgId: targetTgId, handle: String(targetTgId) }),
+              parse_mode: 'HTML',
+              reply_markup: replyKeyboard,
+            });
+
+            try {
+              await api.sendMessage({
+                chat_id: targetTgId,
+                text: t('uz', 'admin.admin_notify_granted'),
+                parse_mode: 'Markdown',
+              });
+            } catch (e) {
+              // Ignore if user has not interacted with bot yet
+            }
+            return;
+          }
+
+          // If username given but not in database yet
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.admin_not_found'),
+            reply_markup: replyKeyboard,
+          });
+          return;
+        }
       }
     }
   }
@@ -369,7 +495,8 @@ export default async function (message, ctx) {
       return;
     }
 
-    const adminMenu = buildAdminPanelMenu(userLang);
+    const isSuper = isUserSuperAdmin(userId);
+    const adminMenu = buildAdminPanelMenu(userLang, isSuper);
     await api.sendMessage({
       chat_id: chatId,
       text: mdToHtml(adminMenu.text),
