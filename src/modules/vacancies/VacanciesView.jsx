@@ -108,8 +108,8 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
       const res = await api.applyVacancy({ vacancyId: vacId, coverLetter });
       if (res && (res.success || res.ok)) {
         setAppliedVacancyIds((prev) => new Set([...prev, vacId]));
-        if (typeof window !== 'undefined' && window.Telegram?.WebApp?.showAlert) {
-          window.Telegram.WebApp.showAlert(t('vacancies.apply_success'));
+        if (typeof window !== 'undefined' && window.Telegram?.WebApp?.HapticFeedback) {
+          window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
         }
         return true;
       } else {
