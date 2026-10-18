@@ -42,15 +42,19 @@ export function ResumeCard({
     <div className={`glass-card resume-card ${className}`} onClick={onClick}>
       <div className="card-top">
         <div className="card-title-group">
-          <h4 className="card-job-title">{title || fullName || t('roles.seeker')}</h4>
+          <h4 className="card-job-title" title={title || fullName || t('roles.seeker')}>
+            {title || fullName || t('roles.seeker')}
+          </h4>
           <span className="card-company-name">
             <Icon icon="solar:user-bold" width="15" height="15" />
-            {fullName || t(`categories.${category}`) || category}
+            <span className="card-company-text">
+              {fullName || t(`categories.${category}`) || category}
+            </span>
           </span>
         </div>
 
         {expectedSalary && (
-          <div className="card-salary-box" style={{ fontSize: '0.95rem' }}>
+          <div className="card-salary-box" style={{ fontSize: '0.95rem', flexShrink: 0 }}>
             {Number(expectedSalary) ? `${Number(expectedSalary).toLocaleString()} ${salaryCurrency}` : expectedSalary}
           </div>
         )}

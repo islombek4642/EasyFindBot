@@ -294,9 +294,9 @@
     "semantic_hash": ""
   },
   "endpoints/applyVacancy.js": {
-    "mtime": 1792158114.1564996,
-    "seen": 1792160635.6663272,
-    "ast_hash": "26a3f75d77e026ab1032a809d2bd88fa",
+    "mtime": 1792337132.419987,
+    "seen": 1792347526.4373963,
+    "ast_hash": "322c0c05b0c895827e942ce6d25657c6",
     "semantic_hash": ""
   },
   "endpoints/closeVacancy.js": {
@@ -378,9 +378,9 @@
     "semantic_hash": ""
   },
   "endpoints/updateApplicationStatus.js": {
-    "mtime": 1792158114.1604989,
-    "seen": 1792160635.6663544,
-    "ast_hash": "e3c0b800e0be5f9e554c8c1b35b0743d",
+    "mtime": 1792336793.9533193,
+    "seen": 1792347526.4374352,
+    "ast_hash": "2d2bf438d70c36fc064caf3132ca8242",
     "semantic_hash": ""
   },
   "endpoints/updateUser.js": {
@@ -390,15 +390,15 @@
     "semantic_hash": ""
   },
   "handlers/callback_query.js": {
-    "mtime": 1792158114.1604989,
-    "seen": 1792160635.6663582,
-    "ast_hash": "7947e8d188976c7ed3e838ea242236da",
+    "mtime": 1792334198.1416428,
+    "seen": 1792347526.4374402,
+    "ast_hash": "ba7f02b33b64fefeee00581289fc1c14",
     "semantic_hash": ""
   },
   "handlers/message.js": {
-    "mtime": 1792164011.0227807,
-    "seen": 1792164097.185421,
-    "ast_hash": "060a6ed5a5ce2773582919bb1c410b1a",
+    "mtime": 1792334396.4116046,
+    "seen": 1792347526.4374423,
+    "ast_hash": "6d6ef2b1e20f1a03af4f56c25cee6526",
     "semantic_hash": ""
   },
   "lib/bot/admin.js": {
@@ -414,27 +414,27 @@
     "semantic_hash": ""
   },
   "lib/bot/channel.js": {
-    "mtime": 1792158114.1644986,
-    "seen": 1792160635.6663654,
-    "ast_hash": "4d2d23e068ccdc200370f7f9cf87d5a0",
+    "mtime": 1792334001.595273,
+    "seen": 1792347526.43745,
+    "ast_hash": "5aaa212c3190d7e7d22f8e65116fd23c",
     "semantic_hash": ""
   },
   "lib/bot/moderator.js": {
-    "mtime": 1792158114.1654973,
-    "seen": 1792160635.6663675,
-    "ast_hash": "30d4c98f2849e4f88e26f3f1d450c4c1",
+    "mtime": 1792333967.2803588,
+    "seen": 1792347526.437455,
+    "ast_hash": "8492813cb85a4258e2d55368a960e0f2",
     "semantic_hash": ""
   },
   "lib/bot/notifier.js": {
-    "mtime": 1792158114.1654973,
-    "seen": 1792160635.6663692,
-    "ast_hash": "50bb3966b1ee90ddffc5dc628ab334e4",
+    "mtime": 1792334044.1822784,
+    "seen": 1792347526.4374568,
+    "ast_hash": "1fec32b486fa3c1d0876ecafbd3916c4",
     "semantic_hash": ""
   },
   "lib/bot/settings.js": {
-    "mtime": 1792158114.1654973,
-    "seen": 1792160635.666371,
-    "ast_hash": "6dc49d7f43490a7d7dbad57dfbae3d46",
+    "mtime": 1792334304.2285647,
+    "seen": 1792347526.437459,
+    "ast_hash": "7902b064759321fe5997b0f4639d0f06",
     "semantic_hash": ""
   },
   "lib/bot/setup.js": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "src/components/common/Button.jsx": {
-    "mtime": 1792158114.1834917,
-    "seen": 1792160635.6664026,
-    "ast_hash": "14c436c116a6fa598739e5bfd2365c5d",
+    "mtime": 1792333224.0697384,
+    "seen": 1792347526.4375007,
+    "ast_hash": "b4e720b2a73472374463eb35503b08a3",
     "semantic_hash": ""
   },
   "src/components/common/EmptyState.jsx": {
@@ -576,9 +576,9 @@
     "semantic_hash": ""
   },
   "src/components/common/VacancyCard.jsx": {
-    "mtime": 1792163802.6552584,
-    "seen": 1792164097.1854985,
-    "ast_hash": "c0a40dfa1e6c05b962a1b3476f84d812",
+    "mtime": 1792347408.1891859,
+    "seen": 1792347526.437521,
+    "ast_hash": "fc445bd81fd8d71b3f3cb257fa777dfd",
     "semantic_hash": ""
   },
   "src/components/common/index.js": {
@@ -654,9 +654,9 @@
     "semantic_hash": ""
   },
   "src/locales/en.js": {
-    "mtime": 1792166281.6641333,
-    "seen": 1792166414.5226393,
-    "ast_hash": "0a4f269b02c94dc61db75ffebb853a4e",
+    "mtime": 1792347336.3398988,
+    "seen": 1792347526.4375541,
+    "ast_hash": "8119779dadb8c6f09aabf5ff26c9034d",
     "semantic_hash": ""
   },
   "src/locales/index.jsx": {
@@ -666,15 +666,15 @@
     "semantic_hash": ""
   },
   "src/locales/ru.js": {
-    "mtime": 1792166252.2767231,
-    "seen": 1792166414.5226464,
-    "ast_hash": "d9d5efe68a7449dc614ec8dac3e66d44",
+    "mtime": 1792347324.2938275,
+    "seen": 1792347526.4375591,
+    "ast_hash": "52832438b67a85d6d5a0deb9eeabbc04",
     "semantic_hash": ""
   },
   "src/locales/uz.js": {
-    "mtime": 1792166238.3955255,
-    "seen": 1792166414.5226624,
-    "ast_hash": "a109973c59d6513fd3de0233e6369c63",
+    "mtime": 1792347315.7040749,
+    "seen": 1792347526.437561,
+    "ast_hash": "b160964bb3d06ca784b6b1673dbb4e33",
     "semantic_hash": ""
   },
   "src/main.jsx": {
@@ -684,9 +684,9 @@
     "semantic_hash": ""
   },
   "src/modules/post-job/PostJobWizard.jsx": {
-    "mtime": 1792166298.1055946,
-    "seen": 1792166414.5226681,
-    "ast_hash": "64a18da1f539bb4655648f2451ed0420",
+    "mtime": 1792333028.4968603,
+    "seen": 1792347526.4375658,
+    "ast_hash": "a17ad2e9e52ef0ac5b61dc1bfbef91a0",
     "semantic_hash": ""
   },
   "src/modules/profile/EmployerVacanciesModal.jsx": {
@@ -702,9 +702,9 @@
     "semantic_hash": ""
   },
   "src/modules/profile/SeekerApplicationsModal.jsx": {
-    "mtime": 1792160036.861704,
-    "seen": 1792160635.6664734,
-    "ast_hash": "63e4c69a9e5e2319d86e4e7025b57365",
+    "mtime": 1792341863.6777842,
+    "seen": 1792347526.4375732,
+    "ast_hash": "8f27d7d6f65a75533e4081c52b7042d5",
     "semantic_hash": ""
   },
   "src/modules/profile/SubscriptionsModal.jsx": {
@@ -714,9 +714,9 @@
     "semantic_hash": ""
   },
   "src/modules/profile/VacancyApplicantsModal.jsx": {
-    "mtime": 1792160051.3572786,
-    "seen": 1792160635.666477,
-    "ast_hash": "7242fd78bda000ade2d1b3c11a955d10",
+    "mtime": 1792345573.0078151,
+    "seen": 1792347526.437578,
+    "ast_hash": "b7dade65f540d2ba9b1aa7bab1a34a0d",
     "semantic_hash": ""
   },
   "src/modules/resumes/CreateResumeModal.jsx": {
@@ -726,27 +726,27 @@
     "semantic_hash": ""
   },
   "src/modules/resumes/ResumesView.jsx": {
-    "mtime": 1792165118.0788555,
-    "seen": 1792165181.7592382,
-    "ast_hash": "6553af5c964b7bcb117656a692432058",
+    "mtime": 1792345625.465526,
+    "seen": 1792347526.4375844,
+    "ast_hash": "a5767578e340e29b01556cdeb889bc1b",
     "semantic_hash": ""
   },
   "src/modules/vacancies/VacanciesView.jsx": {
-    "mtime": 1792165013.1813793,
-    "seen": 1792165181.7592404,
-    "ast_hash": "e1a11b57f74e8c4c43334ebf6435dc72",
+    "mtime": 1792338173.0591044,
+    "seen": 1792347526.4375868,
+    "ast_hash": "f7482bed93f67cbdfa116046cb6b5e0c",
     "semantic_hash": ""
   },
   "src/modules/vacancies/VacancyDetailModal.jsx": {
-    "mtime": 1792163835.995759,
-    "seen": 1792164097.185567,
-    "ast_hash": "db48a87338fc6bfaaff9febee2f2162f",
+    "mtime": 1792347437.6877804,
+    "seen": 1792347526.4375885,
+    "ast_hash": "0e5f95641851336a49081e11e8d4be6a",
     "semantic_hash": ""
   },
   "src/services/api.js": {
-    "mtime": 1792163969.588846,
-    "seen": 1792164097.1855693,
-    "ast_hash": "e32037c583b1c2105850468a3af60010",
+    "mtime": 1792335364.1960156,
+    "seen": 1792347526.4375908,
+    "ast_hash": "aac916b40b54882dfd98f5a5ade24ff6",
     "semantic_hash": ""
   },
   "src/services/mockData.js": {
@@ -756,15 +756,15 @@
     "semantic_hash": ""
   },
   "tgcloud/endpoints/applyVacancy.js": {
-    "mtime": 1792158114.2014866,
-    "seen": 1792160635.6664896,
-    "ast_hash": "26a3f75d77e026ab1032a809d2bd88fa",
+    "mtime": 1792342797.7658708,
+    "seen": 1792347526.4375954,
+    "ast_hash": "93bb7008c1ce1dcc6fa5b8ffde68722d",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/closeVacancy.js": {
-    "mtime": 1792158114.2014866,
-    "seen": 1792160635.6664915,
-    "ast_hash": "cb101c102c892674cfc068d4f3165e42",
+    "mtime": 1792341535.2977536,
+    "seen": 1792347526.4375973,
+    "ast_hash": "01a9eb73739cabb0d7f8143c70ad9b4f",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/createResume.js": {
@@ -786,27 +786,27 @@
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getMyApplications.js": {
-    "mtime": 1792158114.2034862,
-    "seen": 1792160635.666507,
-    "ast_hash": "16e6681f961636e94bcceca42950ae02",
+    "mtime": 1792338737.4122376,
+    "seen": 1792347526.4376066,
+    "ast_hash": "87c468e8900b06c30fb4440a3c27ac66",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getMyResume.js": {
-    "mtime": 1792158114.2044866,
-    "seen": 1792160635.666509,
-    "ast_hash": "cee2b0669f95ac5f1b03b03a597cd64b",
+    "mtime": 1792347305.4556906,
+    "seen": 1792347526.4376085,
+    "ast_hash": "30e90696047d78816ed21c06b37da5db",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getMyVacancies.js": {
-    "mtime": 1792158114.2044866,
-    "seen": 1792160635.6665103,
-    "ast_hash": "636712580265ca75ba2558d695816868",
+    "mtime": 1792347281.0321877,
+    "seen": 1792347526.4376104,
+    "ast_hash": "4debc537f408cc4e5feebdf215fd8906",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getResumes.js": {
-    "mtime": 1792158114.2044866,
-    "seen": 1792160635.666512,
-    "ast_hash": "030a898842ecf8abd8d4061092b7a754",
+    "mtime": 1792347297.2987144,
+    "seen": 1792347526.4376123,
+    "ast_hash": "dc81ef85627ff0567607ce99166dc351",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getSubscriptions.js": {
@@ -816,21 +816,21 @@
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getVacancies.js": {
-    "mtime": 1792158114.2054865,
-    "seen": 1792160635.6665158,
-    "ast_hash": "50ffa50ab3b22680aac2c14400c3b060",
+    "mtime": 1792347227.5744476,
+    "seen": 1792347526.4376168,
+    "ast_hash": "0aa039c3435b105b228d6ef3ececa379",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getVacancyApplications.js": {
-    "mtime": 1792158114.2054865,
-    "seen": 1792160635.6665175,
-    "ast_hash": "e1b0cf9ade446c8f3dc0b63553ad0fe2",
+    "mtime": 1792338773.9783564,
+    "seen": 1792347526.4376187,
+    "ast_hash": "52c7ee3c651b717e13679e542463244a",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/getVacancyById.js": {
-    "mtime": 1792158114.2064853,
-    "seen": 1792160635.6665194,
-    "ast_hash": "8a6a782c5904d5233b86d9866c810911",
+    "mtime": 1792347252.9271433,
+    "seen": 1792347526.4376206,
+    "ast_hash": "f2e7e49bc34a182fc003f4b4fe997b5e",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/toggleSubscription.js": {
@@ -840,9 +840,9 @@
     "semantic_hash": ""
   },
   "tgcloud/endpoints/updateApplicationStatus.js": {
-    "mtime": 1792158114.2064853,
-    "seen": 1792160635.666523,
-    "ast_hash": "e3c0b800e0be5f9e554c8c1b35b0743d",
+    "mtime": 1792336760.4645998,
+    "seen": 1792347526.4376254,
+    "ast_hash": "2d2bf438d70c36fc064caf3132ca8242",
     "semantic_hash": ""
   },
   "tgcloud/endpoints/updateUser.js": {
@@ -852,15 +852,15 @@
     "semantic_hash": ""
   },
   "tgcloud/handlers/callback_query.js": {
-    "mtime": 1792158114.207485,
-    "seen": 1792160635.6665266,
-    "ast_hash": "7947e8d188976c7ed3e838ea242236da",
+    "mtime": 1792334170.2331784,
+    "seen": 1792347526.4376297,
+    "ast_hash": "ba7f02b33b64fefeee00581289fc1c14",
     "semantic_hash": ""
   },
   "tgcloud/handlers/message.js": {
-    "mtime": 1792163996.5325382,
-    "seen": 1792164097.1856165,
-    "ast_hash": "060a6ed5a5ce2773582919bb1c410b1a",
+    "mtime": 1792334356.794398,
+    "seen": 1792347526.437632,
+    "ast_hash": "e5a33f95b940bd4c3b05922cd67b6e11",
     "semantic_hash": ""
   },
   "tgcloud/lib/bot/admin.js": {
@@ -876,27 +876,27 @@
     "semantic_hash": ""
   },
   "tgcloud/lib/bot/channel.js": {
-    "mtime": 1792158114.2084846,
-    "seen": 1792160635.6665337,
-    "ast_hash": "4d2d23e068ccdc200370f7f9cf87d5a0",
+    "mtime": 1792346454.3699672,
+    "seen": 1792347526.437639,
+    "ast_hash": "780b273ffa933475a86f59077d118791",
     "semantic_hash": ""
   },
   "tgcloud/lib/bot/moderator.js": {
-    "mtime": 1792158114.2084846,
-    "seen": 1792160635.6665437,
-    "ast_hash": "30d4c98f2849e4f88e26f3f1d450c4c1",
+    "mtime": 1792342617.7289371,
+    "seen": 1792347526.4376435,
+    "ast_hash": "0491d33f33e194c32f473b92dd1193bb",
     "semantic_hash": ""
   },
   "tgcloud/lib/bot/notifier.js": {
-    "mtime": 1792158114.2084846,
-    "seen": 1792160635.6665454,
-    "ast_hash": "50bb3966b1ee90ddffc5dc628ab334e4",
+    "mtime": 1792334030.1756902,
+    "seen": 1792347526.4376452,
+    "ast_hash": "1fec32b486fa3c1d0876ecafbd3916c4",
     "semantic_hash": ""
   },
   "tgcloud/lib/bot/settings.js": {
-    "mtime": 1792158114.209484,
-    "seen": 1792160635.6665473,
-    "ast_hash": "6dc49d7f43490a7d7dbad57dfbae3d46",
+    "mtime": 1792334294.4624712,
+    "seen": 1792347526.4376476,
+    "ast_hash": "7902b064759321fe5997b0f4639d0f06",
     "semantic_hash": ""
   },
   "tgcloud/lib/bot/setup.js": {
@@ -936,9 +936,9 @@
     "semantic_hash": ""
   },
   "tgcloud/lib/locales/en.js": {
-    "mtime": 1792158114.2114842,
-    "seen": 1792160635.6665592,
-    "ast_hash": "a2d9f8ae3cb3de1f1e203a1174558674",
+    "mtime": 1792341468.3414135,
+    "seen": 1792347526.4376652,
+    "ast_hash": "804337d9d81eae8af4a668d27138d6cc",
     "semantic_hash": ""
   },
   "tgcloud/lib/locales/index.js": {
@@ -948,15 +948,15 @@
     "semantic_hash": ""
   },
   "tgcloud/lib/locales/ru.js": {
-    "mtime": 1792158114.214484,
-    "seen": 1792160635.6665628,
-    "ast_hash": "517b0f8f5697c5a74fc4d91ce0781e25",
+    "mtime": 1792341419.221807,
+    "seen": 1792347526.43767,
+    "ast_hash": "8285079ee50c5ce110ef49d95a16b183",
     "semantic_hash": ""
   },
   "tgcloud/lib/locales/uz.js": {
-    "mtime": 1792158114.214484,
-    "seen": 1792160635.6665647,
-    "ast_hash": "f986138aa3b1ad91d6837a83eaa5f4f2",
+    "mtime": 1792341349.4952438,
+    "seen": 1792347526.4376717,
+    "ast_hash": "33a9103452f97d40ff2d1b48e7c6a9fb",
     "semantic_hash": ""
   },
   "tgcloud/lib/logger.js": {
@@ -2685,6 +2685,24 @@
     "mtime": 1792158114.1545,
     "seen": 1792160635.6670787,
     "ast_hash": "53ec6fe8c207be53d224dd5fb78e71d7",
+    "semantic_hash": ""
+  },
+  "lib/bot/html.js": {
+    "mtime": 1792333930.0214355,
+    "seen": 1792347526.4374523,
+    "ast_hash": "69014a1db4c72643776615782c243c51",
+    "semantic_hash": ""
+  },
+  "src/modules/resumes/ResumeDetailModal.jsx": {
+    "mtime": 1792345432.0455585,
+    "seen": 1792347526.4375823,
+    "ast_hash": "0a50588a5bc3df4851e42aca493c5454",
+    "semantic_hash": ""
+  },
+  "tgcloud/lib/bot/html.js": {
+    "mtime": 1792333922.569997,
+    "seen": 1792347526.4376411,
+    "ast_hash": "69014a1db4c72643776615782c243c51",
     "semantic_hash": ""
   }
 }

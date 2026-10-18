@@ -130,26 +130,30 @@ export function VacancyCard({
     >
       <div className="card-top">
         <div className="card-title-group">
-          <h4 className="card-job-title">{title}</h4>
-          <span className="card-company-name">
+          <h4 className="card-job-title" title={title}>{title}</h4>
+          <span className="card-company-name" title={displayCompany}>
             <Icon icon="solar:buildings-2-bold" width="15" height="15" />
-            {displayCompany}
+            <span className="card-company-text">{displayCompany}</span>
           </span>
         </div>
 
-        {hasApplied && (
-          <Badge variant="primary" icon="solar:check-circle-bold">
-            {t('vacancies.applied_btn')}
-          </Badge>
-        )}
+        {(hasApplied || ((showStatus || isClosed) && status)) && (
+          <div className="card-badges-group">
+            {hasApplied && (
+              <Badge variant="primary" icon="solar:check-circle-bold">
+                {t('vacancies.applied_btn')}
+              </Badge>
+            )}
 
-        {(showStatus || isClosed) && status && (
-          <Badge
-            variant={getStatusBadgeVariant(status)}
-            icon={isClosed ? 'solar:lock-bold' : null}
-          >
-            {t(`statuses.${status}`) || status}
-          </Badge>
+            {(showStatus || isClosed) && status && (
+              <Badge
+                variant={getStatusBadgeVariant(status)}
+                icon={isClosed ? 'solar:lock-bold' : null}
+              >
+                {t(`statuses.${status}`) || status}
+              </Badge>
+            )}
+          </div>
         )}
       </div>
 
