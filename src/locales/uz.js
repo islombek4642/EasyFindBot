@@ -99,6 +99,7 @@ export default {
     details_title: "Vakansiya tafsilotlari",
     company: "Kompaniya",
     per_month: "/oy",
+    published_at: "E'lon qilingan",
   },
   post_job: {
     wizard_title: "Yangi ish o'rni e'lon qilish",

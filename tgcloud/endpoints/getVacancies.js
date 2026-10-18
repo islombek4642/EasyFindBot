@@ -2,6 +2,17 @@ import { db } from 'sdk';
 import { eq, and, or, gte, like, desc, sql, count } from 'sdk/db';
 import { vacancies } from '../schema.js';
 
+function toEpochMs(val) {
+  if (!val) return null;
+  if (val instanceof Date) return val.getTime();
+  if (typeof val === 'number') return val < 1e11 ? val * 1000 : val;
+  if (typeof val === 'string') {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d.getTime();
+  }
+  return null;
+}
+
 export default async function (input = {}, ctx) {
   const {
     category,
@@ -13,7 +24,10 @@ export default async function (input = {}, ctx) {
     offset = 0,
   } = input;
 
-  const conditions = [eq(vacancies.status, 'approved')];
+  // Option B: show both approved and closed vacancies
+  const conditions = [
+    or(eq(vacancies.status, 'approved'), eq(vacancies.status, 'closed'))
+  ];
 
   if (category && category !== 'all') {
     conditions.push(eq(vacancies.category, category));
@@ -61,14 +75,23 @@ export default async function (input = {}, ctx) {
     const items = await db.select()
       .from(vacancies)
       .where(whereClause)
-      .orderBy(desc(vacancies.createdAt))
+      .orderBy(
+        sql`CASE WHEN ${vacancies.status} = 'approved' THEN 0 ELSE 1 END`,
+        desc(vacancies.createdAt)
+      )
       .limit(safeLimit)
       .offset(safeOffset)
       .all();
 
+    const formattedItems = items.map((vac) => ({
+      ...vac,
+      createdAt: toEpochMs(vac.createdAt),
+      updatedAt: toEpochMs(vac.updatedAt),
+    }));
+
     return {
       success: true,
-      vacancies: items,
+      vacancies: formattedItems,
       total: totalRow?.total || 0,
       limit: safeLimit,
       offset: safeOffset,
@@ -77,3 +100,4 @@ export default async function (input = {}, ctx) {
     return { success: false, error: err.message };
   }
 }
+

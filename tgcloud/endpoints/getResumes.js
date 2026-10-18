@@ -2,6 +2,17 @@ import { db } from 'sdk';
 import { eq, and, or, gte, like, desc, sql, count } from 'sdk/db';
 import { resumes, users } from '../schema.js';
 
+function toEpochMs(val) {
+  if (!val) return null;
+  if (val instanceof Date) return val.getTime();
+  if (typeof val === 'number') return val < 1e11 ? val * 1000 : val;
+  if (typeof val === 'string') {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d.getTime();
+  }
+  return null;
+}
+
 export default async function (input = {}, ctx) {
   const {
     category,
@@ -68,6 +79,8 @@ export default async function (input = {}, ctx) {
 
         return {
           ...res,
+          createdAt: toEpochMs(res.createdAt),
+          updatedAt: toEpochMs(res.updatedAt),
           user: u || null,
         };
       })
@@ -84,3 +97,4 @@ export default async function (input = {}, ctx) {
     return { success: false, error: err.message };
   }
 }
+

@@ -46,10 +46,39 @@ export function VacancyDetailModal({
     requirements,
     contacts,
     viewsCount = 0,
+    createdAt,
   } = vacancy;
 
   const displayCompany = companyName || company || '';
   const displayCurrency = salaryCurrency || currency || 'UZS';
+
+  const formatDateTime = (val) => {
+    if (!val) return '';
+    try {
+      let d;
+      const num = Number(val);
+      if (!isNaN(num) && num > 0) {
+        const ms = num < 1e11 ? num * 1000 : num;
+        d = new Date(ms);
+      } else if (typeof val === 'string') {
+        d = new Date(val.replace(' ', 'T'));
+      } else if (val instanceof Date) {
+        d = val;
+      }
+      if (!d || isNaN(d.getTime())) return '';
+
+      const pad = (n) => String(n).padStart(2, '0');
+      const day = pad(d.getDate());
+      const month = pad(d.getMonth() + 1);
+      const year = d.getFullYear();
+      const hours = pad(d.getHours());
+      const minutes = pad(d.getMinutes());
+
+      return `${day}.${month}.${year}, ${hours}:${minutes}`;
+    } catch {
+      return '';
+    }
+  };
 
   const renderSalary = () => {
     if (salaryType === 'negotiable') {
@@ -112,6 +141,28 @@ export function VacancyDetailModal({
             <Icon icon="solar:buildings-2-bold" width="16" height="16" />
             {displayCompany}
           </div>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '0.82rem',
+            color: 'var(--text-secondary)',
+            padding: '2px 0',
+          }}
+        >
+          {createdAt && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Icon icon="solar:calendar-date-bold" width="15" height="15" />
+              <span>{t('vacancies.published_at')}: {formatDateTime(createdAt)}</span>
+            </span>
+          )}
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px', marginLeft: 'auto' }}>
+            <Icon icon="solar:eye-bold" width="15" height="15" />
+            <span>{viewsCount || 0} {t('common.views')}</span>
+          </span>
         </div>
 
         <div className="card-meta-row">

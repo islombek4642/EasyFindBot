@@ -99,6 +99,7 @@ export default {
     details_title: "Vacancy Details",
     company: "Company",
     per_month: "/mo",
+    published_at: "Published",
   },
   post_job: {
     wizard_title: "Post a New Job Opening",

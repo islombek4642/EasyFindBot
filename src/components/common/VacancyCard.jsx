@@ -82,15 +82,26 @@ export function VacancyCard({
   const formatDate = (val) => {
     if (!val) return '';
     try {
+      let d;
       const num = Number(val);
       if (!isNaN(num) && num > 0) {
         const ms = num < 1e11 ? num * 1000 : num;
-        const d = new Date(ms);
-        return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+        d = new Date(ms);
+      } else if (typeof val === 'string') {
+        d = new Date(val.replace(' ', 'T'));
+      } else if (val instanceof Date) {
+        d = val;
       }
-      const iso = typeof val === 'string' ? val.replace(' ', 'T') : val;
-      const d = new Date(iso);
-      return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+      if (!d || isNaN(d.getTime())) return '';
+
+      const pad = (n) => String(n).padStart(2, '0');
+      const day = pad(d.getDate());
+      const month = pad(d.getMonth() + 1);
+      const year = d.getFullYear();
+      const hours = pad(d.getHours());
+      const minutes = pad(d.getMinutes());
+
+      return `${day}.${month}.${year}, ${hours}:${minutes}`;
     } catch {
       return '';
     }
@@ -110,8 +121,13 @@ export function VacancyCard({
     }
   };
 
+  const isClosed = status === 'closed';
+
   return (
-    <div className={`glass-card vacancy-card ${className}`} onClick={onClick}>
+    <div
+      className={`glass-card vacancy-card ${isClosed ? 'vacancy-card-closed' : ''} ${className}`}
+      onClick={onClick}
+    >
       <div className="card-top">
         <div className="card-title-group">
           <h4 className="card-job-title">{title}</h4>
@@ -127,8 +143,11 @@ export function VacancyCard({
           </Badge>
         )}
 
-        {showStatus && status && (
-          <Badge variant={getStatusBadgeVariant(status)}>
+        {(showStatus || isClosed) && status && (
+          <Badge
+            variant={getStatusBadgeVariant(status)}
+            icon={isClosed ? 'solar:lock-bold' : null}
+          >
             {t(`statuses.${status}`) || status}
           </Badge>
         )}
@@ -172,7 +191,7 @@ export function VacancyCard({
           </button>
         ) : (
           <div className="card-footer-item">
-            <Icon icon="solar:calendar-bold" width="14" height="14" />
+            <Icon icon="solar:calendar-date-bold" width="14" height="14" />
             <span>
               {formatDate(createdAt)}
             </span>

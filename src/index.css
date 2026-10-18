@@ -1248,6 +1248,16 @@ a {
   gap: 4px;
 }
 
+.vacancy-card-closed {
+  opacity: 0.85;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+.vacancy-card-closed:hover {
+  opacity: 0.95;
+}
+
+
 .skills-wrap {
   display: flex;
   flex-wrap: wrap;

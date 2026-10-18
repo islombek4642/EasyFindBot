@@ -99,6 +99,7 @@ export default {
     details_title: "Детали вакансии",
     company: "Компания",
     per_month: "/мес",
+    published_at: "Опубликовано",
   },
   post_job: {
     wizard_title: "Размещение вакансии",
