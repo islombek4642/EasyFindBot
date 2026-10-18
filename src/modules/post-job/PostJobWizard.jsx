@@ -408,25 +408,83 @@ export function PostJobWizard({ onSuccess }) {
               error={errors.contacts}
             />
 
-            {/* Summary Preview Box */}
-            <div
-              style={{
-                background: 'var(--bg-input)',
-                padding: '14px',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                fontSize: '0.88rem',
-              }}
-            >
-              <div style={{ fontWeight: 700, fontSize: '1rem' }}>{formData.title}</div>
-              <div style={{ color: 'var(--text-secondary)' }}>{formData.company}</div>
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                <Badge variant="neutral">{t(`categories.${formData.category}`)}</Badge>
+            {/* Premium Summary Preview Card */}
+            <div className="preview-card">
+              {/* Gradient Header */}
+              <div className="preview-card-header">
+                <div className="preview-card-avatar">
+                  <Icon icon="solar:buildings-2-bold" width="22" height="22" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="preview-card-title">{formData.title}</div>
+                  <div className="preview-card-company">{formData.company}</div>
+                </div>
+                <div className="preview-card-status-dot" />
+              </div>
+
+              {/* Tags Row */}
+              <div className="preview-card-tags">
+                <Badge variant="primary">{t(`categories.${formData.category}`)}</Badge>
                 <Badge variant="neutral">{t(`regions.${formData.region}`)}</Badge>
                 <Badge variant="neutral">{t(`employment_types.${formData.employmentType}`)}</Badge>
               </div>
+
+              {/* Info Rows */}
+              <div className="preview-info-rows">
+                {/* Salary */}
+                <div className="preview-info-row">
+                  <div className="preview-info-icon salary">
+                    <Icon icon="solar:wallet-money-bold" width="14" height="14" />
+                  </div>
+                  <div className="preview-info-content">
+                    <span className="preview-info-label">{t('common.salary')}</span>
+                    <span className="preview-info-value salary-value">
+                      {formData.salaryType === 'negotiable'
+                        ? t('salary_types.negotiable')
+                        : formData.salaryMin
+                        ? `${Number(formData.salaryMin).toLocaleString()}${
+                            formData.salaryType === 'range' && formData.salaryMax
+                              ? ` – ${Number(formData.salaryMax).toLocaleString()}`
+                              : ''
+                          } ${formData.currency}`
+                        : '—'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="preview-divider" />
+
+              {/* Description */}
+              {formData.description && (
+                <div className="preview-section">
+                  <div className="preview-section-label">
+                    <Icon icon="solar:document-text-bold" width="13" height="13" />
+                    {t('common.description')}
+                  </div>
+                  <div className="preview-section-text">{formData.description}</div>
+                </div>
+              )}
+
+              {/* Requirements */}
+              {formData.requirements && (
+                <div className="preview-section">
+                  <div className="preview-section-label">
+                    <Icon icon="solar:checklist-minimalistic-bold" width="13" height="13" />
+                    {t('common.requirements')}
+                  </div>
+                  <div className="preview-section-text">{formData.requirements}</div>
+                </div>
+              )}
+
+              {/* Contacts */}
+              {formData.contacts && (
+                <div className="preview-contacts-row">
+                  <Icon icon="solar:phone-calling-bold" width="14" height="14" />
+                  <span>{formData.contacts}</span>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -450,14 +508,21 @@ export function PostJobWizard({ onSuccess }) {
         )}
 
         {/* Nav Buttons */}
-        <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: step === 4 ? 'column-reverse' : 'row',
+            gap: '10px',
+            marginTop: '8px',
+          }}
+        >
           {step > 1 && (
             <Button
               variant="secondary"
               size="md"
               icon="solar:alt-arrow-left-linear"
               onClick={handleBack}
-              style={{ flex: 1 }}
+              style={step === 4 ? { width: '100%' } : { flex: 1 }}
             >
               {t('common.back')}
             </Button>
@@ -476,11 +541,11 @@ export function PostJobWizard({ onSuccess }) {
           ) : (
             <Button
               variant="primary"
-              size="md"
+              size="lg"
               icon="solar:plain-bold"
               loading={submitting}
               onClick={handleSubmit}
-              style={{ flex: 2 }}
+              style={{ width: '100%' }}
             >
               {t('post_job.submit_btn')}
             </Button>

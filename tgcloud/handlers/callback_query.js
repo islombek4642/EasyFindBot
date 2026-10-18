@@ -13,6 +13,7 @@ import { notifyEmployer, notifySubscribers } from '../lib/bot/notifier.js';
 import { getModerationChannelId, getPublicChannelId, setSetting } from '../lib/bot/settings.js';
 import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
+import { escapeHtml, mdToHtml } from '../lib/bot/html.js';
 import { buildMainReplyKeyboard } from './message.js';
 
 export default async function (callbackQuery, ctx) {
@@ -115,16 +116,16 @@ export default async function (callbackQuery, ctx) {
       // Edit moderation message in place (removes buttons, appends approval record)
       if (chatId && messageId) {
         const approvedTag =
-          `\n\n${t(userLang, 'moderation.status_approved')}\n` +
-          `👤 ${t(userLang, 'moderation.moderator')}: @${moderatorUsername} (\`${fromId}\`)\n` +
-          `⏰ ${t(userLang, 'moderation.time')}: ${nowIso}`;
+          `\n\n<b>${escapeHtml(t(userLang, 'moderation.status_approved'))}</b>\n` +
+          `👤 ${escapeHtml(t(userLang, 'moderation.moderator'))}: @${escapeHtml(moderatorUsername)} (<code>${fromId}</code>)\n` +
+          `⏰ ${escapeHtml(t(userLang, 'moderation.time'))}: ${nowIso}`;
 
         try {
           await api.editMessageText({
             chat_id: chatId,
             message_id: messageId,
             text: (msg?.text || '') + approvedTag,
-            parse_mode: 'Markdown',
+            parse_mode: 'HTML',
           });
         } catch (e) {
           logger.warn('handlers/callback_query.js', 'Could not edit moderation message', e);
@@ -157,16 +158,16 @@ export default async function (callbackQuery, ctx) {
       // Edit moderation message in place
       if (chatId && messageId) {
         const rejectedTag =
-          `\n\n${t(userLang, 'moderation.status_rejected')}\n` +
-          `👤 ${t(userLang, 'moderation.moderator')}: @${moderatorUsername}\n` +
-          `⏰ ${t(userLang, 'moderation.time')}: ${nowIso}`;
+          `\n\n<b>${escapeHtml(t(userLang, 'moderation.status_rejected'))}</b>\n` +
+          `👤 ${escapeHtml(t(userLang, 'moderation.moderator'))}: @${escapeHtml(moderatorUsername)}\n` +
+          `⏰ ${escapeHtml(t(userLang, 'moderation.time'))}: ${nowIso}`;
 
         try {
           await api.editMessageText({
             chat_id: chatId,
             message_id: messageId,
             text: (msg?.text || '') + rejectedTag,
-            parse_mode: 'Markdown',
+            parse_mode: 'HTML',
           });
         } catch (e) {
           logger.warn('handlers/callback_query.js', 'Could not edit moderation message', e);
@@ -192,13 +193,17 @@ export default async function (callbackQuery, ctx) {
     if (data === 'admin:menu') {
       const menu = buildAdminPanelMenu(userLang);
       if (chatId && messageId) {
-        await api.editMessageText({
-          chat_id: chatId,
-          message_id: messageId,
-          text: menu.text,
-          parse_mode: 'Markdown',
-          reply_markup: menu.reply_markup,
-        });
+        try {
+          await api.editMessageText({
+            chat_id: chatId,
+            message_id: messageId,
+            text: mdToHtml(menu.text),
+            parse_mode: 'HTML',
+            reply_markup: menu.reply_markup,
+          });
+        } catch (err) {
+          logger.error('handlers/callback_query.js', 'Error editing admin:menu', err);
+        }
       }
       return;
     }
@@ -231,8 +236,8 @@ export default async function (callbackQuery, ctx) {
           await api.editMessageText({
             chat_id: chatId,
             message_id: messageId,
-            text: statsReport.text,
-            parse_mode: 'Markdown',
+            text: mdToHtml(statsReport.text),
+            parse_mode: 'HTML',
             reply_markup: statsReport.reply_markup,
           });
         }
@@ -248,13 +253,17 @@ export default async function (callbackQuery, ctx) {
       const pubChannel = await getPublicChannelId();
       const menu = buildChannelSettingsMenu(modChannel, pubChannel, userLang);
       if (chatId && messageId) {
-        await api.editMessageText({
-          chat_id: chatId,
-          message_id: messageId,
-          text: menu.text,
-          parse_mode: 'Markdown',
-          reply_markup: menu.reply_markup,
-        });
+        try {
+          await api.editMessageText({
+            chat_id: chatId,
+            message_id: messageId,
+            text: mdToHtml(menu.text),
+            parse_mode: 'HTML',
+            reply_markup: menu.reply_markup,
+          });
+        } catch (err) {
+          logger.error('handlers/callback_query.js', 'Error editing admin:channels', err);
+        }
       }
       return;
     }
@@ -306,7 +315,8 @@ export default async function (callbackQuery, ctx) {
           await api.editMessageText({
             chat_id: chatId,
             message_id: messageId,
-            text: t(userLang, 'admin.queue_empty'),
+            text: escapeHtml(t(userLang, 'admin.queue_empty')),
+            parse_mode: 'HTML',
             reply_markup: {
               inline_keyboard: [
                 [{ text: t(userLang, 'common.back'), callback_data: 'admin:menu' }],
@@ -325,13 +335,17 @@ export default async function (callbackQuery, ctx) {
       ]);
 
       if (chatId && messageId) {
-        await api.editMessageText({
-          chat_id: chatId,
-          message_id: messageId,
-          text: card.text,
-          parse_mode: 'Markdown',
-          reply_markup: card.reply_markup,
-        });
+        try {
+          await api.editMessageText({
+            chat_id: chatId,
+            message_id: messageId,
+            text: card.text,
+            parse_mode: 'HTML',
+            reply_markup: card.reply_markup,
+          });
+        } catch (err) {
+          logger.error('handlers/callback_query.js', 'Error editing message for admin queue', err);
+        }
       }
       return;
     }
@@ -344,19 +358,19 @@ export default async function (callbackQuery, ctx) {
         .all();
 
       const adminListText = currentAdmins
-        .map((a) => `• @${a.username || a.tgId} (\`${a.tgId}\`)`)
+        .map((a) => `• @${escapeHtml(a.username || a.tgId)} (<code>${a.tgId}</code>)`)
         .join('\n');
 
       const infoText =
-        `👥 **${t(userLang, 'admin.btn_manage_admins')}**\n\n` +
-        (adminListText || t(userLang, 'common.not_specified'));
+        `👥 <b>${escapeHtml(t(userLang, 'admin.btn_manage_admins'))}</b>\n\n` +
+        (adminListText || escapeHtml(t(userLang, 'common.not_specified')));
 
       if (chatId && messageId) {
         await api.editMessageText({
           chat_id: chatId,
           message_id: messageId,
           text: infoText,
-          parse_mode: 'Markdown',
+          parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
               [{ text: t(userLang, 'common.back'), callback_data: 'admin:menu' }],

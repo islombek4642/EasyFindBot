@@ -10,6 +10,7 @@ export function Button({
   size = 'md',
   icon = null,
   iconRight = null,
+  iconSize,
   loading = false,
   disabled = false,
   children,
@@ -41,6 +42,9 @@ export function Button({
     .filter(Boolean)
     .join(' ');
 
+  // Auto icon size: lg → 22, md → 18, sm → 16
+  const autoSize = iconSize ?? (size === 'lg' ? 22 : size === 'sm' ? 16 : 18);
+
   return (
     <button
       type={type}
@@ -50,12 +54,12 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <Icon icon="solar:refresh-circle-bold" className="spin-icon" width="18" height="18" />
+        <Icon icon="solar:refresh-circle-bold" className="spin-icon" width={autoSize} height={autoSize} />
       ) : (
-        icon && <Icon icon={icon} width="18" height="18" />
+        icon && <Icon icon={icon} width={autoSize} height={autoSize} />
       )}
       {children}
-      {!loading && iconRight && <Icon icon={iconRight} width="18" height="18" />}
+      {!loading && iconRight && <Icon icon={iconRight} width={autoSize} height={autoSize} />}
     </button>
   );
 }

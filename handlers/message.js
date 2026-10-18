@@ -4,7 +4,8 @@ import { users, vacancies } from '../schema.js';
 import { config } from '../lib/config.js';
 import { isUserAdmin } from '../lib/bot/auth.js';
 import { buildAdminPanelMenu } from '../lib/bot/admin.js';
-import { getSetting, setSetting } from '../lib/bot/settings.js';
+import { getSetting, setSetting, normalizeChannelId } from '../lib/bot/settings.js';
+import { mdToHtml } from '../lib/bot/html.js';
 import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
 import { registerBotCommands } from '../lib/bot/setup.js';
@@ -140,7 +141,8 @@ export default async function (message, ctx) {
     const pendingAction = await getSetting(`pending_action_${userId}`);
     if (pendingAction) {
       if (pendingAction === 'set_channel_public') {
-        await setSetting('public_channel_id', text);
+        const normalized = normalizeChannelId(text);
+        await setSetting('public_channel_id', normalized);
         await setSetting(`pending_action_${userId}`, '');
         await api.sendMessage({
           chat_id: chatId,
@@ -149,7 +151,8 @@ export default async function (message, ctx) {
         });
         return;
       } else if (pendingAction === 'set_channel_moderation') {
-        await setSetting('moderation_channel_id', text);
+        const normalized = normalizeChannelId(text);
+        await setSetting('moderation_channel_id', normalized);
         await setSetting(`pending_action_${userId}`, '');
         await api.sendMessage({
           chat_id: chatId,
@@ -369,8 +372,8 @@ export default async function (message, ctx) {
     const adminMenu = buildAdminPanelMenu(userLang);
     await api.sendMessage({
       chat_id: chatId,
-      text: adminMenu.text,
-      parse_mode: 'Markdown',
+      text: mdToHtml(adminMenu.text),
+      parse_mode: 'HTML',
       reply_markup: adminMenu.reply_markup,
     });
     return;
