@@ -174,3 +174,41 @@ export function buildChannelSettingsMenu(modChannel, pubChannel, lang = 'uz') {
   };
 }
 
+export function buildBroadcastAudienceMenu(counts = {}, lang = 'uz') {
+  const { all = 0, seekers = 0, employers = 0 } = counts;
+  const text = t(lang, 'admin.broadcast_title');
+  const buttons = [
+    [{ text: t(lang, 'admin.broadcast_aud_all', { count: all }), callback_data: "admin:broadcast:audience:all" }],
+    [{ text: t(lang, 'admin.broadcast_aud_seekers', { count: seekers }), callback_data: "admin:broadcast:audience:seeker" }],
+    [{ text: t(lang, 'admin.broadcast_aud_employers', { count: employers }), callback_data: "admin:broadcast:audience:employer" }],
+    [{ text: t(lang, 'common.back'), callback_data: "admin:menu" }],
+  ];
+
+  return {
+    text,
+    reply_markup: {
+      inline_keyboard: buttons,
+    },
+  };
+}
+
+export function buildBroadcastPreview(audienceName, userCount, content, lang = 'uz') {
+  const text = t(lang, 'admin.broadcast_preview_title', {
+    audience: audienceName,
+    count: userCount,
+    content,
+  });
+
+  const buttons = [
+    [{ text: t(lang, 'admin.broadcast_btn_send'), callback_data: "admin:broadcast:send" }],
+    [{ text: t(lang, 'admin.broadcast_btn_cancel'), callback_data: "admin:broadcast:cancel" }],
+  ];
+
+  return {
+    text,
+    reply_markup: {
+      inline_keyboard: buttons,
+    },
+  };
+}
+

@@ -1,9 +1,9 @@
 import { api, db } from 'sdk';
-import { eq, sql, asc } from 'sdk/db';
+import { eq, sql, asc, count } from 'sdk/db';
 import { users, vacancies } from '../schema.js';
 import { config } from '../lib/config.js';
 import { isUserAdmin, isUserSuperAdmin } from '../lib/bot/auth.js';
-import { buildAdminPanelMenu } from '../lib/bot/admin.js';
+import { buildAdminPanelMenu, buildBroadcastPreview } from '../lib/bot/admin.js';
 import { buildModerationCard } from '../lib/bot/moderator.js';
 import { notifyEmployer } from '../lib/bot/notifier.js';
 import { getSetting, setSetting, normalizeChannelId } from '../lib/bot/settings.js';
@@ -248,6 +248,68 @@ export default async function (message, ctx) {
             reply_markup: card.reply_markup,
           });
         }
+        return;
+      } else if (pendingAction.startsWith('broadcast_input:')) {
+        const isSuper = isUserSuperAdmin(userId);
+        if (!isSuper) {
+          await setSetting(`pending_action_${userId}`, '');
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.unauthorized_action'),
+            reply_markup: replyKeyboard,
+          });
+          return;
+        }
+
+        const audience = pendingAction.split(':')[1] || 'all';
+        const raw = text.trim();
+
+        // Check cancel
+        if (
+          raw.toLowerCase() === 'bekor qilish' ||
+          raw.toLowerCase() === 'cancel' ||
+          raw.toLowerCase() === 'отмена' ||
+          raw.includes('Bekor') ||
+          raw.includes('Отмена')
+        ) {
+          await setSetting(`pending_action_${userId}`, '');
+          await setSetting(`broadcast_draft_${userId}`, '');
+          const menu = buildAdminPanelMenu(userLang, true);
+          await api.sendMessage({
+            chat_id: chatId,
+            text: mdToHtml(menu.text),
+            parse_mode: 'HTML',
+            reply_markup: menu.reply_markup,
+          });
+          return;
+        }
+
+        // Save draft in settings
+        await setSetting(`broadcast_draft_${userId}`, JSON.stringify({ audience, text: raw }));
+        await setSetting(`pending_action_${userId}`, 'broadcast_confirm');
+
+        // Query audience count
+        let countQ;
+        if (audience === 'seeker') {
+          countQ = db.select({ value: count() }).from(users).where(eq(users.role, 'seeker'));
+        } else if (audience === 'employer') {
+          countQ = db.select({ value: count() }).from(users).where(eq(users.role, 'employer'));
+        } else {
+          countQ = db.select({ value: count() }).from(users);
+        }
+        const [cntRes] = await countQ;
+        const totalAudience = cntRes?.value || 0;
+
+        const audienceKey = audience === 'all' ? 'all' : audience + 's';
+        const audienceName = t(userLang, `admin.broadcast_aud_${audienceKey}_name`);
+        const preview = buildBroadcastPreview(audienceName, totalAudience, raw, userLang);
+
+        await api.sendMessage({
+          chat_id: chatId,
+          text: mdToHtml(preview.text),
+          parse_mode: 'HTML',
+          reply_markup: preview.reply_markup,
+        });
         return;
       } else if (pendingAction === 'add_admin') {
         const isSuper = isUserSuperAdmin(userId);

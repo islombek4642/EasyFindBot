@@ -9,11 +9,13 @@ import {
   buildChannelSettingsMenu,
   buildManageAdminsMenu,
   buildRemoveAdminMenu,
+  buildBroadcastAudienceMenu,
+  buildBroadcastPreview,
 } from '../lib/bot/admin.js';
 import { buildModerationCard, buildRejectReasonsMenu } from '../lib/bot/moderator.js';
 import { publishToChannel } from '../lib/bot/channel.js';
 import { notifyEmployer, notifySubscribers } from '../lib/bot/notifier.js';
-import { getModerationChannelId, getPublicChannelId, setSetting, deleteSetting } from '../lib/bot/settings.js';
+import { getModerationChannelId, getPublicChannelId, getSetting, setSetting, deleteSetting } from '../lib/bot/settings.js';
 import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
 import { escapeHtml, mdToHtml } from '../lib/bot/html.js';
@@ -717,18 +719,186 @@ export default async function (callbackQuery, ctx) {
       return;
     }
 
-    // 4.11. Broadcast Placeholder (SuperAdmin only)
+    // 4.11. Broadcast Menu (SuperAdmin only)
     if (data === 'admin:broadcast') {
       if (!isUserSuperAdmin(fromId)) {
         await ack(t(userLang, 'admin.unauthorized_action'), true);
         return;
       }
 
+      const [allU] = await db.select({ value: count() }).from(users);
+      const [sU] = await db.select({ value: count() }).from(users).where(eq(users.role, 'seeker'));
+      const [eU] = await db.select({ value: count() }).from(users).where(eq(users.role, 'employer'));
+
+      const menu = buildBroadcastAudienceMenu({
+        all: allU?.value || 0,
+        seekers: sU?.value || 0,
+        employers: eU?.value || 0,
+      }, userLang);
+
       if (chatId && messageId) {
         await api.editMessageText({
           chat_id: chatId,
           message_id: messageId,
-          text: `📢 <b>${escapeHtml(t(userLang, 'admin.btn_broadcast'))}</b>\n\n<i>Tez kunda...</i>`,
+          text: mdToHtml(menu.text),
+          parse_mode: 'HTML',
+          reply_markup: menu.reply_markup,
+        });
+      }
+      return;
+    }
+
+    // 4.12. Choose Broadcast Audience
+    if (data.startsWith('admin:broadcast:audience:')) {
+      if (!isUserSuperAdmin(fromId)) {
+        await ack(t(userLang, 'admin.unauthorized_action'), true);
+        return;
+      }
+
+      const audience = data.split(':')[3] || 'all';
+      await setSetting(`pending_action_${fromId}`, `broadcast_input:${audience}`);
+
+      const audienceKey = audience === 'all' ? 'all' : audience + 's';
+      const audienceName = t(userLang, `admin.broadcast_aud_${audienceKey}_name`);
+      const promptText = t(userLang, 'admin.broadcast_prompt_text', { audience: audienceName });
+
+      if (chatId && messageId) {
+        await api.editMessageText({
+          chat_id: chatId,
+          message_id: messageId,
+          text: mdToHtml(promptText),
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: t(userLang, 'admin.btn_cancel'), callback_data: 'admin:broadcast' }],
+            ],
+          },
+        });
+      }
+      return;
+    }
+
+    // 4.13. Cancel Broadcast
+    if (data === 'admin:broadcast:cancel') {
+      if (!isUserSuperAdmin(fromId)) {
+        await ack(t(userLang, 'admin.unauthorized_action'), true);
+        return;
+      }
+
+      await setSetting(`pending_action_${fromId}`, '');
+      await setSetting(`broadcast_draft_${fromId}`, '');
+      await ack(t(userLang, 'admin.broadcast_cancelled'));
+
+      const isSuper = isUserSuperAdmin(fromId);
+      const menu = buildAdminPanelMenu(userLang, isSuper);
+      if (chatId && messageId) {
+        await api.editMessageText({
+          chat_id: chatId,
+          message_id: messageId,
+          text: mdToHtml(menu.text),
+          parse_mode: 'HTML',
+          reply_markup: menu.reply_markup,
+        });
+      }
+      return;
+    }
+
+    // 4.14. Execute Broadcast Send
+    if (data === 'admin:broadcast:send') {
+      if (!isUserSuperAdmin(fromId)) {
+        await ack(t(userLang, 'admin.unauthorized_action'), true);
+        return;
+      }
+
+      const draftRaw = await getSetting(`broadcast_draft_${fromId}`);
+      if (!draftRaw) {
+        await ack(t(userLang, 'admin.broadcast_cancelled'), true);
+        return;
+      }
+
+      let draft = null;
+      try {
+        draft = JSON.parse(draftRaw);
+      } catch (e) {
+        await ack(t(userLang, 'admin.broadcast_cancelled'), true);
+        return;
+      }
+
+      await setSetting(`pending_action_${fromId}`, '');
+      await setSetting(`broadcast_draft_${fromId}`, '');
+
+      // Show intermediate sending indicator
+      if (chatId && messageId) {
+        try {
+          await api.editMessageText({
+            chat_id: chatId,
+            message_id: messageId,
+            text: mdToHtml(t(userLang, 'admin.broadcast_sending')),
+            parse_mode: 'HTML',
+          });
+        } catch (e) {}
+      }
+
+      const { audience = 'all', text: draftContent = '' } = draft;
+
+      let targetUsers = [];
+      if (audience === 'seeker') {
+        targetUsers = await db.select({ tgId: users.tgId }).from(users).where(eq(users.role, 'seeker')).all();
+      } else if (audience === 'employer') {
+        targetUsers = await db.select({ tgId: users.tgId }).from(users).where(eq(users.role, 'employer')).all();
+      } else {
+        targetUsers = await db.select({ tgId: users.tgId }).from(users).all();
+      }
+
+      const audienceKey = audience === 'all' ? 'all' : audience + 's';
+      const audienceName = t(userLang, `admin.broadcast_aud_${audienceKey}_name`);
+
+      if (!targetUsers || targetUsers.length === 0) {
+        if (chatId && messageId) {
+          await api.editMessageText({
+            chat_id: chatId,
+            message_id: messageId,
+            text: mdToHtml(t(userLang, 'admin.broadcast_no_users')),
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: t(userLang, 'common.back'), callback_data: 'admin:menu' }],
+              ],
+            },
+          });
+        }
+        return;
+      }
+
+      let sentCount = 0;
+      let failedCount = 0;
+      const formattedContent = mdToHtml(draftContent);
+
+      for (const u of targetUsers) {
+        if (!u.tgId) continue;
+        try {
+          await api.sendMessage({
+            chat_id: u.tgId,
+            text: formattedContent,
+            parse_mode: 'HTML',
+          });
+          sentCount++;
+        } catch (err) {
+          failedCount++;
+        }
+      }
+
+      const reportText = t(userLang, 'admin.broadcast_success_report', {
+        audience: audienceName,
+        sent: sentCount,
+        failed: failedCount,
+      });
+
+      if (chatId && messageId) {
+        await api.editMessageText({
+          chat_id: chatId,
+          message_id: messageId,
+          text: mdToHtml(reportText),
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
