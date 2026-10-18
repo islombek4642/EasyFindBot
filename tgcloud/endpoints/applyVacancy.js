@@ -96,8 +96,6 @@ export default async function (input, ctx) {
         resumeId,
         coverLetter: input?.coverLetter ? String(input.coverLetter).trim() : null,
         status: 'applied',
-        createdAt: sql`(unixepoch())`,
-        updatedAt: sql`(unixepoch())`,
       })
       .returning()
       .run();
