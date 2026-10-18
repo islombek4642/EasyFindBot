@@ -13,6 +13,7 @@ import {
   EmptyState,
   Skeleton,
 } from '../../components/common/index.js';
+import { ResumeDetailModal } from '../resumes/ResumeDetailModal.jsx';
 
 export function VacancyApplicantsModal({
   vacancy,
@@ -23,6 +24,7 @@ export function VacancyApplicantsModal({
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [viewingResume, setViewingResume] = useState(null);
 
   const fetchApplicants = useCallback(async () => {
     if (!vacancy) return;
@@ -92,7 +94,8 @@ export function VacancyApplicantsModal({
   };
 
   return (
-    <Modal
+    <>
+      <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={`${t('profile.applicants_title')} (${applicants.length})`}
@@ -258,28 +261,75 @@ export function VacancyApplicantsModal({
                   <div style={{ flexShrink: 0 }}>{getStatusBadge(app.status)}</div>
                 </div>
 
-                {/* Resume information if attached */}
-                {app.resume && (
+                {/* Resume information: full card with view action or no-resume indicator */}
+                {app.resume ? (
                   <div
+                    onClick={() => {
+                      setViewingResume({
+                        ...app.resume,
+                        candidateName,
+                        username: candidateUsername,
+                        phone: app.user?.phone,
+                        seekerTgId: app.seekerTgId,
+                      });
+                    }}
                     style={{
                       background: 'var(--bg-input)',
-                      padding: '10px 12px',
+                      padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '4px',
+                      gap: '6px',
                       fontSize: '0.85rem',
                       borderLeft: '3px solid var(--accent-primary)',
+                      border: '1px solid rgba(var(--accent-primary-rgb, 59, 130, 246), 0.25)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                      {app.resume.title}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Icon icon="solar:document-text-bold" width="16" height="16" style={{ color: 'var(--accent-primary)' }} />
+                        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                          {app.resume.title}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          fontSize: '0.78rem',
+                          color: 'var(--accent-primary)',
+                          fontWeight: 500,
+                        }}
+                      >
+                        <span>{t('resumes.view_resume_btn')}</span>
+                        <Icon icon="solar:arrow-right-linear" width="12" height="12" />
+                      </div>
                     </div>
                     {app.resume.skills && (
                       <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                        {app.resume.skills}
+                        {Array.isArray(app.resume.skills) ? app.resume.skills.join(', ') : app.resume.skills}
                       </div>
                     )}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      background: 'var(--bg-input)',
+                      padding: '8px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.8rem',
+                      color: 'var(--text-tertiary)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      border: '1px dashed var(--border-subtle)',
+                    }}
+                  >
+                    <Icon icon="solar:document-cross-linear" width="15" height="15" />
+                    <span>{t('profile.no_resume_attached')}</span>
                   </div>
                 )}
 
@@ -359,5 +409,12 @@ export function VacancyApplicantsModal({
         </div>
       )}
     </Modal>
-  );
+
+    <ResumeDetailModal
+      resume={viewingResume}
+      isOpen={Boolean(viewingResume)}
+      onClose={() => setViewingResume(null)}
+    />
+  </>
+);
 }

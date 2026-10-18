@@ -18,10 +18,12 @@ import {
   Button,
 } from '../../components/common/index.js';
 import { CreateResumeModal } from './CreateResumeModal.jsx';
+import { ResumeDetailModal } from './ResumeDetailModal.jsx';
 
 export function ResumesView() {
   const { t } = useTranslation();
   const { resume } = useAuth();
+  const [selectedResume, setSelectedResume] = useState(null);
 
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -243,7 +245,11 @@ export function ResumesView() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {filteredResumes.map((res) => (
-            <ResumeCard key={res.id} resume={res} />
+            <ResumeCard
+              key={res.id}
+              resume={res}
+              onClick={() => setSelectedResume(res)}
+            />
           ))}
 
           {hasMore && (
@@ -269,6 +275,13 @@ export function ResumesView() {
         onSaved={() => {
           fetchResumes(1, false);
         }}
+      />
+
+      {/* Resume Detail Modal */}
+      <ResumeDetailModal
+        resume={selectedResume}
+        isOpen={Boolean(selectedResume)}
+        onClose={() => setSelectedResume(null)}
       />
     </div>
   );
