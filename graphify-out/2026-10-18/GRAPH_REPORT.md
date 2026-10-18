@@ -1,17 +1,17 @@
-# Graph Report - EasyFindBot  (2026-10-16)
+# Graph Report - EasyFindBot  (2026-10-18)
 
 ## Corpus Check
-- 411 files · ~415,584 words
+- 414 files · ~419,375 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 96 file(s) not represented in the graph (top: .ttf 54, .csv 37, .zip 1)
 
 ## Summary
-- 3104 nodes · 4256 edges · 316 communities (193 shown, 123 thin omitted)
+- 3120 nodes · 4359 edges · 312 communities (190 shown, 122 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 142 edges (avg confidence: 0.92)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9d9d1289`
+- Built from commit: `2c01bbe3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,7 +19,7 @@
 - ref_sdk
 - tgcloud/handlers/callback_query.js
 - validate_data.py
-- test_data_contracts.py
+- parse_decision_rules
 - csv
 - search_stack
 - Subagent-Driven Development
@@ -59,7 +59,7 @@
 - Telegram Serverless (`tgcloud`) Development Skill
 - Session diagnosis: <session-id>
 - prisma migrate dev
-- .generate
+- Prisma ORM 7 CLI reference
 - common/index.js
 - prisma db seed
 - Environment Variables
@@ -93,7 +93,7 @@
 - 7. JavaScript Performance
 - Quick Reference
 - Writing Skills
-- Task 7: Mini App Feature Modules & Dashboards
+- App.jsx
 - Dispatching Parallel Agents
 - Find Skills
 - Prisma Compute Framework Readiness
@@ -162,7 +162,7 @@
 - Prisma MongoDB Upgrade Path
 - _select_palette_for_mode
 - render-graphs.js
-- Review Focus
+- test_design_system_mode.py
 - stop-server.sh
 - Diagnosing Superpowers
 - Superpowers session diagnosis bundle
@@ -180,7 +180,7 @@
 - detect_framework
 - Prisma Client Setup
 - CatalogSummaryLineEndingsTest
-- split_values
+- _style_is_dark_primary
 - test_core_data_quality.py
 - using-superpowers/SKILL.md
 - Sections
@@ -188,7 +188,7 @@
 - Skill Discovery Optimization (SDO)
 - Bulletproofing Skills Against Rationalization
 - renderBranding
-- Prisma Postgres setup
+- index.jsx
 - shadcn CLI Reference
 - Pressure Test 1: Emergency Production Fix
 - Pressure Test 2: Sunk Cost + Exhaustion
@@ -203,7 +203,8 @@
 - hitl-loop.template.sh
 - GitHub issues
 - AI safety checkpoint for destructive commands
-- TestFixtureValidation
+- Critical Rules
+- TestMetricMath
 - Pi Tool Mapping
 - async-cheap-condition-before-await.md
 - Prefer Statically Analyzable Paths
@@ -305,25 +306,21 @@
 - lib/constants/salaryTypes.js
 - tgcloud/lib/constants/roles.js
 - tgcloud/lib/constants/salaryTypes.js
-- EasyFindBot — Agent Architectural Rules
-- test_core.py
-- codex-tools.md
-- Gemini CLI Tool Mapping
-- REFACTOR Phase: Close Loopholes (Stay Green)
-- TestLandingAndStackContract
-- VERIFY GREEN: Pressure Testing
-- Example: TDD Skill Bulletproofing
+- _filter_anti_patterns_for_mode
+- detect_domain
+- test_skill_script_paths.py
+- Muse Tool Mapping
 
 ## God Nodes (most connected - your core abstractions)
 1. `search()` - 45 edges
-2. `DesignSystemGenerator` - 38 edges
-3. `useTranslation()` - 38 edges
+2. `useTranslation()` - 40 edges
+3. `DesignSystemGenerator` - 38 edges
 4. `search_stack()` - 35 edges
-5. `Button()` - 30 edges
-6. `react` - 29 edges
-7. `Troubleshooting Prisma Compute` - 23 edges
-8. `t()` - 22 edges
-9. `Badge()` - 22 edges
+5. `Button()` - 32 edges
+6. `react` - 30 edges
+7. `Badge()` - 24 edges
+8. `t()` - 23 edges
+9. `Troubleshooting Prisma Compute` - 23 edges
 10. `t()` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -335,61 +332,61 @@
   .agents/skills/shadcn/rules/base-vs-radix.md → src/components/common/Button.jsx
 - `No sizing classes on icons inside components` --references--> `Button()`  [INFERRED]
   .agents/skills/shadcn/rules/icons.md → src/components/common/Button.jsx
-- `Interaction (App)` --references--> `Button()`  [INFERRED]
-  .agents/skills/ui-ux-pro-max/references/pro-rules.md → src/components/common/Button.jsx
+- `Icons → [icons.md](./rules/icons.md)` --references--> `Button()`  [INFERRED]
+  .agents/skills/shadcn/SKILL.md → src/components/common/Button.jsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (316 total, 123 thin omitted)
+## Communities (312 total, 122 thin omitted)
 
 ### Community 0 - "ref_sdk"
 Cohesion: 0.11
-Nodes (33): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildChannelSettingsMenu(), buildStatsReport(), getAllAdminTgIds(), getAuthenticatedUserId(), isUserAdmin() (+25 more)
+Nodes (36): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildChannelSettingsMenu(), buildStatsReport(), getAllAdminTgIds(), getAuthenticatedUserId(), isUserAdmin() (+28 more)
 
 ### Community 1 - "tgcloud/handlers/callback_query.js"
-Cohesion: 0.10
-Nodes (33): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildChannelSettingsMenu(), buildStatsReport(), getAllAdminTgIds(), getAuthenticatedUserId(), isUserAdmin() (+25 more)
+Cohesion: 0.09
+Nodes (37): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildChannelSettingsMenu(), buildStatsReport(), getAllAdminTgIds(), getAuthenticatedUserId(), isUserAdmin() (+29 more)
 
 ### Community 2 - "validate_data.py"
-Cohesion: 0.10
-Nodes (34): _catalog_date(), _check_app_interface_contract(), _check_catalog_contract(), _check_catalog_summary(), _check_chart_contract(), _check_color_contract(), _check_core_data_contract(), _check_file() (+26 more)
+Cohesion: 0.11
+Nodes (32): _catalog_date(), _check_app_interface_contract(), _check_catalog_contract(), _check_catalog_summary(), _check_chart_contract(), _check_color_contract(), _check_core_data_contract(), _check_file() (+24 more)
 
-### Community 3 - "test_data_contracts.py"
-Cohesion: 0.20
+### Community 3 - "parse_decision_rules"
+Cohesion: 0.24
 Nodes (4): apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), _validate_action()
 
 ### Community 4 - "csv"
-Cohesion: 0.06
-Nodes (9): _write_persisted_file(), TestMetricMath, resolve(), shipped_invocations(), SkillScriptPathsTest, read_rows(), read_rows(), TestTextLayoutDataContracts (+1 more)
+Cohesion: 0.16
+Nodes (4): read_rows(), read_rows(), TestTextLayoutDataContracts, TestTextLayoutRetrieval
 
 ### Community 5 - "search_stack"
 Cohesion: 0.09
-Nodes (6): _exact_stack_identifier(), search_stack(), _rows(), TestNativeDesktopStackFreshness, _rows(), TestWebStackFreshness
+Nodes (7): _exact_stack_identifier(), _project_row(), search_stack(), _rows(), TestNativeDesktopStackFreshness, _rows(), TestWebStackFreshness
 
 ### Community 6 - "Subagent-Driven Development"
 Cohesion: 0.04
 Nodes (39): 1. Take the task, 2. Work the steps, 3. The completion contract, 4. Complete the task, Common Rationalizations, Example Workflow, Executing Plans, Final Review (+31 more)
 
 ### Community 7 - "Testing Skills With Subagents"
-Cohesion: 0.15
-Nodes (13): Common Mistakes (Same as TDD), GREEN Phase: Write Minimal Skill (Make It Pass), Meta-Testing (When GREEN Isn't Working), Overview, Quick Reference (TDD Cycle), Real-World Impact, RED Phase: Baseline Testing (Watch It Fail), TDD Mapping for Skill Testing (+5 more)
+Cohesion: 0.04
+Nodes (41): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children, Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file (+33 more)
 
 ### Community 8 - "core.py"
-Cohesion: 0.07
-Nodes (23): _contains_phrase(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _file_signature(), _legacy_successor_guidance(), _load_csv(), _load_csv_snapshot() (+15 more)
+Cohesion: 0.08
+Nodes (21): _contains_phrase(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _file_signature(), _legacy_successor_guidance(), _load_csv(), _load_csv_snapshot() (+13 more)
 
 ### Community 9 - "design_system.py"
-Cohesion: 0.04
-Nodes (27): ansi_ljust(), _button_outline_text_color(), _contrast_ratio(), _derive_dark_palette(), _detect_page_type(), _filter_anti_patterns_for_mode(), format_ascii_box(), add_wrapped() (+19 more)
+Cohesion: 0.07
+Nodes (9): _detect_page_type(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system(), safe_slug(), _write_persisted_file(), format_output() (+1 more)
 
 ### Community 10 - "Test-Driven Development (TDD)"
 Cohesion: 0.06
 Nodes (29): Common Rationalizations, Debugging Integration, Example: Bug Fix, Final Rule, Good Tests, GREEN - Minimal Code, Overview, Red Flags - STOP and Start Over (+21 more)
 
 ### Community 11 - "search"
-Cohesion: 0.09
-Nodes (9): search(), _style_search_destination(), TestSearchDomains, TestStyleTaxonomy, Instructions file, Muse Tool Mapping, Skill invocation, Subagent dispatch (+1 more)
+Cohesion: 0.10
+Nodes (6): search(), _style_search_destination(), _valid_max_results(), TestDiagnosticsContracts, TestSearchDomains, TestStyleTaxonomy
 
 ### Community 12 - "server.cjs"
 Cohesion: 0.08
@@ -405,7 +402,7 @@ Nodes (27): Accept self-signed certificates, After (v7), Available Adapters, Bef
 
 ### Community 15 - "Button"
 Cohesion: 0.15
-Nodes (23): Buttons inside inputs use InputGroup + InputGroupAddon, Contents, Field validation and disabled states, FieldSet + FieldLegend for grouping related fields, Forms & Inputs, Forms use FieldGroup + Field, InputGroup requires InputGroupInput/InputGroupTextarea, Option sets (2–7 choices) use ToggleGroup (+15 more)
+Nodes (26): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, Buttons inside inputs use InputGroup + InputGroupAddon, Contents, Field validation and disabled states, FieldSet + FieldLegend for grouping related fields, Forms & Inputs, Forms use FieldGroup + Field, InputGroup requires InputGroupInput/InputGroupTextarea (+18 more)
 
 ### Community 16 - "AppHeader.jsx"
 Cohesion: 0.12
@@ -463,6 +460,10 @@ Nodes (20): AND (explicit), AND (implicit), Array Field Filters, Combined, Compa
 Cohesion: 0.10
 Nodes (20): cursor, distinct, Filtered include, include, Include relation count, Multiple distinct fields, Negative take (reverse), Nested include (+12 more)
 
+### Community 30 - "DesignSystemGenerator"
+Cohesion: 0.10
+Nodes (4): DesignSystemGenerator, _resolve_dial(), TestReasoningMatch, TestReasoningContract
+
 ### Community 31 - "Visual Companion Guide"
 Cohesion: 0.10
 Nodes (19): Browser Events Format, Cards (visual designs), Cleaning Up, CSS Classes Available, Design Tips, File Naming, How It Works, Mock elements (wireframe building blocks) (+11 more)
@@ -511,13 +512,9 @@ Nodes (18): 1. Problem statement (REQUIRED), 2. Triage verdict (REQUIRED), 3. En
 Cohesion: 0.11
 Nodes (18): After schema changes, Command, Common Patterns, Create and apply migration, Create without applying, Examples, Follow-up Commands, Full workflow (+10 more)
 
-### Community 43 - ".generate"
-Cohesion: 0.11
-Nodes (13): AI Safety Checkpoint, Boundary: Platform and Compute, Command Categories, Current Command Behavior, Current Prisma CLI Setup, Environment Variables, How to Use, New Configuration File (+5 more)
-
-### Community 44 - "common/index.js"
-Cohesion: 0.17
-Nodes (8): @iconify/react, react, react-dom, AuthProvider(), dictionaries, TranslationContext, TranslationProvider(), rootElement
+### Community 43 - "Prisma ORM 7 CLI reference"
+Cohesion: 0.15
+Nodes (12): AI Safety Checkpoint, Boundary: Platform and Compute, Command Categories, Current Command Behavior, Current Prisma CLI Setup, Environment Variables, How to Use, New Configuration File (+4 more)
 
 ### Community 45 - "prisma db seed"
 Cohesion: 0.11
@@ -532,8 +529,8 @@ Cohesion: 0.11
 Nodes (17): Before Delivering App UI, Example Workflow, If a search returns 0 results, Output Formats, Query Contract, Rule Categories by Priority, Running the search tool, Step 1: Analyze User Requirements (+9 more)
 
 ### Community 48 - "useTranslation"
-Cohesion: 0.43
-Nodes (13): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, Use Components, Not Custom Markup → [composition.md](./rules/composition.md), Badge(), EmptyState(), Modal(), Skeleton(), VacancyCard(), useTranslation() (+5 more)
+Cohesion: 0.39
+Nodes (16): Task 7: Mini App Feature Modules & Dashboards, 6.2. Mini App Deep Linking Routes (`src/hooks/useDeepLink.js`), Badge(), EmptyState(), Modal(), Skeleton(), VacancyCard(), useTranslation() (+8 more)
 
 ### Community 49 - "api.js"
 Cohesion: 0.17
@@ -577,7 +574,7 @@ Nodes (16): Documentation Variants to Test, Expected Results, Next Steps, NULL (
 
 ### Community 59 - "ResumesView.jsx"
 Cohesion: 0.27
-Nodes (10): Select(), CATEGORIES, REGIONS, EMPLOYMENT_TYPES, SALARY_TYPES, AuthContext, useAuth(), EMPLOYMENT_TYPES (+2 more)
+Nodes (8): CATEGORIES, REGIONS, EMPLOYMENT_TYPES, SALARY_TYPES, AuthContext, useAuth(), EMPLOYMENT_TYPES, api
 
 ### Community 60 - "Schema Changes"
 Cohesion: 0.12
@@ -592,8 +589,8 @@ Cohesion: 0.12
 Nodes (15): Common Rationalizations, Overview, Phase 1: Root Cause Investigation, Phase 2: Pattern Analysis, Phase 3: Hypothesis and Testing, Phase 4: Implementation, Quick Reference, Red Flags - STOP and Follow Process (+7 more)
 
 ### Community 63 - "read_rows"
-Cohesion: 0.23
-Nodes (3): read_rows(), TestGeneratedCatalogContract, TestReasoningContract
+Cohesion: 0.16
+Nodes (6): read_rows(), split_values(), style_identities(), TestGeneratedCatalogContract, TestLandingAndStackContract, TestStyleIdentityContract
 
 ### Community 64 - "5. Re-render Optimization"
 Cohesion: 0.12
@@ -643,9 +640,9 @@ Nodes (14): 1. Eliminating Waterfalls (CRITICAL), 2. Bundle Size Optimization (C
 Cohesion: 0.13
 Nodes (15): Code Examples, Common Rationalizations for Skipping Testing, Directory Structure, Discovery Workflow, Flowchart Usage, Match the Form to the Failure, Overview, Skill Creation Checklist (TDD Adapted) (+7 more)
 
-### Community 77 - "Task 7: Mini App Feature Modules & Dashboards"
-Cohesion: 0.36
-Nodes (9): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, Task 7: Mini App Feature Modules & Dashboards, App(), ResumeCard(), AppHeader(), BottomNav(), ROUTES, useDeepLink() (+1 more)
+### Community 77 - "App.jsx"
+Cohesion: 0.24
+Nodes (10): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, 2. Telegram Serverless Backend (`tgcloud/`), 3. Strict Reusable Design System & Frontend Architecture (`src/`), 4. Bot Handlers & Navigation, EasyFindBot — Agent Architectural Rules, App(), AppHeader(), BottomNav() (+2 more)
 
 ### Community 78 - "Dispatching Parallel Agents"
 Cohesion: 0.14
@@ -692,8 +689,8 @@ Cohesion: 0.15
 Nodes (12): 1. Schema Configuration, 2. Config Configuration, 3. Environment Variable, Common Issues, Connection String Format, "Database file not found", Driver Adapter, Limitations (+4 more)
 
 ### Community 89 - "prisma-postgres-setup/SKILL.md"
-Cohesion: 0.18
-Nodes (9): Console and database operations, Console and programmatic operations, Management API SDK, Authentication and errors, Persistent databases, Standalone provisioning, Temporary databases with create-db, v0 and Vercel Marketplace (+1 more)
+Cohesion: 0.12
+Nodes (14): Console and database operations, Console and programmatic operations, Management API SDK, Authentication and errors, Persistent databases, Standalone provisioning, Temporary databases with create-db, v0 and Vercel Marketplace (+6 more)
 
 ### Community 90 - "Component Composition"
 Cohesion: 0.15
@@ -911,13 +908,17 @@ Nodes (7): Bad, client-api-mapping, Good, Priority, References, The mapping, Why
 Cohesion: 0.25
 Nodes (8): Decision table, Hand-off rule, If staying on v6: hygiene (a deliberate stay, not neglect), Prisma MongoDB Upgrade Path, Reference files, The decision, up front, The version landscape, Verified against
 
+### Community 144 - "_select_palette_for_mode"
+Cohesion: 0.15
+Nodes (6): _button_outline_text_color(), _contrast_ratio(), _derive_dark_palette(), format_master_md(), _select_palette_for_mode(), TestPaletteSelection
+
 ### Community 145 - "render-graphs.js"
 Cohesion: 0.39
 Nodes (5): combineGraphs(), extractDotBlocks(), extractGraphBody(), main(), renderToSvg()
 
-### Community 146 - "Review Focus"
-Cohesion: 0.25
-Nodes (7): Fix Profile Telegram Data Sync, Auth Security, and Schema Mismatches Implementation Plan, Global Constraints, Review Focus, Task 2: Fix API Property Mismatches & Response Normalization, Task 3: Resolve `company` vs `companyName` and `currency` vs `salaryCurrency`, Task 4: Fix `CreateResumeModal` and `ResumeCard` Array Skills Crash, Task 5: Secure Authentication & Final Verification
+### Community 146 - "test_design_system_mode.py"
+Cohesion: 0.13
+Nodes (9): ansi_ljust(), format_ascii_box(), add_wrapped(), wrap_text(), format_markdown(), hex_to_ansi(), _mode_support_labels(), section_header() (+1 more)
 
 ### Community 147 - "stop-server.sh"
 Cohesion: 0.52
@@ -971,13 +972,13 @@ Nodes (5): 2. Telegram Serverless Backend (`tgcloud/`), 3. Frontend & Atomic Des
 Cohesion: 0.33
 Nodes (6): 1. Install dependencies, 2. Add generator block, 3. Generate Prisma Client, 4. Instantiate Prisma Client, 5. Use a single instance, Prisma Client Setup
 
-### Community 165 - "split_values"
-Cohesion: 0.47
-Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
+### Community 165 - "_style_is_dark_primary"
+Cohesion: 0.21
+Nodes (4): _query_wants_dark(), _resolve_color_mode(), _style_is_dark_primary(), TestModeResolution
 
 ### Community 166 - "test_core_data_quality.py"
-Cohesion: 0.17
-Nodes (9): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _check_typography_contract(), _configured_font_names(), _font_families() (+1 more)
+Cohesion: 0.14
+Nodes (11): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _check_typography_contract(), _configured_font_names(), contrast_ratio() (+3 more)
 
 ### Community 167 - "using-superpowers/SKILL.md"
 Cohesion: 0.33
@@ -1003,9 +1004,9 @@ Nodes (6): Address "Spirit vs Letter" Arguments, Build Rationalization Table, Bu
 Cohesion: 0.40
 Nodes (5): brandMarkup(), escapeHtmlText(), renderBranding(), waitingPage(), wrapInFrame()
 
-### Community 173 - "Prisma Postgres setup"
-Cohesion: 0.40
-Nodes (5): 1. Inspect the project, 2. Reuse or obtain a database, 3. Connect the application, 4. Configure the ORM and verify, Prisma Postgres setup
+### Community 173 - "index.jsx"
+Cohesion: 0.18
+Nodes (6): react-dom, AuthProvider(), dictionaries, TranslationContext, TranslationProvider(), rootElement
 
 ### Community 174 - "shadcn CLI Reference"
 Cohesion: 0.40
@@ -1059,6 +1060,10 @@ Nodes (3): File, GitHub issues, Search
 Cohesion: 0.50
 Nodes (3): AI safety checkpoint for destructive commands, Reference, Required workflow
 
+### Community 188 - "Critical Rules"
+Cohesion: 0.29
+Nodes (7): Chat & Messaging → [chat.md](./rules/chat.md), CLI, Component Structure → [composition.md](./rules/composition.md), Critical Rules, Icons → [icons.md](./rules/icons.md), Styling & Tailwind → [styling.md](./rules/styling.md), Use Components, Not Custom Markup → [composition.md](./rules/composition.md)
+
 ### Community 190 - "Pi Tool Mapping"
 Cohesion: 0.50
 Nodes (3): Pi Tool Mapping, Subagents, Task lists
@@ -1087,53 +1092,33 @@ Nodes (4): File Organization, Self-Contained Skill, Skill with Heavy Reference, 
 Cohesion: 0.50
 Nodes (4): Pattern, Reference, Skill Types, Technique
 
-### Community 308 - "EasyFindBot — Agent Architectural Rules"
-Cohesion: 0.40
-Nodes (4): 2. Telegram Serverless Backend (`tgcloud/`), 3. Strict Reusable Design System & Frontend Architecture (`src/`), 4. Bot Handlers & Navigation, EasyFindBot — Agent Architectural Rules
+### Community 310 - "test_skill_script_paths.py"
+Cohesion: 0.38
+Nodes (3): resolve(), shipped_invocations(), SkillScriptPathsTest
 
-### Community 309 - "test_core.py"
-Cohesion: 0.16
-Nodes (3): detect_domain(), TestDiagnosticsContracts, TestDomainDetection
-
-### Community 310 - "codex-tools.md"
-Cohesion: 0.22
-Nodes (5): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children
-
-### Community 311 - "Gemini CLI Tool Mapping"
-Cohesion: 0.29
-Nodes (7): Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file, Parallel dispatch, Personal skills directory, Prompt filling, Subagent support
-
-### Community 312 - "REFACTOR Phase: Close Loopholes (Stay Green)"
-Cohesion: 0.29
-Nodes (7): 1. Explicit Negation in Rules, 2. Entry in Rationalization Table, 3. Red Flag Entry, 4. Update description, Plugging Each Hole, Re-verify After Refactoring, REFACTOR Phase: Close Loopholes (Stay Green)
-
-### Community 314 - "VERIFY GREEN: Pressure Testing"
-Cohesion: 0.40
-Nodes (5): Key Elements of Good Scenarios, Pressure Types, Testing Setup, VERIFY GREEN: Pressure Testing, Writing Pressure Scenarios
-
-### Community 315 - "Example: TDD Skill Bulletproofing"
-Cohesion: 0.50
-Nodes (4): Example: TDD Skill Bulletproofing, Initial Test (Failed), Iteration 1 - Add Counter, Iteration 2 - Add Foundational Principle
+### Community 311 - "Muse Tool Mapping"
+Cohesion: 0.33
+Nodes (5): Instructions file, Muse Tool Mapping, Skill invocation, Subagent dispatch, Task tracking
 
 ## Knowledge Gaps
 - **2 isolated node(s):** `RFC-6455`, `@tgcloud/cli`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2007 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **123 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2012 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **122 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `search()` connect `search` to `Commands`, `csv`, `test_core_data_quality.py`, `core.py`, `design_system.py`, `.generate`, `BM25`, `test_core.py`, `._multi_domain_search`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Why does `search()` connect `search` to `Commands`, `csv`, `search_stack`, `test_core_data_quality.py`, `core.py`, `design_system.py`, `BM25`, `detect_domain`, `Muse Tool Mapping`, `DesignSystemGenerator`?**
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `search()` (e.g. with ``search` — Search registries` and `Muse Tool Mapping`) actually correct?**
   _`search()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `RFC-6455`, `@tgcloud/cli` to the rest of the system?**
   _2 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ref_sdk` be split into smaller, more focused modules?**
-  _Cohesion score 0.10571184995737426 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10730593607305935 - nodes in this community are weakly interconnected._
 - **Why does `Commands` connect `Commands` to `shadcn CLI Reference`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
-- **Are the 4 inferred relationships involving `DesignSystemGenerator` (e.g. with `TestReasoningMatch` and `TestReasoningContract`) actually correct?**
-  _`DesignSystemGenerator` has 4 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+- **Are the 7 inferred relationships involving `useTranslation()` (e.g. with `3. Frontend & Atomic Design System (`src/`)` and `3. Strict Reusable Design System & Frontend Architecture (`src/`)`) actually correct?**
+  _`useTranslation()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Should `tgcloud/handlers/callback_query.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.09877085162423178 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09057609057609058 - nodes in this community are weakly interconnected._

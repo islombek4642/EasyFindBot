@@ -43548,7 +43548,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/common/ResumeCard.jsx",
-      "source_location": "L60",
+      "source_location": "L64",
       "weight": 1.0
     },
     {
@@ -43596,7 +43596,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/common/VacancyCard.jsx",
-      "source_location": "L141",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -87579,5 +87579,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "2c01bbe3514bab0e39b68525ac7807d3ea38992b"
+  "built_at_commit": "4a97cf343cfa280b921e7f9ff683bc75e06bdb35"
 }
