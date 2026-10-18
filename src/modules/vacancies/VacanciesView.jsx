@@ -91,8 +91,9 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
   useEffect(() => {
     if (initialVacancyId) {
       api.getVacancyById({ id: initialVacancyId })
-        .then((vac) => {
-          if (vac) setActiveVacancy(vac);
+        .then((res) => {
+          const vac = res?.vacancy || res;
+          if (vac && (vac.title || vac.id)) setActiveVacancy(vac);
         })
         .catch((err) => console.error('Deep link vacancy not found:', err))
         .finally(() => {

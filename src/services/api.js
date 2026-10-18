@@ -402,7 +402,10 @@ export const api = {
   getInitData: () => callServerless('getInitData'),
   updateUser: (params) => callServerless('updateUser', params),
   getVacancies: (params) => callServerless('getVacancies', params),
-  getVacancyById: (params) => callServerless('getVacancyById', params),
+  getVacancyById: async (params) => {
+    const res = await callServerless('getVacancyById', params);
+    return res?.vacancy || res;
+  },
   createVacancy: (params) => callServerless('createVacancy', params),
   closeVacancy: (params) => callServerless('closeVacancy', params),
   getMyVacancies: () => callServerless('getMyVacancies'),

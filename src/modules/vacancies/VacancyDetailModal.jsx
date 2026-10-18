@@ -8,7 +8,7 @@ import { useTranslation } from '../../locales/index.jsx';
 import { Modal, Badge, Button, Input } from '../../components/common/index.js';
 
 export function VacancyDetailModal({
-  vacancy,
+  vacancy: rawVacancy,
   isOpen,
   onClose,
   hasApplied,
@@ -19,6 +19,7 @@ export function VacancyDetailModal({
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
 
+  const vacancy = rawVacancy?.vacancy || rawVacancy;
   if (!vacancy) return null;
 
   const {
