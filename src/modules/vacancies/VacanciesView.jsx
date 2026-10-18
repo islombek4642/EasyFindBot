@@ -105,10 +105,31 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
   const handleApply = async (vacId, coverLetter) => {
     try {
       setApplying(true);
-      await api.applyVacancy({ vacancyId: vacId, coverLetter });
-      setAppliedVacancyIds((prev) => new Set([...prev, vacId]));
+      const res = await api.applyVacancy({ vacancyId: vacId, coverLetter });
+      if (res && (res.success || res.ok)) {
+        setAppliedVacancyIds((prev) => new Set([...prev, vacId]));
+        if (typeof window !== 'undefined' && window.Telegram?.WebApp?.showAlert) {
+          window.Telegram.WebApp.showAlert(t('vacancies.apply_success'));
+        }
+        return true;
+      } else {
+        const errorMsg = res?.error || t('common.error');
+        if (typeof window !== 'undefined' && window.Telegram?.WebApp?.showAlert) {
+          window.Telegram.WebApp.showAlert(errorMsg);
+        } else {
+          alert(errorMsg);
+        }
+        return false;
+      }
     } catch (err) {
       console.error('Apply error:', err);
+      const errorMsg = err.message || t('common.error');
+      if (typeof window !== 'undefined' && window.Telegram?.WebApp?.showAlert) {
+        window.Telegram.WebApp.showAlert(errorMsg);
+      } else {
+        alert(errorMsg);
+      }
+      return false;
     } finally {
       setApplying(false);
     }

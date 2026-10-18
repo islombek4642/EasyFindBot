@@ -92,6 +92,8 @@ export default {
     apply_btn: "Откликнуться",
     applied_btn: "Вы откликнулись",
     apply_success: "Ваш отклик успешно отправлен!",
+    own_vacancy_notice: "Это ваше объявление (нельзя откликнуться самому себе)",
+    cover_letter_placeholder: "Вы можете написать сопроводительное сообщение (необязательно)...",
     details_title: "Детали вакансии",
     company: "Компания",
     per_month: "/мес",

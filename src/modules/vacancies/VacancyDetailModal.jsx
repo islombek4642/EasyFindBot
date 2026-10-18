@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useTranslation } from '../../locales/index.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
 import { Modal, Badge, Button, Input } from '../../components/common/index.js';
 
 export function VacancyDetailModal({
@@ -16,11 +17,18 @@ export function VacancyDetailModal({
   applying = false,
 }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
 
   const vacancy = rawVacancy?.vacancy || rawVacancy;
   if (!vacancy) return null;
+
+  const currentUserId = user?.id || user?.tgId;
+  const isOwner = Boolean(
+    vacancy?.isOwner ||
+    (currentUserId && Number(vacancy.employerTgId) === Number(currentUserId))
+  );
 
   const {
     title,
@@ -81,9 +89,11 @@ export function VacancyDetailModal({
   };
 
   const handleSubmitApply = async () => {
-    await onApply(vacancy.id, coverLetter);
-    setShowApplyForm(false);
-    setCoverLetter('');
+    const success = await onApply(vacancy.id, coverLetter);
+    if (success) {
+      setShowApplyForm(false);
+      setCoverLetter('');
+    }
   };
 
   return (
@@ -166,7 +176,27 @@ export function VacancyDetailModal({
 
         {/* Action / Apply Section */}
         <div style={{ marginTop: '8px', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
-          {hasApplied ? (
+          {isOwner ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-input)',
+                color: 'var(--text-secondary)',
+                fontSize: '0.9rem',
+                fontWeight: 500,
+                textAlign: 'center',
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <Icon icon="solar:user-check-bold" width="20" height="20" style={{ color: 'var(--accent-primary)' }} />
+              <span>{t('vacancies.own_vacancy_notice')}</span>
+            </div>
+          ) : hasApplied ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--success)' }}>
               <Icon icon="solar:check-circle-bold" width="22" height="22" />
               <span style={{ fontWeight: 600 }}>{t('vacancies.applied_btn')}</span>
@@ -176,7 +206,7 @@ export function VacancyDetailModal({
               <Input
                 multiline
                 rows={3}
-                placeholder={t('post_job.desc_placeholder')}
+                placeholder={t('vacancies.cover_letter_placeholder')}
                 value={coverLetter}
                 onChange={(e) => setCoverLetter(e.target.value)}
               />

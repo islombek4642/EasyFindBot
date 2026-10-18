@@ -92,6 +92,8 @@ export default {
     apply_btn: "Ariza topshirish",
     applied_btn: "Ariza topshirilgan",
     apply_success: "Arizangiz muvaffaqiyatli yuborildi!",
+    own_vacancy_notice: "Bu siz joylashtirgan e'lon (o'zingizga ariza bera olmaysiz)",
+    cover_letter_placeholder: "Qo'shimcha xabar yoki izoh yozishingiz mumkin (ixtiyoriy)...",
     details_title: "Vakansiya tafsilotlari",
     company: "Kompaniya",
     per_month: "/oy",

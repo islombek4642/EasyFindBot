@@ -92,6 +92,8 @@ export default {
     apply_btn: "Apply Now",
     applied_btn: "Applied",
     apply_success: "Your application was submitted successfully!",
+    own_vacancy_notice: "This is your posting (you cannot apply to your own job)",
+    cover_letter_placeholder: "You can write a brief note or message (optional)...",
     details_title: "Vacancy Details",
     company: "Company",
     per_month: "/mo",
