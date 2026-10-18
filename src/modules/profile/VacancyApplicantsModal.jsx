@@ -153,12 +153,18 @@ export function VacancyApplicantsModal({
                       </div>
                     </div>
 
-                    {candidateUsername && (
+                    {candidateUsername ? (
                       <div style={{ marginTop: '6px' }}>
                         <a
                           href={`https://t.me/${candidateUsername}`}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={(e) => {
+                            if (window.Telegram?.WebApp?.openTelegramLink) {
+                              e.preventDefault();
+                              window.Telegram.WebApp.openTelegramLink(`https://t.me/${candidateUsername}`);
+                            }
+                          }}
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -177,6 +183,53 @@ export function VacancyApplicantsModal({
                           <span>@{candidateUsername}</span>
                           <Icon icon="solar:arrow-right-up-linear" width="11" height="11" style={{ opacity: 0.7 }} />
                         </a>
+                      </div>
+                    ) : (
+                      <div style={{ marginTop: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const url = `tg://user?id=${app.seekerTgId}`;
+                            if (window.Telegram?.WebApp?.openTelegramLink) {
+                              window.Telegram.WebApp.openTelegramLink(url);
+                            } else {
+                              window.open(url, '_blank');
+                            }
+                          }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            fontSize: '0.82rem',
+                            color: 'var(--accent-primary)',
+                            background: 'var(--accent-subtle)',
+                            padding: '4px 10px',
+                            borderRadius: '16px',
+                            fontWeight: 500,
+                            border: '1px solid rgba(var(--accent-primary-rgb, 59, 130, 246), 0.25)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Icon icon="solar:chat-round-dots-bold" width="13" height="13" />
+                          <span>{t('profile.contact_via_tg')}</span>
+                          <Icon icon="solar:arrow-right-up-linear" width="11" height="11" style={{ opacity: 0.7 }} />
+                        </button>
+                      </div>
+                    )}
+
+                    {(app.user?.phone || app.resume?.contacts) && (
+                      <div
+                        style={{
+                          marginTop: '4px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontSize: '0.8rem',
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        <Icon icon="solar:phone-bold" width="13" height="13" style={{ color: 'var(--accent-primary)' }} />
+                        <span>{app.user?.phone || app.resume?.contacts}</span>
                       </div>
                     )}
                   </div>

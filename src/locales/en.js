@@ -164,6 +164,8 @@ export default {
     status_accept_btn: "Accept",
     status_reject_btn: "Reject",
     contact_candidate: "Contact",
+    contact_via_tg: "Message on Telegram",
+    candidate_contacts: "Contact",
     candidate_message: "Candidate note",
   },
 };

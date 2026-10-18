@@ -164,6 +164,8 @@ export default {
     status_accept_btn: "Принять",
     status_reject_btn: "Отклонить",
     contact_candidate: "Связаться",
+    contact_via_tg: "Написать в Telegram",
+    candidate_contacts: "Контакты",
     candidate_message: "Сообщение кандидата",
   },
 };

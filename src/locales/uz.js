@@ -164,6 +164,8 @@ export default {
     status_accept_btn: "Qabul qilish",
     status_reject_btn: "Rad etish",
     contact_candidate: "Bog'lanish",
+    contact_via_tg: "Telegram orqali yozish",
+    candidate_contacts: "Aloqa",
     candidate_message: "Nomzod izohi",
   },
 };
