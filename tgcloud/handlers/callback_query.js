@@ -1,11 +1,12 @@
 import { api, db } from 'sdk';
-import { eq, sql, count, asc } from 'sdk/db';
+import { eq, sql, count, asc, desc } from 'sdk/db';
 import { users, vacancies, applications, resumes } from '../schema.js';
 import { isUserAdmin, isUserSuperAdmin } from '../lib/bot/auth.js';
 import { config } from '../lib/config.js';
 import {
   buildAdminPanelMenu,
   buildStatsReport,
+  buildUsersListReport,
   buildChannelSettingsMenu,
   buildManageAdminsMenu,
   buildRemoveAdminMenu,
@@ -463,6 +464,54 @@ export default async function (callbackQuery, ctx) {
         }
       } catch (err) {
         logger.error('handlers/callback_query.js', 'Error gathering stats', err);
+      }
+      return;
+    }
+
+    // 4.25. Admin Users Directory
+    if (data.startsWith('admin:users')) {
+      try {
+        const parts = data.split(':');
+        const page = Math.max(1, parseInt(parts[2] || '1', 10) || 1);
+        const pageSize = 10;
+        const offset = (page - 1) * pageSize;
+
+        const [totalU] = await db.select({ value: count() }).from(users);
+        const totalUsers = totalU?.value || 0;
+
+        const usersList = await db
+          .select({
+            id: users.id,
+            tgId: users.tgId,
+            firstName: users.firstName,
+            lastName: users.lastName,
+            username: users.username,
+            createdAt: users.createdAt,
+          })
+          .from(users)
+          .orderBy(desc(users.createdAt))
+          .limit(pageSize)
+          .offset(offset);
+
+        const usersReport = buildUsersListReport(usersList, totalUsers, page, pageSize, userLang);
+        if (chatId && messageId) {
+          try {
+            await api.editMessageText({
+              chat_id: chatId,
+              message_id: messageId,
+              text: usersReport.text,
+              parse_mode: 'HTML',
+              reply_markup: usersReport.reply_markup,
+            });
+          } catch (editErr) {
+            if (!String(editErr?.message || editErr).includes('message is not modified')) {
+              throw editErr;
+            }
+          }
+          await ack();
+        }
+      } catch (err) {
+        logger.error('handlers/callback_query.js', 'Error displaying admin:users', err);
       }
       return;
     }

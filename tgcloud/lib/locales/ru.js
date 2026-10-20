@@ -2,6 +2,8 @@ export default {
   common: {
     back: "🔙 Главное меню",
     refresh: "🔄 Обновить",
+    prev: "Назад",
+    next: "Вперед",
     not_specified: "Не указано",
     negotiable: "По договоренности",
   },
@@ -48,6 +50,9 @@ export default {
     menu_title_super: "⚙️ **EasyFindBot — Панель Главного Администратора**\n\nВыберите раздел для управления:",
     btn_queue: "⏳ Очередь модерации",
     btn_stats: "📊 Статистика системы",
+    btn_users_list: "👥 Пользователи",
+    users_list_title: "👥 <b>Список пользователей</b> (Всего: {total})\n<i>Страница {page} / {totalPages}:</i>",
+    users_empty: "Пользователей пока нет.",
     btn_manage_admins: "👥 Управление админами",
     btn_channels: "📡 Настройки каналов",
     btn_broadcast: "📢 Рассылка сообщений",
