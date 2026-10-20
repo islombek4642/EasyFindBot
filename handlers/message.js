@@ -1,51 +1,19 @@
 import { api, db } from 'sdk';
-import { eq } from 'sdk/db';
+import { eq, sql, asc, count } from 'sdk/db';
 import { users, vacancies } from '../schema.js';
 import { config } from '../lib/config.js';
-import { isUserAdmin } from '../lib/bot/auth.js';
-import { buildAdminPanelMenu } from '../lib/bot/admin.js';
+import { isUserAdmin, isUserSuperAdmin } from '../lib/bot/auth.js';
+import { buildAdminPanelMenu, buildBroadcastPreview } from '../lib/bot/admin.js';
+import { buildModerationCard } from '../lib/bot/moderator.js';
+import { notifyEmployer } from '../lib/bot/notifier.js';
 import { getSetting, setSetting, normalizeChannelId } from '../lib/bot/settings.js';
 import { mdToHtml } from '../lib/bot/html.js';
 import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
 import { registerBotCommands } from '../lib/bot/setup.js';
 
-export function buildMainReplyKeyboard(isAdmin, lang = 'uz', user = null) {
-  const miniAppBaseUrl = config.miniAppUrl || 'https://app.tgcloud.ai';
-  let userParams = '';
-  if (user) {
-    const uid = typeof user === 'object' ? user.id : user;
-    const fn = typeof user === 'object' ? (user.first_name || user.firstName || '') : '';
-    const ln = typeof user === 'object' ? (user.last_name || user.lastName || '') : '';
-    const un = typeof user === 'object' ? (user.username || '') : '';
-    userParams = `&uid=${uid}`;
-    if (fn) userParams += `&first_name=${encodeURIComponent(fn)}`;
-    if (ln) userParams += `&last_name=${encodeURIComponent(ln)}`;
-    if (un) userParams += `&username=${encodeURIComponent(un)}`;
-  }
-  const vParam = '&v=1.0.2';
-
+export function buildMainReplyKeyboard(isAdmin, lang = 'uz') {
   const rows = [
-    [
-      {
-        text: t(lang, 'keyboard.search_jobs'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=jobs${userParams}${vParam}` },
-      },
-      {
-        text: t(lang, 'keyboard.post_job'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=post_job${userParams}${vParam}` },
-      },
-    ],
-    [
-      {
-        text: t(lang, 'keyboard.my_applications'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps${userParams}${vParam}` },
-      },
-      {
-        text: t(lang, 'keyboard.my_vacancies'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs${userParams}${vParam}` },
-      },
-    ],
     [
       { text: t(lang, 'keyboard.change_language') },
       { text: t(lang, 'keyboard.help') },
@@ -136,7 +104,7 @@ export default async function (message, ctx) {
     resize_keyboard: true,
   };
 
-  // 2. Check if admin has pending action (e.g. setting channel ID)
+  // 2. Check if admin has pending action (e.g. setting channel ID, adding admin)
   if (isAdmin && text && !text.startsWith('/')) {
     const pendingAction = await getSetting(`pending_action_${userId}`);
     if (pendingAction) {
@@ -160,6 +128,281 @@ export default async function (message, ctx) {
           reply_markup: replyKeyboard,
         });
         return;
+      } else if (pendingAction.startsWith('custom_reject:')) {
+        const parts = pendingAction.split(':');
+        const vacId = parseInt(parts[1], 10);
+        const queueIdx = parseInt(parts[2] || '0', 10);
+        await setSetting(`pending_action_${userId}`, '');
+
+        const raw = text.trim();
+        // Check cancel
+        if (
+          raw.toLowerCase() === 'bekor qilish' ||
+          raw.toLowerCase() === 'cancel' ||
+          raw.toLowerCase() === 'отмена' ||
+          raw.includes('Bekor') ||
+          raw.includes('Отмена')
+        ) {
+          const remaining = await db.select()
+            .from(vacancies)
+            .where(eq(vacancies.status, 'pending'))
+            .orderBy(asc(vacancies.createdAt))
+            .all();
+          if (!remaining || remaining.length === 0) {
+            await api.sendMessage({
+              chat_id: chatId,
+              text: mdToHtml(t(userLang, 'admin.queue_empty')),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: [
+                  [{ text: t(userLang, 'commands.back'), callback_data: 'admin:menu' }],
+                ],
+              },
+            });
+          } else {
+            const safeIdx = Math.max(0, Math.min(queueIdx, remaining.length - 1));
+            const card = buildModerationCard(remaining[safeIdx], userLang, { index: safeIdx, total: remaining.length });
+            await api.sendMessage({
+              chat_id: chatId,
+              text: card.text,
+              parse_mode: 'HTML',
+              reply_markup: card.reply_markup,
+            });
+          }
+          return;
+        }
+
+        const vacancy = await db.select().from(vacancies).where(eq(vacancies.id, vacId)).get();
+        if (vacancy && vacancy.status === 'pending') {
+          await db.update(vacancies)
+            .set({
+              status: 'rejected',
+              rejectionReason: raw,
+              moderatedByTgId: Number(userId),
+              updatedAt: sql`(unixepoch())`,
+            })
+            .where(eq(vacancies.id, vacId))
+            .run();
+
+          await notifyEmployer(api, vacancy.employerTgId, vacancy, 'rejected', raw);
+        }
+
+        const remaining = await db.select()
+          .from(vacancies)
+          .where(eq(vacancies.status, 'pending'))
+          .orderBy(asc(vacancies.createdAt))
+          .all();
+
+        if (!remaining || remaining.length === 0) {
+          await api.sendMessage({
+            chat_id: chatId,
+            text: mdToHtml(t(userLang, 'admin.queue_all_done')),
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: t(userLang, 'commands.back'), callback_data: 'admin:menu' }],
+              ],
+            },
+          });
+        } else {
+          const safeIdx = Math.max(0, Math.min(queueIdx, remaining.length - 1));
+          const card = buildModerationCard(remaining[safeIdx], userLang, { index: safeIdx, total: remaining.length });
+          await api.sendMessage({
+            chat_id: chatId,
+            text: card.text,
+            parse_mode: 'HTML',
+            reply_markup: card.reply_markup,
+          });
+        }
+        return;
+      } else if (pendingAction.startsWith('broadcast_input:')) {
+        const isSuper = isUserSuperAdmin(userId);
+        if (!isSuper) {
+          await setSetting(`pending_action_${userId}`, '');
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.unauthorized_action'),
+            reply_markup: replyKeyboard,
+          });
+          return;
+        }
+
+        const audience = pendingAction.split(':')[1] || 'all';
+        const raw = text.trim();
+
+        // Check cancel
+        if (
+          raw.toLowerCase() === 'bekor qilish' ||
+          raw.toLowerCase() === 'cancel' ||
+          raw.toLowerCase() === 'отмена' ||
+          raw.includes('Bekor') ||
+          raw.includes('Отмена')
+        ) {
+          await setSetting(`pending_action_${userId}`, '');
+          await setSetting(`broadcast_draft_${userId}`, '');
+          const menu = buildAdminPanelMenu(userLang, true);
+          await api.sendMessage({
+            chat_id: chatId,
+            text: mdToHtml(menu.text),
+            parse_mode: 'HTML',
+            reply_markup: menu.reply_markup,
+          });
+          return;
+        }
+
+        // Save draft in settings
+        await setSetting(`broadcast_draft_${userId}`, JSON.stringify({ audience, text: raw }));
+        await setSetting(`pending_action_${userId}`, 'broadcast_confirm');
+
+        // Query audience count
+        let countQ;
+        if (audience === 'seeker') {
+          countQ = db.select({ value: count() }).from(users).where(eq(users.role, 'seeker'));
+        } else if (audience === 'employer') {
+          countQ = db.select({ value: count() }).from(users).where(eq(users.role, 'employer'));
+        } else {
+          countQ = db.select({ value: count() }).from(users);
+        }
+        const [cntRes] = await countQ;
+        const totalAudience = cntRes?.value || 0;
+
+        const audienceKey = audience === 'all' ? 'all' : audience + 's';
+        const audienceName = t(userLang, `admin.broadcast_aud_${audienceKey}_name`);
+        const preview = buildBroadcastPreview(audienceName, totalAudience, raw, userLang);
+
+        await api.sendMessage({
+          chat_id: chatId,
+          text: mdToHtml(preview.text),
+          parse_mode: 'HTML',
+          reply_markup: preview.reply_markup,
+        });
+        return;
+      } else if (pendingAction === 'add_admin') {
+        const isSuper = isUserSuperAdmin(userId);
+        if (!isSuper) {
+          await setSetting(`pending_action_${userId}`, '');
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.unauthorized_action'),
+            reply_markup: replyKeyboard,
+          });
+          return;
+        }
+
+        const raw = text.trim();
+        // Check cancel
+        if (
+          raw.toLowerCase() === 'bekor qilish' ||
+          raw.toLowerCase() === 'cancel' ||
+          raw.toLowerCase() === 'отмена' ||
+          raw.includes('Bekor') ||
+          raw.includes('Отмена')
+        ) {
+          await setSetting(`pending_action_${userId}`, '');
+          const menu = buildAdminPanelMenu(userLang, true);
+          await api.sendMessage({
+            chat_id: chatId,
+            text: mdToHtml(menu.text),
+            parse_mode: 'HTML',
+            reply_markup: menu.reply_markup,
+          });
+          return;
+        }
+
+        let targetTgId = null;
+        let targetUsername = null;
+
+        const cleanStr = raw.replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '').trim();
+
+        if (/^\d+$/.test(cleanStr)) {
+          targetTgId = Number(cleanStr);
+        } else {
+          targetUsername = cleanStr.toLowerCase();
+        }
+
+        let targetUser = null;
+        if (targetTgId) {
+          targetUser = await db.select().from(users).where(eq(users.tgId, targetTgId)).get();
+        } else if (targetUsername) {
+          targetUser = await db.select().from(users).where(eq(sql`lower(${users.username})`, targetUsername)).get();
+        }
+
+        if (targetUser) {
+          if (targetUser.role === 'admin' || Number(targetUser.tgId) === Number(config.superAdminTgId)) {
+            await api.sendMessage({
+              chat_id: chatId,
+              text: t(userLang, 'admin.admin_already_exists'),
+              reply_markup: replyKeyboard,
+            });
+            return;
+          }
+
+          await db.update(users)
+            .set({ role: 'admin' })
+            .where(eq(users.tgId, targetUser.tgId))
+            .run();
+
+          await setSetting(`pending_action_${userId}`, '');
+
+          const handle = targetUser.username ? `@${targetUser.username}` : (targetUser.firstName || String(targetUser.tgId));
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.admin_added_success', { tgId: targetUser.tgId, handle }),
+            parse_mode: 'HTML',
+            reply_markup: replyKeyboard,
+          });
+
+          // Notify newly appointed admin
+          try {
+            await api.sendMessage({
+              chat_id: targetUser.tgId,
+              text: t(targetUser.language || 'uz', 'admin.admin_notify_granted'),
+              parse_mode: 'Markdown',
+            });
+          } catch (e) {
+            logger.warn('handlers/message.js', 'Could not notify newly appointed admin', e);
+          }
+          return;
+        } else {
+          // If purely numeric ID was given, insert new user record
+          if (targetTgId) {
+            await db.insert(users)
+              .values({
+                tgId: targetTgId,
+                role: 'admin',
+                language: 'uz',
+              })
+              .run();
+
+            await setSetting(`pending_action_${userId}`, '');
+
+            await api.sendMessage({
+              chat_id: chatId,
+              text: t(userLang, 'admin.admin_added_success', { tgId: targetTgId, handle: String(targetTgId) }),
+              parse_mode: 'HTML',
+              reply_markup: replyKeyboard,
+            });
+
+            try {
+              await api.sendMessage({
+                chat_id: targetTgId,
+                text: t('uz', 'admin.admin_notify_granted'),
+                parse_mode: 'Markdown',
+              });
+            } catch (e) {
+              // Ignore if user has not interacted with bot yet
+            }
+            return;
+          }
+
+          // If username given but not in database yet
+          await api.sendMessage({
+            chat_id: chatId,
+            text: t(userLang, 'admin.admin_not_found'),
+            reply_markup: replyKeyboard,
+          });
+          return;
+        }
       }
     }
   }
@@ -209,9 +452,32 @@ export default async function (message, ctx) {
       name: from.first_name || 'Foydalanuvchi',
     });
 
+    const appUrl = config.miniAppUrl || 'https://app8716517896.tgcloud.ai';
+
     await api.sendMessage({
       chat_id: chatId,
       text: welcomeText,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: t(userLang, 'commands.btn_search_jobs'),
+              web_app: { url: `${appUrl}?startapp=jobs` },
+            },
+          ],
+          [
+            {
+              text: t(userLang, 'commands.btn_post_job'),
+              web_app: { url: `${appUrl}?startapp=post_job` },
+            },
+          ],
+        ],
+      },
+    });
+
+    await api.sendMessage({
+      chat_id: chatId,
+      text: t(userLang, 'commands.menu_mounted'),
       reply_markup: replyKeyboard,
     });
     return;
@@ -369,7 +635,8 @@ export default async function (message, ctx) {
       return;
     }
 
-    const adminMenu = buildAdminPanelMenu(userLang);
+    const isSuper = isUserSuperAdmin(userId);
+    const adminMenu = buildAdminPanelMenu(userLang, isSuper);
     await api.sendMessage({
       chat_id: chatId,
       text: mdToHtml(adminMenu.text),

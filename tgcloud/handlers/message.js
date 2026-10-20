@@ -12,42 +12,8 @@ import { t } from '../lib/locales/index.js';
 import { logger } from '../lib/logger.js';
 import { registerBotCommands } from '../lib/bot/setup.js';
 
-export function buildMainReplyKeyboard(isAdmin, lang = 'uz', user = null) {
-  const miniAppBaseUrl = config.miniAppUrl || 'https://app.tgcloud.ai';
-  let userParams = '';
-  if (user) {
-    const uid = typeof user === 'object' ? user.id : user;
-    const fn = typeof user === 'object' ? (user.first_name || user.firstName || '') : '';
-    const ln = typeof user === 'object' ? (user.last_name || user.lastName || '') : '';
-    const un = typeof user === 'object' ? (user.username || '') : '';
-    userParams = `&uid=${uid}`;
-    if (fn) userParams += `&first_name=${encodeURIComponent(fn)}`;
-    if (ln) userParams += `&last_name=${encodeURIComponent(ln)}`;
-    if (un) userParams += `&username=${encodeURIComponent(un)}`;
-  }
-  const vParam = '&v=1.0.2';
-
+export function buildMainReplyKeyboard(isAdmin, lang = 'uz') {
   const rows = [
-    [
-      {
-        text: t(lang, 'keyboard.search_jobs'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=jobs${userParams}${vParam}` },
-      },
-      {
-        text: t(lang, 'keyboard.post_job'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=post_job${userParams}${vParam}` },
-      },
-    ],
-    [
-      {
-        text: t(lang, 'keyboard.my_applications'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_apps${userParams}${vParam}` },
-      },
-      {
-        text: t(lang, 'keyboard.my_vacancies'),
-        web_app: { url: `${miniAppBaseUrl}?startapp=my_vacs${userParams}${vParam}` },
-      },
-    ],
     [
       { text: t(lang, 'keyboard.change_language') },
       { text: t(lang, 'keyboard.help') },
@@ -486,9 +452,32 @@ export default async function (message, ctx) {
       name: from.first_name || 'Foydalanuvchi',
     });
 
+    const appUrl = config.miniAppUrl || 'https://app8716517896.tgcloud.ai';
+
     await api.sendMessage({
       chat_id: chatId,
       text: welcomeText,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: t(userLang, 'commands.btn_search_jobs'),
+              web_app: { url: `${appUrl}?startapp=jobs` },
+            },
+          ],
+          [
+            {
+              text: t(userLang, 'commands.btn_post_job'),
+              web_app: { url: `${appUrl}?startapp=post_job` },
+            },
+          ],
+        ],
+      },
+    });
+
+    await api.sendMessage({
+      chat_id: chatId,
+      text: t(userLang, 'commands.menu_mounted'),
       reply_markup: replyKeyboard,
     });
     return;

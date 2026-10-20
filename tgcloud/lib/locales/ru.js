@@ -25,6 +25,9 @@ export default {
     unauthorized: "У вас нет прав для выполнения этого действия.",
     already_reviewed: "Эта вакансия уже была рассмотрена.",
     back: "⬅️ Назад",
+    btn_search_jobs: "🔍 Поиск работы (Mini App)",
+    btn_post_job: "📢 Разместить вакансию",
+    menu_mounted: "Используйте меню ниже для дополнительных разделов 👇",
   },
   keyboard: {
     search_jobs: "🔍 Поиск работы (App)",

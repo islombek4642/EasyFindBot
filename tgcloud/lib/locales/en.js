@@ -25,6 +25,9 @@ export default {
     unauthorized: "You do not have permission to perform this action.",
     already_reviewed: "This vacancy has already been reviewed.",
     back: "⬅️ Back",
+    btn_search_jobs: "🔍 Search Jobs (Mini App)",
+    btn_post_job: "📢 Post a Job",
+    menu_mounted: "Use the menu below for additional sections 👇",
   },
   keyboard: {
     search_jobs: "🔍 Search Jobs (App)",

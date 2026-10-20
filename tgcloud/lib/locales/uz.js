@@ -25,6 +25,9 @@ export default {
     unauthorized: "Sizda ushbu amalni bajarish uchun ruxsat yo'q.",
     already_reviewed: "Ushbu e'lon allaqachon ko'rib chiqilgan.",
     back: "⬅️ Orqaga",
+    btn_search_jobs: "🔍 Ish qidirish (Mini App)",
+    btn_post_job: "📢 E'lon berish",
+    menu_mounted: "Qo'shimcha bo'limlar uchun pastdagi menyudan foydalaning 👇",
   },
   keyboard: {
     search_jobs: "🔍 Ish qidirish (Ilova)",
