@@ -501,6 +501,8 @@ export default async function (callbackQuery, ctx) {
               message_id: messageId,
               text: usersReport.text,
               parse_mode: 'HTML',
+              link_preview_options: { is_disabled: true },
+              disable_web_page_preview: true,
               reply_markup: usersReport.reply_markup,
             });
           } catch (editErr) {
