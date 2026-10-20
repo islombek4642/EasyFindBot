@@ -411,20 +411,21 @@ export default async function (callbackQuery, ctx) {
         const weekAgoSec = nowSec - 7 * 86400;
 
         const [totalU] = await db.select({ value: count() }).from(users);
-        const [dayU] = await db.select({ value: count() }).from(users).where(sql`(${users.createdAt} >= ${dayAgoSec} OR ${users.createdAt} >= ${dayAgoSec * 1000})`);
-        const [weekU] = await db.select({ value: count() }).from(users).where(sql`(${users.createdAt} >= ${weekAgoSec} OR ${users.createdAt} >= ${weekAgoSec * 1000})`);
+        const [dayU] = await db.select({ value: count() }).from(users).where(sql`(CASE WHEN ${users.createdAt} > 10000000000 THEN ${users.createdAt} / 1000 ELSE ${users.createdAt} END) >= ${dayAgoSec}`);
+        const [weekU] = await db.select({ value: count() }).from(users).where(sql`(CASE WHEN ${users.createdAt} > 10000000000 THEN ${users.createdAt} / 1000 ELSE ${users.createdAt} END) >= ${weekAgoSec}`);
         const [seekersU] = await db.select({ value: count() }).from(users).where(eq(users.role, 'seeker'));
         const [employersU] = await db.select({ value: count() }).from(users).where(eq(users.role, 'employer'));
 
         const [totalV] = await db.select({ value: count() }).from(vacancies);
-        const [dayV] = await db.select({ value: count() }).from(vacancies).where(sql`(${vacancies.createdAt} >= ${dayAgoSec} OR ${vacancies.createdAt} >= ${dayAgoSec * 1000})`);
-        const [weekV] = await db.select({ value: count() }).from(vacancies).where(sql`(${vacancies.createdAt} >= ${weekAgoSec} OR ${vacancies.createdAt} >= ${weekAgoSec * 1000})`);
+        const [dayV] = await db.select({ value: count() }).from(vacancies).where(sql`(CASE WHEN ${vacancies.createdAt} > 10000000000 THEN ${vacancies.createdAt} / 1000 ELSE ${vacancies.createdAt} END) >= ${dayAgoSec}`);
+        const [weekV] = await db.select({ value: count() }).from(vacancies).where(sql`(CASE WHEN ${vacancies.createdAt} > 10000000000 THEN ${vacancies.createdAt} / 1000 ELSE ${vacancies.createdAt} END) >= ${weekAgoSec}`);
         const [activeV] = await db.select({ value: count() }).from(vacancies).where(eq(vacancies.status, 'approved'));
         const [pendingV] = await db.select({ value: count() }).from(vacancies).where(eq(vacancies.status, 'pending'));
 
         const [totalA] = await db.select({ value: count() }).from(applications);
-        const [dayA] = await db.select({ value: count() }).from(applications).where(sql`(${applications.createdAt} >= ${dayAgoSec} OR ${applications.createdAt} >= ${dayAgoSec * 1000})`);
+        const [dayA] = await db.select({ value: count() }).from(applications).where(sql`(CASE WHEN ${applications.createdAt} > 10000000000 THEN ${applications.createdAt} / 1000 ELSE ${applications.createdAt} END) >= ${dayAgoSec}`);
         const [totalR] = await db.select({ value: count() }).from(resumes);
+        const [activeR] = await db.select({ value: count() }).from(resumes).where(eq(resumes.isActive, true));
 
         const statsData = {
           totalUsers: totalU?.value || 0,
@@ -433,24 +434,32 @@ export default async function (callbackQuery, ctx) {
           seekers: seekersU?.value || 0,
           employers: employersU?.value || 0,
           totalVacancies: totalV?.value || 0,
-          newVacancies24h: dayV?.value || 0,
-          newVacancies7d: weekV?.value || 0,
           activeVacancies: activeV?.value || 0,
           pendingVacancies: pendingV?.value || 0,
+          newVacancies24h: dayV?.value || 0,
+          newVacancies7d: weekV?.value || 0,
           totalApplications: totalA?.value || 0,
           newApplications24h: dayA?.value || 0,
           totalResumes: totalR?.value || 0,
+          activeResumes: activeR?.value || 0,
         };
 
         const statsReport = buildStatsReport(statsData, userLang);
         if (chatId && messageId) {
-          await api.editMessageText({
-            chat_id: chatId,
-            message_id: messageId,
-            text: mdToHtml(statsReport.text),
-            parse_mode: 'HTML',
-            reply_markup: statsReport.reply_markup,
-          });
+          try {
+            await api.editMessageText({
+              chat_id: chatId,
+              message_id: messageId,
+              text: mdToHtml(statsReport.text),
+              parse_mode: 'HTML',
+              reply_markup: statsReport.reply_markup,
+            });
+          } catch (editErr) {
+            if (!String(editErr?.message || editErr).includes('message is not modified')) {
+              throw editErr;
+            }
+          }
+          await ack();
         }
       } catch (err) {
         logger.error('handlers/callback_query.js', 'Error gathering stats', err);

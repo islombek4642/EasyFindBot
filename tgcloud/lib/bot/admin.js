@@ -107,23 +107,32 @@ export function buildStatsReport(stats = {}, lang = 'uz') {
     totalApplications = 0,
     newApplications24h = 0,
     totalResumes = 0,
+    activeResumes = 0,
   } = stats;
 
-  const text =
-    `${t(lang, 'admin.stats_title')}\n\n` +
-    `${t(lang, 'admin.stats_users', { total: totalUsers })}\n` +
-    `${t(lang, 'admin.stats_users_growth', { day: newUsers24h, week: newUsers7d })}\n` +
-    `   • ${t(lang, 'admin.stats_seekers')}: ${seekers}\n` +
-    `   • ${t(lang, 'admin.stats_employers')}: ${employers}\n\n` +
-    `${t(lang, 'admin.stats_vacancies', { total: totalVacancies })}\n` +
-    `${t(lang, 'admin.stats_vacancies_growth', { day: newVacancies24h, week: newVacancies7d })}\n` +
-    `   • ${t(lang, 'admin.stats_active')}: ${activeVacancies}\n` +
-    `   • ${t(lang, 'admin.stats_pending')}: ${pendingVacancies}\n\n` +
-    `${t(lang, 'admin.stats_applications', { total: totalApplications, day: newApplications24h })}\n` +
-    `${t(lang, 'admin.stats_resumes', { total: totalResumes })}`;
+  const lines = [
+    t(lang, 'admin.stats_title'),
+    '',
+    t(lang, 'admin.stats_users_total', { count: totalUsers }),
+    t(lang, 'admin.stats_users_24h', { count: newUsers24h }),
+    t(lang, 'admin.stats_users_7d', { count: newUsers7d }),
+    t(lang, 'admin.stats_seekers', { count: seekers }),
+    t(lang, 'admin.stats_employers', { count: employers }),
+    '',
+    t(lang, 'admin.stats_vacancies_total', { count: totalVacancies }),
+    t(lang, 'admin.stats_vacancies_active', { count: activeVacancies }),
+    t(lang, 'admin.stats_vacancies_pending', { count: pendingVacancies }),
+    t(lang, 'admin.stats_vacancies_24h', { count: newVacancies24h }),
+    t(lang, 'admin.stats_vacancies_7d', { count: newVacancies7d }),
+    '',
+    t(lang, 'admin.stats_applications_total', { count: totalApplications }),
+    t(lang, 'admin.stats_applications_24h', { count: newApplications24h }),
+    t(lang, 'admin.stats_resumes_total', { count: totalResumes }),
+    t(lang, 'admin.stats_resumes_active', { count: activeResumes }),
+  ];
 
   return {
-    text,
+    text: lines.join('\n'),
     reply_markup: {
       inline_keyboard: [
         [
