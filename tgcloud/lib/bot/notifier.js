@@ -102,7 +102,7 @@ export async function notifySubscribers(api, vacancy) {
             `<b>${escapeHtml(subTitle)}</b>\n\n` +
             `📌 <b>${escapeHtml(vacancy.title)}</b>\n` +
             `🏢 <b>${escapeHtml(t(userLang, 'channel.company'))}:</b> ${escapeHtml(vacancy.companyName)}\n` +
-            `📍 <b>${escapeHtml(t(userLang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n\n` +
+            `📍 <b>${escapeHtml(t(userLang, 'channel.region'))}:</b> ${escapeHtml(t(userLang, 'regions.' + vacancy.region) || vacancy.region)}\n\n` +
             `${escapeHtml(t(userLang, 'channel.footer'))}`;
 
           const reply_markup = {

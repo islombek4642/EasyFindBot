@@ -19,6 +19,10 @@ export function formatChannelPost(vacancy, lang = 'uz', options = {}) {
   const headerText = t(lang, 'channel.header').replace(/\*\*/g, '').trim();
   const maxCaptionLength = options.maxCaptionLength || 0;
 
+  const categoryLabel = t(lang, `categories.${vacancy.category}`) || vacancy.category;
+  const categoryHashtag = t(lang, `category_hashtags.${vacancy.category}`) || (vacancy.category === 'it' ? 'IT' : vacancy.category);
+  const regionLabel = t(lang, `regions.${vacancy.region}`) || vacancy.region;
+
   let desc = vacancy.description || '';
   let reqs = vacancy.requirements || '';
 
@@ -28,8 +32,9 @@ export function formatChannelPost(vacancy, lang = 'uz', options = {}) {
       headerText.length +
       (vacancy.title || '').length +
       (vacancy.companyName || '').length +
-      (vacancy.category || '').length +
-      (vacancy.region || '').length +
+      categoryLabel.length +
+      categoryHashtag.length +
+      regionLabel.length +
       salaryText.length +
       (vacancy.contacts || '').length +
       320; // estimated HTML tags & label length
@@ -50,8 +55,8 @@ export function formatChannelPost(vacancy, lang = 'uz', options = {}) {
     `<b>${escapeHtml(headerText)}</b>\n\n` +
     `📌 <b>${escapeHtml(vacancy.title)}</b>\n` +
     `🏢 <b>${escapeHtml(t(lang, 'channel.company'))}:</b> ${escapeHtml(vacancy.companyName)}\n` +
-    `📂 <b>${escapeHtml(t(lang, 'channel.category'))}:</b> #${escapeHtml(vacancy.category)}\n` +
-    `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
+    `📂 <b>${escapeHtml(t(lang, 'channel.category'))}:</b> ${escapeHtml(categoryLabel)} #${escapeHtml(categoryHashtag)}\n` +
+    `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(regionLabel)}\n` +
     `⏱️ <b>${escapeHtml(t(lang, 'channel.employment_type'))}:</b> ${escapeHtml(t(lang, 'employment_types.' + vacancy.employmentType) || vacancy.employmentType)}\n` +
     `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
     `📝 <b>${escapeHtml(t(lang, 'channel.description'))}:</b>\n<blockquote expandable>${escapeHtml(desc)}</blockquote>\n\n` +
@@ -73,13 +78,15 @@ export function formatChannelPost(vacancy, lang = 'uz', options = {}) {
   return { text, reply_markup, parse_mode: 'HTML' };
 }
 
-export async function publishToChannel(api, vacancy, lang = 'uz') {
+export async function publishToChannel(api, vacancy, lang = null) {
   const channelId = await getPublicChannelId();
   if (!channelId) {
     return null;
   }
 
-  const { text, reply_markup } = formatChannelPost(vacancy, lang);
+  // Channel posts should default to channel language (default 'uz'), not clicking moderator's interface language
+  const channelLang = lang || (await getSetting('channel_language')) || 'uz';
+  const { text, reply_markup } = formatChannelPost(vacancy, channelLang);
   const bannerUrl = (await getSetting('channel_banner_url')) || config.channelBannerUrl || `${config.miniAppUrl}/channel_banner.jpg`;
 
   try {
@@ -87,7 +94,7 @@ export async function publishToChannel(api, vacancy, lang = 'uz') {
       let caption = text;
       // Telegram photo caption limit is 1024 characters
       if (caption.length > 1024) {
-        caption = formatChannelPost(vacancy, lang, { maxCaptionLength: 1020 }).text;
+        caption = formatChannelPost(vacancy, channelLang, { maxCaptionLength: 1020 }).text;
       }
 
       try {
@@ -117,25 +124,30 @@ export async function publishToChannel(api, vacancy, lang = 'uz') {
   }
 }
 
-export async function closeChannelPost(api, vacancy, lang = 'uz') {
+export async function closeChannelPost(api, vacancy, lang = null) {
   const channelId = await getPublicChannelId();
   if (!channelId || !vacancy.channelMessageId) {
     return false;
   }
 
   try {
-    const salaryText = formatSalary(vacancy, lang);
-    const rawHeader = t(lang, 'channel.closed_header') || '🚫 VAKANSIYA YOPILGAN';
-    const closedHeader = `<b>${escapeHtml(rawHeader)}</b>\n<i>${escapeHtml(t(lang, 'channel.closed_sub') || '(Qabul to\'xtatildi)')}</i>`;
+    const channelLang = lang || (await getSetting('channel_language')) || 'uz';
+    const salaryText = formatSalary(vacancy, channelLang);
+    const rawHeader = t(channelLang, 'channel.closed_header') || '🚫 VAKANSIYA YOPILGAN';
+    const closedHeader = `<b>${escapeHtml(rawHeader)}</b>\n<i>${escapeHtml(t(channelLang, 'channel.closed_sub') || '(Qabul to\'xtatildi)')}</i>`;
+
+    const categoryLabel = t(channelLang, `categories.${vacancy.category}`) || vacancy.category;
+    const categoryHashtag = t(channelLang, `category_hashtags.${vacancy.category}`) || (vacancy.category === 'it' ? 'IT' : vacancy.category);
+    const regionLabel = t(channelLang, `regions.${vacancy.region}`) || vacancy.region;
 
     const text =
       `${closedHeader}\n\n` +
       `<s>📌 <b>${escapeHtml(vacancy.title)}</b></s>\n` +
-      `🏢 <b>${escapeHtml(t(lang, 'channel.company'))}:</b> ${escapeHtml(vacancy.companyName)}\n` +
-      `📂 <b>${escapeHtml(t(lang, 'channel.category'))}:</b> #${escapeHtml(vacancy.category)}\n` +
-      `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
-      `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
-      `🔒 <i>${escapeHtml(t(lang, 'channel.closed_note') || 'Ushbu vakansiya bo\'yicha arizalar qabuli yakunlangan.')}</i>`;
+      `🏢 <b>${escapeHtml(t(channelLang, 'channel.company'))}:</b> ${escapeHtml(vacancy.companyName)}\n` +
+      `📂 <b>${escapeHtml(t(channelLang, 'channel.category'))}:</b> ${escapeHtml(categoryLabel)} #${escapeHtml(categoryHashtag)}\n` +
+      `📍 <b>${escapeHtml(t(channelLang, 'channel.region'))}:</b> ${escapeHtml(regionLabel)}\n` +
+      `💰 <b>${escapeHtml(t(channelLang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
+      `🔒 <i>${escapeHtml(t(channelLang, 'channel.closed_note') || 'Ushbu vakansiya bo\'yicha arizalar qabuli yakunlangan.')}</i>`;
 
     // Try editMessageCaption first (when post was published with a photo banner), fallback to editMessageText
     try {
