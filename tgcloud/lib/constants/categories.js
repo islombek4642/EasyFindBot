@@ -1,11 +1,18 @@
 export const CATEGORIES = [
   'it',
+  'construction',
+  'logistics',
+  'textiles',
+  'agriculture',
+  'horeca',
+  'sales',
+  'medicine',
+  'education',
+  'services',
   'design',
   'marketing',
-  'sales',
   'finance',
   'management',
-  'education',
   'other',
 ];
 
