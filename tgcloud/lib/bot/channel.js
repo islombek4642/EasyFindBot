@@ -1,5 +1,5 @@
 import { config } from '../config.js';
-import { getPublicChannelId } from './settings.js';
+import { getPublicChannelId, getSetting } from './settings.js';
 import { t } from '../locales/index.js';
 import { escapeHtml } from './html.js';
 import { logger } from '../logger.js';
@@ -14,9 +14,37 @@ function formatSalary(vacancy, lang = 'uz') {
   return `${vacancy.salaryMin?.toLocaleString() || 0} - ${vacancy.salaryMax?.toLocaleString() || 0} ${vacancy.salaryCurrency || 'USD'}`;
 }
 
-export function formatChannelPost(vacancy, lang = 'uz') {
+export function formatChannelPost(vacancy, lang = 'uz', options = {}) {
   const salaryText = formatSalary(vacancy, lang);
   const headerText = t(lang, 'channel.header').replace(/\*\*/g, '').trim();
+  const maxCaptionLength = options.maxCaptionLength || 0;
+
+  let desc = vacancy.description || '';
+  let reqs = vacancy.requirements || '';
+
+  // If caption limit is requested (Telegram sendPhoto caption limit is 1024 characters)
+  if (maxCaptionLength > 0) {
+    const fixedPartLength =
+      headerText.length +
+      (vacancy.title || '').length +
+      (vacancy.companyName || '').length +
+      (vacancy.category || '').length +
+      (vacancy.region || '').length +
+      salaryText.length +
+      (vacancy.contacts || '').length +
+      320; // estimated HTML tags & label length
+
+    const available = Math.max(150, maxCaptionLength - fixedPartLength);
+    if (desc.length + reqs.length > available) {
+      if (reqs) {
+        const half = Math.floor(available / 2);
+        if (desc.length > half) desc = desc.slice(0, half - 3) + '...';
+        if (reqs.length > half) reqs = reqs.slice(0, half - 3) + '...';
+      } else {
+        if (desc.length > available) desc = desc.slice(0, available - 3) + '...';
+      }
+    }
+  }
 
   const text =
     `<b>${escapeHtml(headerText)}</b>\n\n` +
@@ -26,8 +54,8 @@ export function formatChannelPost(vacancy, lang = 'uz') {
     `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
     `⏱️ <b>${escapeHtml(t(lang, 'channel.employment_type'))}:</b> ${escapeHtml(t(lang, 'employment_types.' + vacancy.employmentType) || vacancy.employmentType)}\n` +
     `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
-    `📝 <b>${escapeHtml(t(lang, 'channel.description'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.description)}</blockquote>\n\n` +
-    (vacancy.requirements ? `🎯 <b>${escapeHtml(t(lang, 'channel.requirements'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.requirements)}</blockquote>\n\n` : '') +
+    `📝 <b>${escapeHtml(t(lang, 'channel.description'))}:</b>\n<blockquote expandable>${escapeHtml(desc)}</blockquote>\n\n` +
+    (reqs ? `🎯 <b>${escapeHtml(t(lang, 'channel.requirements'))}:</b>\n<blockquote expandable>${escapeHtml(reqs)}</blockquote>\n\n` : '') +
     `📞 <b>${escapeHtml(t(lang, 'channel.contacts'))}:</b> ${escapeHtml(vacancy.contacts)}\n\n` +
     `${escapeHtml(t(lang, 'channel.footer'))}`;
 
@@ -52,8 +80,30 @@ export async function publishToChannel(api, vacancy, lang = 'uz') {
   }
 
   const { text, reply_markup } = formatChannelPost(vacancy, lang);
+  const bannerUrl = (await getSetting('channel_banner_url')) || config.channelBannerUrl || `${config.miniAppUrl}/channel_banner.jpg`;
 
   try {
+    if (bannerUrl) {
+      let caption = text;
+      // Telegram photo caption limit is 1024 characters
+      if (caption.length > 1024) {
+        caption = formatChannelPost(vacancy, lang, { maxCaptionLength: 1020 }).text;
+      }
+
+      try {
+        const sent = await api.sendPhoto({
+          chat_id: channelId,
+          photo: bannerUrl,
+          caption,
+          parse_mode: 'HTML',
+          reply_markup,
+        });
+        return sent?.message_id || null;
+      } catch (photoErr) {
+        logger.warn('lib/bot/channel.js', `sendPhoto failed, falling back to sendMessage:`, photoErr);
+      }
+    }
+
     const sent = await api.sendMessage({
       chat_id: channelId,
       text,
@@ -87,17 +137,32 @@ export async function closeChannelPost(api, vacancy, lang = 'uz') {
       `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
       `🔒 <i>${escapeHtml(t(lang, 'channel.closed_note') || 'Ushbu vakansiya bo\'yicha arizalar qabuli yakunlangan.')}</i>`;
 
-    await api.editMessageText({
-      chat_id: channelId,
-      message_id: vacancy.channelMessageId,
-      text,
-      parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [],
-      },
-    });
-    logger.info('lib/bot/channel.js', `Closed vacancy post ${vacancy.channelMessageId} in channel ${channelId}`);
-    return true;
+    // Try editMessageCaption first (when post was published with a photo banner), fallback to editMessageText
+    try {
+      await api.editMessageCaption({
+        chat_id: channelId,
+        message_id: vacancy.channelMessageId,
+        caption: text,
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [],
+        },
+      });
+      logger.info('lib/bot/channel.js', `Closed vacancy post (caption) ${vacancy.channelMessageId} in channel ${channelId}`);
+      return true;
+    } catch (captionErr) {
+      await api.editMessageText({
+        chat_id: channelId,
+        message_id: vacancy.channelMessageId,
+        text,
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [],
+        },
+      });
+      logger.info('lib/bot/channel.js', `Closed vacancy post (text) ${vacancy.channelMessageId} in channel ${channelId}`);
+      return true;
+    }
   } catch (err) {
     logger.warn('lib/bot/channel.js', `Failed to edit closed channel post ${vacancy.channelMessageId}:`, err);
     return false;
