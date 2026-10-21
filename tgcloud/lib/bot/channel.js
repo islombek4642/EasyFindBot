@@ -86,8 +86,10 @@ export async function publishToChannel(api, vacancy, lang = null) {
 
   // Channel posts should default to channel language (default 'uz'), not clicking moderator's interface language
   const channelLang = lang || (await getSetting('channel_language')) || 'uz';
-  const { text, reply_markup } = formatChannelPost(vacancy, channelLang);
-  const bannerUrl = (await getSetting('channel_banner_url')) || config.channelBannerUrl || `${config.miniAppUrl}/channel_banner.jpg`;
+  const customBanner = await getSetting('channel_banner_url');
+  const bannerUrl =
+    customBanner ||
+    (vacancy.category ? `${config.miniAppUrl}/banners/${vacancy.category}.jpg` : `${config.miniAppUrl}/channel_banner.jpg`);
 
   try {
     if (bannerUrl) {
