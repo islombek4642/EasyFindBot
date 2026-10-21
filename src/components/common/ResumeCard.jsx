@@ -38,17 +38,23 @@ export function ResumeCard({
       ? skills.split(',').map((s) => s.trim()).filter(Boolean)
       : [];
 
+  const candidateName =
+    resume.fullName ||
+    resume.candidateName ||
+    (resume.user ? [resume.user.firstName, resume.user.lastName].filter(Boolean).join(' ') : '') ||
+    '';
+
   return (
     <div className={`glass-card resume-card ${className}`} onClick={onClick}>
       <div className="card-top">
         <div className="card-title-group">
-          <h4 className="card-job-title" title={title || fullName || t('roles.seeker')}>
-            {title || fullName || t('roles.seeker')}
+          <h4 className="card-job-title" title={title || candidateName || t('profile.role_seeker')}>
+            {title || candidateName || t('profile.role_seeker')}
           </h4>
           <span className="card-company-name">
             <Icon icon="solar:user-bold" width="15" height="15" />
             <span className="card-company-text">
-              {fullName || t(`categories.${category}`) || category}
+              {candidateName || t(`categories.${category}`) || category}
             </span>
           </span>
         </div>

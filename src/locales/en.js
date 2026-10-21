@@ -64,6 +64,7 @@ export default {
     save: "Save",
     next: "Next",
     back: "Back",
+    done: "Done",
     close: "Close",
     loading: "Loading...",
     all: "All",
@@ -127,6 +128,7 @@ export default {
     submit_btn: "Submit for Moderation",
     success_title: "Job Submitted!",
     success_desc: "Your vacancy was dispatched to the moderation team. Once approved, it will be published to the channel and live search.",
+    view_vacancies: "Back to Vacancies",
   },
   resumes: {
     title: "Talent Pool",

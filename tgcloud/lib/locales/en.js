@@ -183,4 +183,17 @@ export default {
     app_rejected_title: "ℹ️ **Application Status Updated**",
     app_rejected_desc: "🏢 **{company}** reviewed your application for the **{title}** position, but selected another candidate this time.\nWe wish you best of luck with future openings!",
   },
+  employment_types: {
+    full_time: "Full-time",
+    part_time: "Part-time",
+    remote: "Remote",
+    internship: "Internship",
+  },
+  bot_setup: {
+    desc_long: "EasyFind — Modern job board and talent platform in Uzbekistan.\n\n🔹 Browse job vacancies and apply instantly\n🔹 Build a talent profile and get discovered by employers\n🔹 Post jobs and review applicants seamlessly\n🔹 Subscribe to instant alerts for your industry\n\nTap «Start» to begin!",
+    desc_short: "Smart job board and talent discovery platform in Uzbekistan.",
+    cmd_start: "Start bot",
+    btn_app: "App",
+    setup_success: "Bot descriptions and commands updated successfully!",
+  },
 };

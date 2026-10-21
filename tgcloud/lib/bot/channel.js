@@ -24,7 +24,7 @@ export function formatChannelPost(vacancy, lang = 'uz') {
     `🏢 <b>${escapeHtml(t(lang, 'channel.company'))}:</b> ${escapeHtml(vacancy.companyName)}\n` +
     `📂 <b>${escapeHtml(t(lang, 'channel.category'))}:</b> #${escapeHtml(vacancy.category)}\n` +
     `📍 <b>${escapeHtml(t(lang, 'channel.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
-    `⏱️ <b>${escapeHtml(t(lang, 'channel.employment_type'))}:</b> ${escapeHtml(vacancy.employmentType)}\n` +
+    `⏱️ <b>${escapeHtml(t(lang, 'channel.employment_type'))}:</b> ${escapeHtml(t(lang, 'employment_types.' + vacancy.employmentType) || vacancy.employmentType)}\n` +
     `💰 <b>${escapeHtml(t(lang, 'channel.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
     `📝 <b>${escapeHtml(t(lang, 'channel.description'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.description)}</blockquote>\n\n` +
     (vacancy.requirements ? `🎯 <b>${escapeHtml(t(lang, 'channel.requirements'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.requirements)}</blockquote>\n\n` : '') +

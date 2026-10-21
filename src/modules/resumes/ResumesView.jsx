@@ -40,12 +40,22 @@ export function ResumesView() {
   // Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  // Debounced search for API calls
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
   const fetchResumes = useCallback(async (pageNum = 1, append = false) => {
     try {
       if (pageNum === 1) setLoading(true);
       else setLoadingMore(true);
 
       const res = await api.getResumes({
+        search: debouncedSearch.trim() || undefined,
         category: selectedCategory !== 'all' ? selectedCategory : undefined,
         region: selectedRegion !== 'all' ? selectedRegion : undefined,
         page: pageNum,
@@ -61,7 +71,7 @@ export function ResumesView() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [selectedCategory, selectedRegion]);
+  }, [debouncedSearch, selectedCategory, selectedRegion]);
 
   useEffect(() => {
     setPage(1);
@@ -86,10 +96,11 @@ export function ResumesView() {
   const filteredResumes = resumes.filter((r) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
+    const candidateName = r.fullName || (r.user ? [r.user.firstName, r.user.lastName].filter(Boolean).join(' ') : '') || '';
     const skillsStr = Array.isArray(r.skills) ? r.skills.join(' ') : (r.skills || '');
     return (
       (r.title && r.title.toLowerCase().includes(q)) ||
-      (r.fullName && r.fullName.toLowerCase().includes(q)) ||
+      (candidateName && candidateName.toLowerCase().includes(q)) ||
       skillsStr.toLowerCase().includes(q)
     );
   });

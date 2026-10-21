@@ -70,7 +70,9 @@ export default async function (input = {}, ctx) {
       .where(whereClause);
 
     const safeLimit = Math.min(Math.max(Number(limit) || 15, 1), 50);
-    const safeOffset = Math.max(Number(offset) || 0, 0);
+    const safeOffset = input.offset !== undefined
+      ? Math.max(Number(input.offset) || 0, 0)
+      : (Math.max(Number(input.page) || 1, 1) - 1) * safeLimit;
 
     const items = await db.select()
       .from(vacancies)
@@ -89,10 +91,14 @@ export default async function (input = {}, ctx) {
       updatedAt: toEpochMs(vac.updatedAt),
     }));
 
+    const totalCount = totalRow?.total || 0;
+
     return {
       success: true,
       vacancies: formattedItems,
-      total: totalRow?.total || 0,
+      items: formattedItems,
+      total: totalCount,
+      hasMore: safeOffset + items.length < totalCount,
       limit: safeLimit,
       offset: safeOffset,
     };

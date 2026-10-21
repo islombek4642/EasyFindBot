@@ -38,7 +38,7 @@ export default async function (input, ctx) {
     const employer = await db.select({
       username: users.username,
       firstName: users.firstName,
-      companyName: users.lastName,
+      phone: users.phone,
     })
       .from(users)
       .where(eq(users.tgId, vacancy.employerTgId))

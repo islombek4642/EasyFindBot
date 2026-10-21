@@ -64,6 +64,7 @@ export default {
     save: "Saqlash",
     next: "Keyingisi",
     back: "Orqaga",
+    done: "Tayyor",
     close: "Yopish",
     loading: "Yuklanmoqda...",
     all: "Barchasi",
@@ -127,6 +128,7 @@ export default {
     submit_btn: "E'lonni moderatsiyaga yuborish",
     success_title: "E'loningiz qabul qilindi!",
     success_desc: "Vakansiya tekshiruv uchun moderatorga yo'llandi. Tasdiqlangach, darhol kanalda va qidiruvda e'lon qilinadi.",
+    view_vacancies: "Vakansiyalarga o'tish",
   },
   resumes: {
     title: "Mutaxassislar bazasi",

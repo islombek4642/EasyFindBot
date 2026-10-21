@@ -55,7 +55,9 @@ export default async function (input = {}, ctx) {
       .where(whereClause);
 
     const safeLimit = Math.min(Math.max(Number(limit) || 15, 1), 50);
-    const safeOffset = Math.max(Number(offset) || 0, 0);
+    const safeOffset = input.offset !== undefined
+      ? Math.max(Number(input.offset) || 0, 0)
+      : (Math.max(Number(input.page) || 1, 1) - 1) * safeLimit;
 
     const items = await db.select()
       .from(resumes)
@@ -65,7 +67,7 @@ export default async function (input = {}, ctx) {
       .offset(safeOffset)
       .all();
 
-    // Attach user metadata
+    // Attach user metadata and computed fullName
     const enriched = await Promise.all(
       items.map(async (res) => {
         const u = await db.select({
@@ -77,8 +79,11 @@ export default async function (input = {}, ctx) {
           .where(eq(users.tgId, res.seekerTgId))
           .get();
 
+        const fullName = [u?.firstName, u?.lastName].filter(Boolean).join(' ') || (u?.username ? `@${u.username}` : '') || res.contacts || '';
+
         return {
           ...res,
+          fullName,
           createdAt: toEpochMs(res.createdAt),
           updatedAt: toEpochMs(res.updatedAt),
           user: u || null,
@@ -86,10 +91,14 @@ export default async function (input = {}, ctx) {
       })
     );
 
+    const totalCount = totalRow?.total || 0;
+
     return {
       success: true,
       resumes: enriched,
-      total: totalRow?.total || 0,
+      items: enriched,
+      total: totalCount,
+      hasMore: safeOffset + items.length < totalCount,
       limit: safeLimit,
       offset: safeOffset,
     };

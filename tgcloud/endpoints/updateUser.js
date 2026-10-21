@@ -19,7 +19,10 @@ export default async function (input, ctx) {
   }
 
   if (role && ['seeker', 'employer'].includes(role)) {
-    updates.role = role;
+    const existingUser = await db.select({ role: users.role }).from(users).where(eq(users.tgId, userId)).get();
+    if (existingUser?.role !== 'admin') {
+      updates.role = role;
+    }
   }
 
   if (phone !== undefined) {

@@ -7,7 +7,7 @@ import { Icon } from '@iconify/react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useTranslation } from '../../locales/index.jsx';
 import { ThemeToggle } from '../common/ThemeToggle.jsx';
-import botAvatar from '../../../assets/bot_avatar.jpg';
+import botAvatar from '../../../assets/bot_avatar.png';
 
 const LANG_FLAGS = {
   uz: 'circle-flags:uz',

@@ -98,7 +98,6 @@ export function PostJobWizard({ onSuccess }) {
         return;
       }
       setSubmitted(true);
-      if (onSuccess) onSuccess();
     } catch (err) {
       console.error('Failed to create vacancy:', err);
       setErrors({ submit: err.message || t('common.error') });
@@ -141,31 +140,45 @@ export function PostJobWizard({ onSuccess }) {
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
             {t('post_job.success_desc')}
           </p>
-          <Button
-            variant="primary"
-            size="md"
-            icon="solar:add-circle-bold"
-            onClick={() => {
-              setFormData({
-                title: '',
-                company: '',
-                category: 'it',
-                region: 'tashkent',
-                employmentType: 'full_time',
-                salaryType: 'range',
-                salaryMin: '',
-                salaryMax: '',
-                currency: 'UZS',
-                description: '',
-                requirements: '',
-                contacts: '',
-              });
-              setSubmitted(false);
-              setStep(1);
-            }}
-          >
-            {t('nav.post_job')}
-          </Button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '8px' }}>
+            <Button
+              variant="primary"
+              size="md"
+              icon="solar:check-read-bold"
+              onClick={() => {
+                if (onSuccess) onSuccess();
+              }}
+              style={{ width: '100%' }}
+            >
+              {t('post_job.view_vacancies')}
+            </Button>
+            <Button
+              variant="secondary"
+              size="md"
+              icon="solar:add-circle-bold"
+              onClick={() => {
+                setFormData({
+                  title: '',
+                  company: '',
+                  category: 'it',
+                  region: 'tashkent',
+                  employmentType: 'full_time',
+                  salaryType: 'range',
+                  salaryMin: '',
+                  salaryMax: '',
+                  currency: 'UZS',
+                  description: '',
+                  requirements: '',
+                  contacts: '',
+                });
+                setSubmitted(false);
+                setStep(1);
+              }}
+              style={{ width: '100%' }}
+            >
+              {t('nav.post_job')}
+            </Button>
+          </div>
         </div>
       </div>
     );

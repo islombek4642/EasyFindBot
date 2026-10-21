@@ -6,6 +6,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '@iconify/react';
 
+let activeModalCount = 0;
+
 export function Modal({
   isOpen,
   onClose,
@@ -24,14 +26,18 @@ export function Modal({
 
   useEffect(() => {
     if (isOpen) {
+      activeModalCount += 1;
       document.body.style.overflow = 'hidden';
       setDragY(0);
       setIsDragging(false);
-    } else {
-      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = '';
+      if (isOpen) {
+        activeModalCount = Math.max(0, activeModalCount - 1);
+        if (activeModalCount === 0) {
+          document.body.style.overflow = '';
+        }
+      }
     };
   }, [isOpen]);
 
@@ -133,22 +139,7 @@ export function Modal({
           </div>
         )}
 
-        <div
-          ref={bodyRef}
-          className="modal-body"
-          onTouchStart={(e) => {
-            // Initiate drag only if body is at the very top
-            if (bodyRef.current && bodyRef.current.scrollTop <= 0) {
-              handleTouchStart(e);
-            }
-          }}
-          onTouchMove={(e) => {
-            if (isDragging) {
-              handleTouchMove(e);
-            }
-          }}
-          onTouchEnd={handleTouchEnd}
-        >
+        <div ref={bodyRef} className="modal-body">
           {children}
         </div>
 

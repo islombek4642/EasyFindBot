@@ -442,12 +442,6 @@ export default async function (message, ctx) {
 
   // 4. Command: /start
   if (text.startsWith('/start')) {
-    try {
-      await registerBotCommands();
-    } catch (e) {
-      // non-blocking
-    }
-
     const welcomeText = t(userLang, 'commands.welcome', {
       name: from.first_name || 'Foydalanuvchi',
     });
@@ -572,6 +566,33 @@ export default async function (message, ctx) {
       }),
       reply_markup: replyKeyboard,
     });
+    return;
+  }
+
+  // 5.3 Command /setup_commands (SuperAdmin only)
+  if (text === '/setup_commands') {
+    if (!isUserSuperAdmin(userId)) {
+      await api.sendMessage({
+        chat_id: chatId,
+        text: t(userLang, 'commands.unauthorized'),
+        reply_markup: replyKeyboard,
+      });
+      return;
+    }
+    try {
+      await registerBotCommands();
+      await api.sendMessage({
+        chat_id: chatId,
+        text: t(userLang, 'bot_setup.setup_success'),
+        reply_markup: replyKeyboard,
+      });
+    } catch (err) {
+      await api.sendMessage({
+        chat_id: chatId,
+        text: `Error: ${err.message}`,
+        reply_markup: replyKeyboard,
+      });
+    }
     return;
   }
 

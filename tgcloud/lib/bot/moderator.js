@@ -28,7 +28,7 @@ export function buildModerationCard(vacancy, lang = 'uz', queueMeta = null) {
     `🏢 <b>${escapeHtml(t(lang, 'moderation.company'))}:</b> ${escapeHtml(vacancy.companyName)}\n` +
     `📂 <b>${escapeHtml(t(lang, 'moderation.category'))}:</b> ${escapeHtml(vacancy.category)}\n` +
     `📍 <b>${escapeHtml(t(lang, 'moderation.region'))}:</b> ${escapeHtml(vacancy.region)}\n` +
-    `⏱️ <b>${escapeHtml(t(lang, 'moderation.employment_type'))}:</b> ${escapeHtml(vacancy.employmentType)}\n` +
+    `⏱️ <b>${escapeHtml(t(lang, 'moderation.employment_type'))}:</b> ${escapeHtml(t(lang, 'employment_types.' + vacancy.employmentType) || vacancy.employmentType)}\n` +
     `💰 <b>${escapeHtml(t(lang, 'moderation.salary'))}:</b> ${escapeHtml(salaryText)}\n\n` +
     `📝 <b>${escapeHtml(t(lang, 'moderation.description'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.description)}</blockquote>\n\n` +
     (vacancy.requirements ? `🎯 <b>${escapeHtml(t(lang, 'moderation.requirements'))}:</b>\n<blockquote expandable>${escapeHtml(vacancy.requirements)}</blockquote>\n\n` : '') +

@@ -53,6 +53,15 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
     }
   }, []);
 
+  // Debounced search for API calls
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
   // Fetch Vacancies List
   const fetchVacancies = useCallback(async (pageNum = 1, append = false) => {
     try {
@@ -60,6 +69,7 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
       else setLoadingMore(true);
 
       const res = await api.getVacancies({
+        search: debouncedSearch.trim() || undefined,
         category: selectedCategory !== 'all' ? selectedCategory : undefined,
         region: selectedRegion !== 'all' ? selectedRegion : undefined,
         salaryMin: salaryMin ? Number(salaryMin) : undefined,
@@ -76,7 +86,7 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [selectedCategory, selectedRegion, salaryMin]);
+  }, [debouncedSearch, selectedCategory, selectedRegion, salaryMin]);
 
   useEffect(() => {
     fetchMyApplications();
@@ -154,9 +164,10 @@ export function VacanciesView({ initialVacancyId = null, onClearInitialVacancyId
   const filteredVacancies = vacancies.filter((v) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
+    const comp = v.companyName || v.company || '';
     return (
       (v.title && v.title.toLowerCase().includes(q)) ||
-      (v.company && v.company.toLowerCase().includes(q))
+      (comp && comp.toLowerCase().includes(q))
     );
   });
 

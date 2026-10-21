@@ -29,7 +29,8 @@ export function ResumeDetailModal({ resume, isOpen, onClose }) {
     seekerTgId,
   } = resume;
 
-  const displayName = candidateName || fullName || '';
+  const userFullName = resume.user ? [resume.user.firstName, resume.user.lastName].filter(Boolean).join(' ') : '';
+  const displayName = candidateName || fullName || userFullName || '';
   const displayContacts = contacts || phone || (username ? `@${username}` : '');
 
   const skillsList = Array.isArray(skills)

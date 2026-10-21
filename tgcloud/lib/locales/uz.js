@@ -183,4 +183,17 @@ export default {
     app_rejected_title: "ℹ️ **Ariza holati yangilandi**",
     app_rejected_desc: "🏢 **{company}** kompaniyasi **{title}** vakansiyasi bo'yicha arizangizni ko'rib chiqdi, ammo bu safar boshqa nomzod ma'qul deb topildi.\nSizga keyingi takliflarimizda omad tilaymiz!",
   },
+  employment_types: {
+    full_time: "To'liq bandlik",
+    part_time: "Yarim stavka",
+    remote: "Masofaviy (Remote)",
+    internship: "Amaliyot / Stajirovka",
+  },
+  bot_setup: {
+    desc_long: "EasyFind — O'zbekistondagi zamonaviy ish o'rinlari va mutaxassislar platformasi.\n\n🔹 Vakansiyalarni qidiring va bir zumda ariza topshiring\n🔹 O'z rezyumeingizni joylang va ish beruvchilarni toping\n🔹 Kompaniyalar uchun e'lon berish va nomzodlarni saralash\n🔹 Soha bo'yicha yangi vakansiyalardan xabardor bo'lish\n\nBoshlash uchun pastdagi «Start» tugmasini bosing!",
+    desc_short: "O'zbekistondagi eng qulay ish va mutaxassislar topish platformasi.",
+    cmd_start: "Botni ishga tushirish",
+    btn_app: "Ilova",
+    setup_success: "Bot tavsiflari va buyruqlari muvaffaqiyatli yangilandi!",
+  },
 };

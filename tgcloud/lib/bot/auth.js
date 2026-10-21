@@ -72,12 +72,14 @@ export function getAuthenticatedUserId(ctx, input = {}) {
     }
   }
 
-  // 3. Fallback for development/testing environments
-  if (input?.uid) {
-    return Number(input.uid);
-  }
-  if (input?.userId) {
-    return Number(input.userId);
+  // 3. Fallback for standalone preview / mock dev
+  if (input?.__dev_mock || !ctx || Object.keys(ctx).length === 0) {
+    if (input?.uid) {
+      return Number(input.uid);
+    }
+    if (input?.userId) {
+      return Number(input.userId);
+    }
   }
   return null;
 }
