@@ -14,18 +14,57 @@ const TranslationContext = createContext({
   dictionary: uz,
 });
 
-export function TranslationProvider({ children, initialLanguage = 'uz' }) {
-  const [language, setLanguageState] = useState(() => {
-    try {
-      const stored = localStorage.getItem('easyfind_lang');
-      if (stored && ['uz', 'ru', 'en'].includes(stored)) {
-        return stored;
-      }
-    } catch (e) {
-      // localStorage unavailable
+function resolveInitialLanguage(fallback = 'uz') {
+  if (typeof window === 'undefined') return fallback;
+
+  // 1. Highest priority: URL query or hash parameter (?lang=... or #...&lang=...)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(
+      window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
+    );
+    const urlLang = urlParams.get('lang') || hashParams.get('lang');
+    if (urlLang && ['uz', 'ru', 'en'].includes(urlLang)) {
+      try {
+        localStorage.setItem('easyfind_lang', urlLang);
+      } catch (e) {}
+      return urlLang;
     }
-    return initialLanguage;
-  });
+  } catch (e) {}
+
+  // 2. Telegram WebApp user language
+  try {
+    const tg = window.Telegram?.WebApp;
+    let tgLang = tg?.initDataUnsafe?.user?.language_code;
+    if (!tgLang && tg?.initData) {
+      const initParams = new URLSearchParams(tg.initData);
+      const userRaw = initParams.get('user');
+      if (userRaw) {
+        const parsed = JSON.parse(userRaw);
+        if (parsed?.language_code) tgLang = parsed.language_code;
+      }
+    }
+    if (tgLang && typeof tgLang === 'string') {
+      const code = tgLang.toLowerCase();
+      if (code.startsWith('ru')) return 'ru';
+      if (code.startsWith('en')) return 'en';
+      if (code.startsWith('uz')) return 'uz';
+    }
+  } catch (e) {}
+
+  // 3. Cached preference in localStorage
+  try {
+    const stored = localStorage.getItem('easyfind_lang');
+    if (stored && ['uz', 'ru', 'en'].includes(stored)) {
+      return stored;
+    }
+  } catch (e) {}
+
+  return fallback;
+}
+
+export function TranslationProvider({ children, initialLanguage = 'uz' }) {
+  const [language, setLanguageState] = useState(() => resolveInitialLanguage(initialLanguage));
 
   const setLanguage = (lang) => {
     if (!['uz', 'ru', 'en'].includes(lang)) return;

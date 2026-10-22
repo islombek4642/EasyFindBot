@@ -1,26 +1,26 @@
-# Graph Report - EasyFindBot  (2026-10-19)
+# Graph Report - EasyFindBot  (2026-10-22)
 
 ## Corpus Check
-- 414 files · ~423,688 words
+- 381 files · ~602,337 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 96 file(s) not represented in the graph (top: .ttf 54, .csv 37, .zip 1)
 
 ## Summary
-- 3127 nodes · 4394 edges · 316 communities (192 shown, 124 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 142 edges (avg confidence: 0.92)
+- 3138 nodes · 4266 edges · 308 communities (188 shown, 120 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 191 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2d10e2a1`
+- Built from commit: `b19ddab9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- ref_sdk
-- tgcloud/handlers/callback_query.js
+- _select_palette_for_mode
+- callback_query.js
 - validate_data.py
-- codex-tools.md
-- Gemini CLI Tool Mapping
+- EasyFindBot — To'liq Loyiha Texnik Auditi va Aniqlangan Buglar Ro'yxati
+- Review Focus
 - search_stack
 - Subagent-Driven Development
 - Testing Skills With Subagents
@@ -31,8 +31,8 @@
 - server.cjs
 - Model Queries
 - Driver Adapters
-- Button
-- AppHeader.jsx
+- Select
+- EasyFindBot — Bugfixes, Architecture Cleanup & UI/UX Refinement Design Spec
 - Upgrade to Prisma ORM 7
 - BM25
 - EasyFindBot — Telegram Serverless Job & Talent Platform Spec
@@ -75,7 +75,7 @@
 - Code Review Reception
 - React Composition Patterns
 - Testing CLAUDE.md Skills Documentation
-- ResumesView.jsx
+- index.jsx
 - Schema Changes
 - Root Cause Tracing
 - Systematic Debugging
@@ -87,7 +87,7 @@
 - Finishing a Development Branch
 - Transactions
 - Condition-Based Waiting
-- _select_palette_for_mode
+- _palette_is_dark
 - CatalogRefreshTest
 - Using Git Worktrees
 - 7. JavaScript Performance
@@ -160,7 +160,7 @@
 - SDK and API Automation
 - client-api-mapping
 - Prisma MongoDB Upgrade Path
-- test_core_data_quality.py
+- Critical Rules
 - render-graphs.js
 - test_design_system_mode.py
 - stop-server.sh
@@ -180,15 +180,15 @@
 - detect_framework
 - Prisma Client Setup
 - CatalogSummaryLineEndingsTest
-- REFACTOR Phase: Close Loopholes (Stay Green)
 - split_values
+- TestGeneratedCatalogContract
 - using-superpowers/SKILL.md
 - Sections
 - React Best Practices
 - Skill Discovery Optimization (SDO)
 - Bulletproofing Skills Against Rationalization
 - renderBranding
-- index.jsx
+- 3. Aniqlangan Kritik Muammolar va Nuqsonlar (Root Causes)
 - shadcn CLI Reference
 - Pressure Test 1: Emergency Production Fix
 - Pressure Test 2: Sunk Cost + Exhaustion
@@ -203,8 +203,8 @@
 - hitl-loop.template.sh
 - GitHub issues
 - AI safety checkpoint for destructive commands
-- Critical Rules
-- detect_domain
+- 4. Serverless RPC Endpoints (`tgcloud/endpoints/`)
+- test_core.py
 - Pi Tool Mapping
 - async-cheap-condition-before-await.md
 - Prefer Statically Analyzable Paths
@@ -218,7 +218,7 @@
 - prisma complete
 - Antigravity CLI (`agy`) Tool Mapping
 - Claude Code Tool Notes
-- lib/constants/categories.js
+- Prisma Postgres setup
 - tgcloud/lib/constants/categories.js
 - spec-document-reviewer-prompt.md
 - context-safety.md
@@ -302,94 +302,82 @@
 - server-parallel-nested-fetching.md
 - server-serialization.md
 - vercel-react-best-practices/rules/_template.md
-- lib/constants/roles.js
-- lib/constants/salaryTypes.js
+- TestFixtureValidation
 - tgcloud/lib/constants/roles.js
 - tgcloud/lib/constants/salaryTypes.js
-- _filter_anti_patterns_for_mode
-- csv
-- Prisma Postgres setup
-- VERIFY GREEN: Pressure Testing
-- Example: TDD Skill Bulletproofing
-- Muse Tool Mapping
-- TestMetricMath
 
 ## God Nodes (most connected - your core abstractions)
-1. `search()` - 45 edges
-2. `useTranslation()` - 40 edges
+1. `search()` - 47 edges
+2. `useTranslation()` - 43 edges
 3. `DesignSystemGenerator` - 38 edges
 4. `search_stack()` - 35 edges
-5. `Button()` - 32 edges
-6. `react` - 30 edges
-7. `t()` - 28 edges
+5. `t()` - 33 edges
+6. `Button()` - 32 edges
+7. `react` - 30 edges
 8. `Badge()` - 24 edges
 9. `Troubleshooting Prisma Compute` - 23 edges
-10. `t()` - 22 edges
+10. `@iconify/react` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Task 3: Serverless RPC Endpoints Pagination, Search & Security Fixes` --references--> `search()`  [INFERRED]
+  docs/superpowers/plans/2026-10-21-bugfixes-and-refinement.md → .agents/skills/ui-ux-pro-max/scripts/core.py
+- `Bug 4.2: Frontend Qidiruvining Backendga Yuborilmasligi va Klient Tomondagi Noto'g'ri Ustun Nomi` --references--> `search()`  [INFERRED]
+  PROJECT_BUGS_AUDIT.md → .agents/skills/ui-ux-pro-max/scripts/core.py
 - `Composition: asChild (radix) vs render (base)` --references--> `Badge()`  [INFERRED]
   .agents/skills/shadcn/rules/base-vs-radix.md → src/components/common/Badge.jsx
 - `Message surfaces use Bubble` --references--> `Badge()`  [INFERRED]
   .agents/skills/shadcn/rules/chat.md → src/components/common/Badge.jsx
 - `Button / trigger as non-button element (base only)` --references--> `Button()`  [INFERRED]
   .agents/skills/shadcn/rules/base-vs-radix.md → src/components/common/Button.jsx
-- `No sizing classes on icons inside components` --references--> `Button()`  [INFERRED]
-  .agents/skills/shadcn/rules/icons.md → src/components/common/Button.jsx
-- `Icons → [icons.md](./rules/icons.md)` --references--> `Button()`  [INFERRED]
-  .agents/skills/shadcn/SKILL.md → src/components/common/Button.jsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (316 total, 124 thin omitted)
+## Communities (308 total, 120 thin omitted)
 
-### Community 0 - "ref_sdk"
-Cohesion: 0.11
-Nodes (36): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildChannelSettingsMenu(), buildStatsReport(), getAllAdminTgIds(), getAuthenticatedUserId(), isUserAdmin() (+28 more)
-
-### Community 1 - "tgcloud/handlers/callback_query.js"
-Cohesion: 0.09
-Nodes (44): buildLanguageReplyKeyboard(), buildMainReplyKeyboard(), buildAdminPanelMenu(), buildBroadcastAudienceMenu(), buildBroadcastPreview(), buildChannelSettingsMenu(), buildManageAdminsMenu(), buildRemoveAdminMenu() (+36 more)
+### Community 1 - "callback_query.js"
+Cohesion: 0.07
+Nodes (64): EasyFindBot Implementation Plan, Global Constraints, Review Focus, Task 1: Project Scaffolding & Configuration, Task 2: Telegram Serverless Database Schema & Shared Library, Task 3: Bot Update Handlers, Task 4: Mini App Serverless RPC Endpoints, Task 8: Verification, Documentation & Remote Push (+56 more)
 
 ### Community 2 - "validate_data.py"
-Cohesion: 0.10
-Nodes (33): _catalog_date(), _check_app_interface_contract(), _check_catalog_contract(), _check_catalog_summary(), _check_chart_contract(), _check_color_contract(), _check_core_data_contract(), _check_file() (+25 more)
+Cohesion: 0.07
+Nodes (43): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _catalog_date(), _check_app_interface_contract(), _check_catalog_contract() (+35 more)
 
-### Community 3 - "codex-tools.md"
-Cohesion: 0.22
-Nodes (5): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children
+### Community 3 - "EasyFindBot — To'liq Loyiha Texnik Auditi va Aniqlangan Buglar Ro'yxati"
+Cohesion: 0.08
+Nodes (23): 1. Arxitektura va Fayllar Tuzilmasidagi Xatolar, 1-Qadam: Fayllar tozaligi va duplikatsiyani yo'qotish, 2-Qadam: Backend xavfsizligi va bot unumdorligini sozlash, 3-Qadam: Serverless RPC endpointlarini muvofiqlashtirish, 3. Serverless RPC Endpointlaridagi Buglar (`tgcloud/endpoints/`), 4. Frontend API Transport va Mock Qatlamidagi Xatolar (`src/services/`), 4-Qadam: Frontend API va ma'lumotlar oqimini uyg'unlashtirish, 5. Frontend Komponentlar va UI/UX Buglari (`src/components/`, `src/modules/`) (+15 more)
 
-### Community 4 - "Gemini CLI Tool Mapping"
-Cohesion: 0.29
-Nodes (7): Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file, Parallel dispatch, Personal skills directory, Prompt filling, Subagent support
+### Community 4 - "Review Focus"
+Cohesion: 0.17
+Nodes (11): EasyFindBot — Bugfixes & Architecture Refinement Implementation Plan, Global Constraints, Review Focus, Task 1: Clean Up Stale Root Backend Duplicates, Task 2: Backend Bot Rate-Limit & Localization Polish, Task 3: Serverless RPC Endpoints Pagination, Search & Security Fixes, Task 4: Frontend Discovery, Search & Pagination Wiring, Task 5: Candidate Name & i18n Normalization in Resumes (+3 more)
 
 ### Community 5 - "search_stack"
-Cohesion: 0.10
-Nodes (6): _exact_stack_identifier(), search_stack(), _rows(), TestNativeDesktopStackFreshness, _rows(), TestWebStackFreshness
+Cohesion: 0.06
+Nodes (11): _exact_stack_identifier(), _project_row(), search_stack(), _rows(), TestNativeDesktopStackFreshness, read_rows(), read_rows(), TestTextLayoutDataContracts (+3 more)
 
 ### Community 6 - "Subagent-Driven Development"
 Cohesion: 0.04
 Nodes (39): 1. Take the task, 2. Work the steps, 3. The completion contract, 4. Complete the task, Common Rationalizations, Example Workflow, Executing Plans, Final Review (+31 more)
 
 ### Community 7 - "Testing Skills With Subagents"
-Cohesion: 0.15
-Nodes (13): Common Mistakes (Same as TDD), GREEN Phase: Write Minimal Skill (Make It Pass), Meta-Testing (When GREEN Isn't Working), Overview, Quick Reference (TDD Cycle), Real-World Impact, RED Phase: Baseline Testing (Watch It Fail), TDD Mapping for Skill Testing (+5 more)
+Cohesion: 0.04
+Nodes (41): Codex App Finishing, Environment Detection, Model routing on spawns, Subagent dispatch requires multi-agent support, Waiting on children, Additional Gemini CLI tools, Gemini CLI Tool Mapping, Instructions file (+33 more)
 
 ### Community 8 - "core.py"
-Cohesion: 0.07
-Nodes (23): _contains_phrase(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _file_signature(), _legacy_successor_guidance(), _load_csv(), _load_csv_snapshot() (+15 more)
+Cohesion: 0.08
+Nodes (21): _contains_phrase(), _domain_keywords(), _exact_match_diagnostic(), _exact_row_identity(), _file_signature(), _legacy_successor_guidance(), _load_csv(), _load_csv_snapshot() (+13 more)
 
 ### Community 9 - "design_system.py"
 Cohesion: 0.06
-Nodes (15): _detect_page_type(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system(), safe_slug(), _write_persisted_file(), apply_decision_rules() (+7 more)
+Nodes (16): _button_outline_text_color(), _contrast_ratio(), _derive_dark_palette(), _detect_page_type(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+8 more)
 
 ### Community 10 - "Test-Driven Development (TDD)"
 Cohesion: 0.06
 Nodes (29): Common Rationalizations, Debugging Integration, Example: Bug Fix, Final Rule, Good Tests, GREEN - Minimal Code, Overview, Red Flags - STOP and Start Over (+21 more)
 
 ### Community 11 - "search"
-Cohesion: 0.10
-Nodes (5): search(), _style_search_destination(), TestSearchDomains, TestStyleTaxonomy, TestTextLayoutRetrieval
+Cohesion: 0.09
+Nodes (10): search(), _style_search_destination(), _valid_max_results(), TestSearchDomains, TestStyleTaxonomy, Instructions file, Muse Tool Mapping, Skill invocation (+2 more)
 
 ### Community 12 - "server.cjs"
 Cohesion: 0.08
@@ -403,13 +391,13 @@ Nodes (27): aggregate, Aggregation Operations, Atomic operations, count, create,
 Cohesion: 0.07
 Nodes (27): Accept self-signed certificates, After (v7), Available Adapters, Before (v6), Configuration, Connection Pool Configuration, Driver Adapters, Installation (+19 more)
 
-### Community 15 - "Button"
-Cohesion: 0.15
-Nodes (26): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, Buttons inside inputs use InputGroup + InputGroupAddon, Contents, Field validation and disabled states, FieldSet + FieldLegend for grouping related fields, Forms & Inputs, Forms use FieldGroup + Field, InputGroup requires InputGroupInput/InputGroupTextarea (+18 more)
+### Community 15 - "Select"
+Cohesion: 0.13
+Nodes (21): Buttons inside inputs use InputGroup + InputGroupAddon, Contents, Field validation and disabled states, FieldSet + FieldLegend for grouping related fields, Forms & Inputs, Forms use FieldGroup + Field, InputGroup requires InputGroupInput/InputGroupTextarea, Option sets (2–7 choices) use ToggleGroup (+13 more)
 
-### Community 16 - "AppHeader.jsx"
-Cohesion: 0.12
-Nodes (16): Pattern 4: Responsive Grid System, EasyFindBot Implementation Plan, Global Constraints, Review Focus, Task 1: Project Scaffolding & Configuration, Task 2: Telegram Serverless Database Schema & Shared Library, Task 3: Bot Update Handlers, Task 4: Mini App Serverless RPC Endpoints (+8 more)
+### Community 16 - "EasyFindBot — Bugfixes, Architecture Cleanup & UI/UX Refinement Design Spec"
+Cohesion: 0.20
+Nodes (9): 2.1 Stale Root Duplication Removal, 2. Architecture & File System Cleanup, 5.1 Vacancies Discovery & Search Integration (`src/modules/vacancies/VacanciesView.jsx`), 5.2 Resume Display & Candidate Name Normalization (`src/components/common/ResumeCard.jsx`, `src/modules/resumes/ResumeDetailModal.jsx`), 5.3 Post Job Confirmation Flow (`src/modules/post-job/PostJobWizard.jsx`, `src/App.jsx`), 5.4 Subscriptions Active State Accuracy (`src/modules/profile/SubscriptionsModal.jsx`), 5.5 Mobile Sheet Gesture & Touch Scroll Conflict (`src/components/common/Modal.jsx`), 5. Frontend & UI/UX Components (`src/`) (+1 more)
 
 ### Community 17 - "Upgrade to Prisma ORM 7"
 Cohesion: 0.08
@@ -421,7 +409,7 @@ Nodes (5): BM25, _get_bm25(), _suggest_identities(), TestBm25CoreBehavior, TestT
 
 ### Community 19 - "EasyFindBot — Telegram Serverless Job & Talent Platform Spec"
 Cohesion: 0.08
-Nodes (24): 1. Overview & Goals, 2. System Architecture, 3. Database Schema (`tgcloud/schema.js`), 4.1. Dynamic Configuration & Storage (`tgcloud/lib/config.js` & `settings` table), 4.2. Two-Tier Dynamic Admin Model & Authorization, 4.3. Dedicated Moderation Channel Workflow, 4. Moderation, Configuration & Channel Broadcasting Workflow, 5.1. Synchronization Strategy (+16 more)
+Nodes (23): 1. Overview & Goals, 2. System Architecture, 3. Database Schema (`tgcloud/schema.js`), 4.1. Dynamic Configuration & Storage (`tgcloud/lib/config.js` & `settings` table), 4.2. Two-Tier Dynamic Admin Model & Authorization, 4. Moderation, Configuration & Channel Broadcasting Workflow, 5.1. Synchronization Strategy, 5.3. Viewport Expansion & Mobile Safe Area Handling (+15 more)
 
 ### Community 20 - "Relation Queries"
 Cohesion: 0.08
@@ -515,6 +503,10 @@ Nodes (18): After schema changes, Command, Common Patterns, Create and apply mig
 Cohesion: 0.11
 Nodes (13): AI Safety Checkpoint, Boundary: Platform and Compute, Command Categories, Current Command Behavior, Current Prisma CLI Setup, Environment Variables, How to Use, New Configuration File (+5 more)
 
+### Community 44 - "common/index.js"
+Cohesion: 0.18
+Nodes (10): Pattern 4: Responsive Grid System, Task 5: Localization, Theme Engine & Design System, Task 6: Atomic Common UI Components & API Transport Layer, @iconify/react, react, ThemeToggle(), LANG_FLAGS, ThemeContext (+2 more)
+
 ### Community 45 - "prisma db seed"
 Cohesion: 0.11
 Nodes (17): Best Practices, Command, Common Patterns, Common seed commands, Conditional seeding, Configuration, Current Workflow, Development reset (+9 more)
@@ -528,8 +520,8 @@ Cohesion: 0.11
 Nodes (17): Before Delivering App UI, Example Workflow, If a search returns 0 results, Output Formats, Query Contract, Rule Categories by Priority, Running the search tool, Step 1: Analyze User Requirements (+9 more)
 
 ### Community 48 - "useTranslation"
-Cohesion: 0.39
-Nodes (16): Task 7: Mini App Feature Modules & Dashboards, 6.2. Mini App Deep Linking Routes (`src/hooks/useDeepLink.js`), Badge(), EmptyState(), Modal(), Skeleton(), VacancyCard(), useTranslation() (+8 more)
+Cohesion: 0.31
+Nodes (24): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, Component Selection, Task 7: Mini App Feature Modules & Dashboards, 6.2. Mini App Deep Linking Routes (`src/hooks/useDeepLink.js`), Phase 4: React Mini App Frontend, 6. Verification & Acceptance Criteria, Bug 4.1: Nomzod Rezyumelarida Ism-Sharif Maydonining Mos Kelmasligi (`fullName` vs `user.firstName`), Badge() (+16 more)
 
 ### Community 49 - "api.js"
 Cohesion: 0.17
@@ -571,9 +563,9 @@ Nodes (16): 1.1 Avoid Boolean Prop Proliferation, 1.2 Use Compound Components, 1
 Cohesion: 0.12
 Nodes (16): Documentation Variants to Test, Expected Results, Next Steps, NULL (Baseline - no skills doc), Scenario 1: Time Pressure + Confidence, Scenario 2: Sunk Cost + Works Already, Scenario 3: Authority + Speed Bias, Scenario 4: Familiarity + Efficiency (+8 more)
 
-### Community 59 - "ResumesView.jsx"
-Cohesion: 0.27
-Nodes (8): CATEGORIES, REGIONS, EMPLOYMENT_TYPES, SALARY_TYPES, AuthContext, useAuth(), EMPLOYMENT_TYPES, api
+### Community 59 - "index.jsx"
+Cohesion: 0.15
+Nodes (15): 3-Bosqich: Frontend Kontekst va Lokalizatsiya Iyerarxiyasini qayta qurish, 🔴 3-Muammo: Komponentlar ierarxiyasidagi xatolik (`src/main.jsx`), CATEGORIES, REGIONS, EMPLOYMENT_TYPES, SALARY_TYPES, AuthContext, AuthProvider() (+7 more)
 
 ### Community 60 - "Schema Changes"
 Cohesion: 0.12
@@ -588,8 +580,8 @@ Cohesion: 0.12
 Nodes (15): Common Rationalizations, Overview, Phase 1: Root Cause Investigation, Phase 2: Pattern Analysis, Phase 3: Hypothesis and Testing, Phase 4: Implementation, Quick Reference, Red Flags - STOP and Follow Process (+7 more)
 
 ### Community 63 - "read_rows"
-Cohesion: 0.16
-Nodes (4): read_rows(), TestGeneratedCatalogContract, TestLandingAndStackContract, TestReasoningContract
+Cohesion: 0.17
+Nodes (3): read_rows(), TestLandingAndStackContract, TestReasoningContract
 
 ### Community 64 - "5. Re-render Optimization"
 Cohesion: 0.12
@@ -619,9 +611,9 @@ Nodes (14): All or nothing, Best Practices, Handle errors, Interactive Transacti
 Cohesion: 0.15
 Nodes (12): Common Mistakes, Condition-Based Waiting, Core Pattern, waitForEvent(), waitForEventCount(), waitForEventMatch(), Implementation, Overview (+4 more)
 
-### Community 71 - "_select_palette_for_mode"
-Cohesion: 0.13
-Nodes (6): _palette_is_dark(), _relative_luminance(), _select_palette_for_mode(), TestEndToEndCoherence, TestLuminance, TestPaletteSelection
+### Community 71 - "_palette_is_dark"
+Cohesion: 0.18
+Nodes (4): _palette_is_dark(), _relative_luminance(), TestEndToEndCoherence, TestLuminance
 
 ### Community 73 - "Using Git Worktrees"
 Cohesion: 0.13
@@ -640,8 +632,8 @@ Cohesion: 0.13
 Nodes (15): Code Examples, Common Rationalizations for Skipping Testing, Directory Structure, Discovery Workflow, Flowchart Usage, Match the Form to the Failure, Overview, Skill Creation Checklist (TDD Adapted) (+7 more)
 
 ### Community 77 - "App.jsx"
-Cohesion: 0.24
-Nodes (10): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, 2. Telegram Serverless Backend (`tgcloud/`), 3. Strict Reusable Design System & Frontend Architecture (`src/`), 4. Bot Handlers & Navigation, EasyFindBot — Agent Architectural Rules, App(), AppHeader(), BottomNav() (+2 more)
+Cohesion: 0.18
+Nodes (12): 1. Separation of Concerns (SoC) — Strictly Enforced Across All Layers, 2. Telegram Serverless Backend (`tgcloud/`), 3. Strict Reusable Design System & Frontend Architecture (`src/`), 4. Bot Handlers & Navigation, EasyFindBot — Agent Architectural Rules, react-dom, App(), AppHeader() (+4 more)
 
 ### Community 78 - "Dispatching Parallel Agents"
 Cohesion: 0.14
@@ -907,17 +899,17 @@ Nodes (7): Bad, client-api-mapping, Good, Priority, References, The mapping, Why
 Cohesion: 0.25
 Nodes (8): Decision table, Hand-off rule, If staying on v6: hygiene (a deliberate stay, not neglect), Prisma MongoDB Upgrade Path, Reference files, The decision, up front, The version landscape, Verified against
 
-### Community 144 - "test_core_data_quality.py"
-Cohesion: 0.17
-Nodes (9): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _check_typography_contract(), _configured_font_names(), _font_families() (+1 more)
+### Community 144 - "Critical Rules"
+Cohesion: 0.25
+Nodes (8): Chat & Messaging → [chat.md](./rules/chat.md), CLI, Component Structure → [composition.md](./rules/composition.md), Critical Rules, Forms & Inputs → [forms.md](./rules/forms.md), Icons → [icons.md](./rules/icons.md), Styling & Tailwind → [styling.md](./rules/styling.md), Use Components, Not Custom Markup → [composition.md](./rules/composition.md)
 
 ### Community 145 - "render-graphs.js"
 Cohesion: 0.39
 Nodes (5): combineGraphs(), extractDotBlocks(), extractGraphBody(), main(), renderToSvg()
 
 ### Community 146 - "test_design_system_mode.py"
-Cohesion: 0.06
-Nodes (17): ansi_ljust(), _button_outline_text_color(), _contrast_ratio(), _derive_dark_palette(), format_ascii_box(), add_wrapped(), wrap_text(), format_markdown() (+9 more)
+Cohesion: 0.07
+Nodes (15): ansi_ljust(), _filter_anti_patterns_for_mode(), format_ascii_box(), add_wrapped(), wrap_text(), format_markdown(), hex_to_ansi(), _mode_support_labels() (+7 more)
 
 ### Community 147 - "stop-server.sh"
 Cohesion: 0.52
@@ -971,11 +963,7 @@ Nodes (5): 2. Telegram Serverless Backend (`tgcloud/`), 3. Frontend & Atomic Des
 Cohesion: 0.33
 Nodes (6): 1. Install dependencies, 2. Add generator block, 3. Generate Prisma Client, 4. Instantiate Prisma Client, 5. Use a single instance, Prisma Client Setup
 
-### Community 165 - "REFACTOR Phase: Close Loopholes (Stay Green)"
-Cohesion: 0.29
-Nodes (7): 1. Explicit Negation in Rules, 2. Entry in Rationalization Table, 3. Red Flag Entry, 4. Update description, Plugging Each Hole, Re-verify After Refactoring, REFACTOR Phase: Close Loopholes (Stay Green)
-
-### Community 166 - "split_values"
+### Community 165 - "split_values"
 Cohesion: 0.47
 Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
 
@@ -1003,9 +991,9 @@ Nodes (6): Address "Spirit vs Letter" Arguments, Build Rationalization Table, Bu
 Cohesion: 0.40
 Nodes (5): brandMarkup(), escapeHtmlText(), renderBranding(), waitingPage(), wrapInFrame()
 
-### Community 173 - "index.jsx"
-Cohesion: 0.18
-Nodes (6): react-dom, AuthProvider(), dictionaries, TranslationContext, TranslationProvider(), rootElement
+### Community 173 - "3. Aniqlangan Kritik Muammolar va Nuqsonlar (Root Causes)"
+Cohesion: 0.10
+Nodes (19): 🔴 10-Muammo: Deep Link havolalarida til konteksti yo'qligi, 1-Bosqich: Arxitekturaviy tozalash va Dublikatlarni bartaraf etish, 🔴 1-Muammo: Botdan WebApp ochilish URL manzillarida `lang` parametri yo'qligi, 1. Qisqa Xulosa (Executive Summary), 2-Bosqich: Bot va Backend tomonida Til parametrlarini to'g'rilash, 2. Ma'lumotlar Oqimi va Sinxronizatsiya Sxemasi, 🔴 2-Muammo: `TranslationProvider`ning faqat `localStorage`ga qotib qolganligi, 3. Aniqlangan Kritik Muammolar va Nuqsonlar (Root Causes) (+11 more)
 
 ### Community 174 - "shadcn CLI Reference"
 Cohesion: 0.40
@@ -1059,9 +1047,13 @@ Nodes (3): File, GitHub issues, Search
 Cohesion: 0.50
 Nodes (3): AI safety checkpoint for destructive commands, Reference, Required workflow
 
-### Community 188 - "Critical Rules"
-Cohesion: 0.29
-Nodes (7): Chat & Messaging → [chat.md](./rules/chat.md), CLI, Component Structure → [composition.md](./rules/composition.md), Critical Rules, Icons → [icons.md](./rules/icons.md), Styling & Tailwind → [styling.md](./rules/styling.md), Use Components, Not Custom Markup → [composition.md](./rules/composition.md)
+### Community 188 - "4. Serverless RPC Endpoints (`tgcloud/endpoints/`)"
+Cohesion: 0.33
+Nodes (6): 4.1 Pagination Offset Resolution (`endpoints/getVacancies.js`, `endpoints/getResumes.js`), 4.2 End-to-End Server-Side Search (`endpoints/getVacancies.js`), 4.3 Employer Details Mapping Fix (`endpoints/getVacancyById.js`), 4.4 Admin Role Demotion Prevention (`endpoints/updateUser.js`), 4.5 Subscriptions Filtering (`endpoints/getSubscriptions.js`), 4. Serverless RPC Endpoints (`tgcloud/endpoints/`)
+
+### Community 189 - "test_core.py"
+Cohesion: 0.06
+Nodes (8): detect_domain(), _write_persisted_file(), TestDiagnosticsContracts, TestDomainDetection, TestMetricMath, resolve(), shipped_invocations(), SkillScriptPathsTest
 
 ### Community 190 - "Pi Tool Mapping"
 Cohesion: 0.50
@@ -1091,45 +1083,29 @@ Nodes (4): File Organization, Self-Contained Skill, Skill with Heavy Reference, 
 Cohesion: 0.50
 Nodes (4): Pattern, Reference, Skill Types, Technique
 
-### Community 309 - "csv"
-Cohesion: 0.08
-Nodes (7): TestFixtureValidation, resolve(), shipped_invocations(), SkillScriptPathsTest, read_rows(), read_rows(), TestTextLayoutDataContracts
-
-### Community 310 - "Prisma Postgres setup"
+### Community 204 - "Prisma Postgres setup"
 Cohesion: 0.40
 Nodes (5): 1. Inspect the project, 2. Reuse or obtain a database, 3. Connect the application, 4. Configure the ORM and verify, Prisma Postgres setup
 
-### Community 311 - "VERIFY GREEN: Pressure Testing"
-Cohesion: 0.40
-Nodes (5): Key Elements of Good Scenarios, Pressure Types, Testing Setup, VERIFY GREEN: Pressure Testing, Writing Pressure Scenarios
-
-### Community 313 - "Example: TDD Skill Bulletproofing"
-Cohesion: 0.50
-Nodes (4): Example: TDD Skill Bulletproofing, Initial Test (Failed), Iteration 1 - Add Counter, Iteration 2 - Add Foundational Principle
-
-### Community 314 - "Muse Tool Mapping"
-Cohesion: 0.33
-Nodes (5): Instructions file, Muse Tool Mapping, Skill invocation, Subagent dispatch, Task tracking
-
 ## Knowledge Gaps
 - **2 isolated node(s):** `RFC-6455`, `@tgcloud/cli`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2012 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **124 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2036 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **120 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `search()` connect `search` to `Commands`, `core.py`, `design_system.py`, `.generate`, `test_core_data_quality.py`, `BM25`, `csv`, `._multi_domain_search`, `Muse Tool Mapping`, `detect_domain`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
-- **Are the 2 inferred relationships involving `search()` (e.g. with ``search` — Search registries` and `Muse Tool Mapping`) actually correct?**
-  _`search()` has 2 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `search()` connect `search` to `validate_data.py`, `Commands`, `Review Focus`, `search_stack`, `._multi_domain_search`, `EasyFindBot — To'liq Loyiha Texnik Auditi va Aniqlangan Buglar Ro'yxati`, `core.py`, `design_system.py`, `.generate`, `BM25`, `test_core.py`?**
+  _High betweenness centrality (0.082) - this node is a cross-community bridge._
+- **Are the 4 inferred relationships involving `search()` (e.g. with ``search` — Search registries` and `Muse Tool Mapping`) actually correct?**
+  _`search()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `RFC-6455`, `@tgcloud/cli` to the rest of the system?**
   _2 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `ref_sdk` be split into smaller, more focused modules?**
-  _Cohesion score 0.10730593607305935 - nodes in this community are weakly interconnected._
-- **Why does `Commands` connect `Commands` to `shadcn CLI Reference`?**
-  _High betweenness centrality (0.048) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `useTranslation()` (e.g. with `3. Frontend & Atomic Design System (`src/`)` and `3. Strict Reusable Design System & Frontend Architecture (`src/`)`) actually correct?**
-  _`useTranslation()` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Should `tgcloud/handlers/callback_query.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.08599439775910364 - nodes in this community are weakly interconnected._
+- **Should `callback_query.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.06736025392347028 - nodes in this community are weakly interconnected._
+- **Why does `Task 3: Serverless RPC Endpoints Pagination, Search & Security Fixes` connect `Review Focus` to `search`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Are the 8 inferred relationships involving `useTranslation()` (e.g. with `3. Frontend & Atomic Design System (`src/`)` and `3. Strict Reusable Design System & Frontend Architecture (`src/`)`) actually correct?**
+  _`useTranslation()` has 8 INFERRED edges - model-reasoned connections that need verification._
+- **Should `validate_data.py` be split into smaller, more focused modules?**
+  _Cohesion score 0.07115384615384615 - nodes in this community are weakly interconnected._

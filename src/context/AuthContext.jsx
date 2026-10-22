@@ -6,10 +6,12 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api.js';
+import { useTranslation } from '../locales/index.jsx';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const { lang, setLang } = useTranslation();
   const [user, setUser] = useState(() => {
     if (typeof window !== 'undefined') {
       const u = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -109,6 +111,13 @@ export function AuthProvider({ children }) {
         return updated;
       });
 
+      // Synchronize language from backend if present
+      if (backendUser.language && ['uz', 'ru', 'en'].includes(backendUser.language)) {
+        if (backendUser.language !== lang) {
+          setLang(backendUser.language);
+        }
+      }
+
       if (data && (data.resume || data.hasResume)) {
         setResume(data.resume || null);
       }
@@ -118,7 +127,7 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [lang, setLang]);
 
   useEffect(() => {
     fetchSession();
@@ -137,14 +146,15 @@ export function AuthProvider({ children }) {
   }, [user, fetchSession]);
 
   const updateLanguage = useCallback(async (newLang) => {
-    if (!user || user.language === newLang) return;
+    if (!['uz', 'ru', 'en'].includes(newLang)) return;
     try {
+      setLang(newLang);
       setUser((prev) => ({ ...prev, language: newLang }));
       await api.updateUser({ language: newLang });
     } catch (err) {
       console.error('[AuthContext] Failed to update language:', err);
     }
-  }, [user]);
+  }, [setLang]);
 
   const value = {
     user,

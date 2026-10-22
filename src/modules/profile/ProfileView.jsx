@@ -15,7 +15,7 @@ import { SubscriptionsModal } from './SubscriptionsModal.jsx';
 import { CreateResumeModal } from '../resumes/CreateResumeModal.jsx';
 
 export function ProfileView({ initialModal = null, onClearInitialModal = null }) {
-  const { user, role, resume, switchRole, loading } = useAuth();
+  const { user, role, resume, switchRole, updateLanguage, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { lang, setLang, t } = useTranslation();
 

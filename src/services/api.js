@@ -56,7 +56,11 @@ function getAppUserInfo() {
     if (tg?.last_name) info.lastName = tg.last_name;
     if (tg?.username) info.username = tg.username;
     if (tg?.photo_url) info.photo_url = tg.photo_url;
-    if (tg?.language_code) info.language = tg.language_code;
+    const urlLang = urlParams.get('lang') || hashParams.get('lang');
+    const storedLang = localStorage.getItem('easyfind_lang');
+    if (urlLang && ['uz', 'ru', 'en'].includes(urlLang)) info.language = urlLang;
+    else if (storedLang && ['uz', 'ru', 'en'].includes(storedLang)) info.language = storedLang;
+    else if (tg?.language_code) info.language = tg.language_code;
 
     // Check parsed user from Telegram.WebApp.initData string
     if ((!info.firstName || !info.username) && window.Telegram?.WebApp?.initData) {

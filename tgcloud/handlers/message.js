@@ -456,13 +456,13 @@ export default async function (message, ctx) {
           [
             {
               text: t(userLang, 'commands.btn_search_jobs'),
-              web_app: { url: `${appUrl}?startapp=jobs` },
+              web_app: { url: `${appUrl}?startapp=jobs&lang=${userLang}` },
             },
           ],
           [
             {
               text: t(userLang, 'commands.btn_post_job'),
-              web_app: { url: `${appUrl}?startapp=post_job` },
+              web_app: { url: `${appUrl}?startapp=post_job&lang=${userLang}` },
             },
           ],
         ],

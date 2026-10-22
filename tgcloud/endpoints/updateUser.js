@@ -1,7 +1,9 @@
-import { db } from 'sdk';
+import { api, db } from 'sdk';
 import { eq, sql } from 'sdk/db';
 import { users } from '../schema.js';
-import { getAuthenticatedUserId } from '../lib/bot/auth.js';
+import { getAuthenticatedUserId, isUserAdmin } from '../lib/bot/auth.js';
+import { buildMainReplyKeyboard } from '../handlers/message.js';
+import { t } from '../lib/locales/index.js';
 
 export default async function (input, ctx) {
   const userId = getAuthenticatedUserId(ctx, input);
@@ -44,6 +46,23 @@ export default async function (input, ctx) {
       .run();
 
     const updatedUser = await db.select().from(users).where(eq(users.tgId, userId)).get();
+
+    // If language was updated, refresh the persistent Telegram bot Reply Keyboard in background
+    if (language && ['uz', 'ru', 'en'].includes(language)) {
+      try {
+        const isAdmin = await isUserAdmin(userId);
+        await api.sendMessage({
+          chat_id: userId,
+          text: t(language, 'commands.language_updated'),
+          reply_markup: {
+            keyboard: buildMainReplyKeyboard(isAdmin, language, updatedUser),
+            resize_keyboard: true,
+          },
+        });
+      } catch (_) {
+        // Non-blocking in case bot notification cannot be sent
+      }
+    }
 
     return {
       success: true,
